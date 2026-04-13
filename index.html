@@ -1,215 +1,2622 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KPI Cash Flow Dashboard — GitHub viewer</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>KPI Cash Flow — Дашборд</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js'"></script>
 <style>
-:root{--bg:#f4f5f9;--bg2:#eef0f5;--sf:#fff;--bd:#e3e6ee;--t1:#0f172a;--t2:#475569;--t3:#94a3b8;--accent:#6366f1;--red:#dc2626;--grn:#059669;--abg:#fffbeb;--abd:#fde68a;--rbg:#fef2f2;--rbd:#fecaca;--gbg:#ecfdf5;--mn:Consolas,ui-monospace,monospace;--sn:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
-*{box-sizing:border-box}html{min-width:1180px}body{margin:0;min-width:1180px;background:var(--bg);color:var(--t1);font-family:var(--sn);font-size:13px}
-.header{background:var(--sf);border-bottom:1px solid var(--bd);padding:20px 32px;position:sticky;top:0;z-index:10;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-.header-inner{max-width:1640px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px}.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px}.title{font-size:16px;font-weight:800}.sub{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:2px}
-.actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.btn{height:40px;padding:10px 16px;border:1px solid var(--bd);border-radius:8px;background:var(--sf);font-weight:800;color:var(--t2);cursor:pointer}.btn.primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:#fff}.btn:hover{border-color:var(--accent);color:var(--accent)}.btn.primary:hover{color:#fff}
-.file-input{display:none}.pill{height:40px;display:flex;align-items:center;padding:9px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--sf);font-family:var(--mn);font-weight:700;color:var(--t2);max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.page{max-width:1640px;margin:0 auto;padding:28px 32px 56px}.tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:4px;margin-bottom:16px;width:max-content;max-width:100%;overflow:auto}.tab{border:0;background:transparent;color:var(--t2);font-weight:800;padding:9px 16px;border-radius:6px;cursor:pointer}.tab.active{background:#fff;color:var(--accent);box-shadow:0 1px 2px rgba(15,23,42,.04)}
-.panel{display:none}.panel.active{display:block}.notice{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:16px;line-height:1.55;box-shadow:0 1px 2px rgba(15,23,42,.04)}.warn{background:var(--abg);border-color:var(--abd);color:#78350f}.err{background:var(--rbg);border-color:var(--rbd);color:#7f1d1d}.muted{display:block;color:var(--t3);font-size:10px;font-weight:700;margin-top:2px}
-.period{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px 18px;margin-bottom:20px}.period-item{display:flex;flex-direction:column;gap:2px}.period-label{font-size:10px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.6px}.period-value{font-family:var(--mn);font-weight:800}.sep{width:1px;height:24px;background:var(--bd)}
-.summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}.summary-item,.card{background:#fff;border:1px solid var(--bd);border-radius:8px;padding:14px 16px;box-shadow:0 1px 2px rgba(15,23,42,.04)}.summary-item{min-width:150px}.summary-label,.card-label{font-size:10px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.06em}.summary-value{font-family:var(--mn);font-size:18px;font-weight:800;margin-top:5px}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}.card{position:relative;overflow:hidden}.card:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--bg2)}.card.s5:before{background:#10b981}.card.s4:before{background:#22c55e}.card.s3:before{background:#f59e0b}.card.s2:before{background:#f97316}.card.s1:before{background:#ef4444}.card-head{display:flex;justify-content:space-between;gap:8px}.score{font-size:10px;font-weight:900;border-radius:12px;padding:3px 8px;background:var(--gbg);color:var(--grn)}.card-value{font-family:var(--mn);font-size:25px;font-weight:800;margin:12px 0 8px}.unit{font-size:12px;color:var(--t3);margin-left:5px}.card-sub{font-family:var(--mn);font-size:11px;color:var(--t3);margin-bottom:10px}.card-foot{border-top:1px solid var(--bd);padding-top:9px;display:flex;justify-content:space-between;color:var(--t3);font-size:11px}
-.table-wrap{overflow:auto;background:#fff;border:1px solid var(--bd);border-radius:10px;margin-bottom:18px;box-shadow:0 1px 2px rgba(15,23,42,.04)}table{border-collapse:separate;border-spacing:0;width:100%;min-width:1120px}th,td{padding:10px;border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}th{position:sticky;top:0;background:#fff;color:var(--t3);font-size:10px;text-transform:uppercase;letter-spacing:.05em;z-index:1}td{font-family:var(--mn);font-size:12px}tr:last-child td{border-bottom:none}.num{text-align:right}.rank{color:var(--t3);font-weight:800}.name{font-family:var(--sn);font-weight:800;white-space:normal;min-width:220px}.risk{color:var(--red)}details{font-family:var(--sn)}summary{cursor:pointer;color:var(--accent);font-weight:800}.nested{background:#f8fafc}
-.stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.bar-panel{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:14px}.bar-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}.bar-sub{font-size:11px;color:var(--t3);font-weight:700;margin-bottom:12px}.bar-row{margin-bottom:10px}.bar-head{display:flex;justify-content:space-between;gap:10px}.bar-name{font-weight:800;overflow:hidden;text-overflow:ellipsis}.bar-meta{font-family:var(--mn);font-weight:800}.track{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin:5px 0}.fill{height:100%;background:linear-gradient(90deg,#10b981,#2563eb)}.bar-foot{display:flex;justify-content:space-between;color:var(--t3);font-family:var(--mn);font-size:10px}
-.wf{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:14px}.wf-row{display:grid;grid-template-columns:170px minmax(200px,1fr) 120px;gap:12px;align-items:center;margin-bottom:10px}.wf-label{font-weight:900}.wf-track{height:20px;background:var(--bg2);border-radius:6px;overflow:hidden}.wf-fill{height:100%;background:linear-gradient(90deg,#2563eb,#10b981)}.wf-fill.neg{background:linear-gradient(90deg,#f97316,#ef4444)}.wf-value{font-family:var(--mn);font-weight:900;text-align:right}.footer{margin-top:28px;color:var(--t3);font-size:11px}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#f4f5f9; --bg2:#eef0f5;
+  --sf:#ffffff;
+  --bd:#e3e6ee; --bd2:#d7dbe6;
+  --t1:#0f172a; --t2:#475569; --t3:#94a3b8; --t4:#cbd5e1;
+
+  --accent:#6366f1; --accent2:#8b5cf6;
+  --grad:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+
+  --red:#dc2626; --rbg:#fef2f2; --rbd:#fecaca;
+  --grn:#059669; --gbg:#ecfdf5; --gbd:#a7f3d0;
+  --amb:#d97706; --abg:#fffbeb; --abd:#fde68a;
+  --blu:#2563eb; --bbg:#eff6ff; --bbd:#bfdbfe;
+  --slt:#64748b; --sbg:#f8fafc; --sbd:#e2e8f0;
+
+  --mn:'JetBrains Mono',ui-monospace,monospace;
+  --sn:'Inter',system-ui,-apple-system,sans-serif;
+
+  --sh1:0 1px 2px rgba(15,23,42,.04);
+  --sh2:0 4px 16px rgba(15,23,42,.06);
+  --sh3:0 10px 32px rgba(15,23,42,.10);
+  --r:14px; --r2:10px; --r3:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ─── Header ─────────────────────────────── */
+.header{background:var(--sf);border-bottom:1px solid var(--bd);padding:22px 32px 26px;position:sticky;top:0;z-index:20;box-shadow:var(--sh1)}
+.header-inner{display:flex;align-items:center;gap:24px;flex-wrap:wrap;max-width:1640px;margin:0 auto}
+
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:38px;height:38px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;box-shadow:0 4px 12px rgba(99,102,241,.3)}
+.brand-text{display:flex;flex-direction:column;line-height:1.1}
+.brand-title{font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
+.brand-sub{font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+
+/* ─── Filters ────────────────────────────── */
+.filters{display:flex;gap:18px;align-items:flex-end;flex:1;justify-content:flex-end;flex-wrap:wrap}
+
+.preset-group{display:flex;flex-direction:column;gap:6px}
+.preset-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.preset-chips{display:flex;gap:6px;background:var(--bg2);padding:4px;border-radius:10px;border:1px solid var(--bd)}
+.chip{padding:7px 14px;border:none;background:transparent;font-family:var(--sn);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap}
+.chip:hover{color:var(--t1)}
+.chip.active{background:var(--sf);color:var(--accent);box-shadow:var(--sh1)}
+
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.fld input{padding:9px 12px;border:1px solid var(--bd);border-radius:var(--r3);font-family:var(--mn);font-size:13px;font-weight:600;width:110px;background:var(--sf);color:var(--t1);transition:border-color .15s,box-shadow .15s}
+.fld.date input{width:145px}
+.fld input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+
+.btn-primary{padding:10px 22px;background:var(--grad);color:#fff;border:none;border-radius:var(--r3);font-weight:700;cursor:pointer;font-size:13px;font-family:var(--sn);transition:transform .1s,box-shadow .15s;box-shadow:0 4px 12px rgba(99,102,241,.25);height:40px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(99,102,241,.35)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-secondary{padding:10px 16px;background:var(--sf);color:var(--t2);border:1px solid var(--bd);border-radius:var(--r3);font-weight:700;cursor:pointer;font-size:13px;font-family:var(--sn);height:40px;transition:border-color .15s,color .15s,box-shadow .15s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 4px 12px rgba(15,23,42,.06)}
+.btn-secondary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+/* ─── Container ──────────────────────────── */
+.container{max-width:1640px;margin:0 auto;padding:28px 32px 56px}
+
+.period-info{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:20px;box-shadow:var(--sh1);flex-wrap:wrap}
+.period-info-item{display:flex;flex-direction:column;gap:2px}
+.period-info-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+.period-info-value{font-family:var(--mn);font-size:12px;color:var(--t1);font-weight:600}
+.period-info-sep{width:1px;height:24px;background:var(--bd)}
+
+/* ─── Tabs ──────────────────────────────── */
+.tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:4px;margin-bottom:16px;width:max-content;max-width:100%;overflow-x:auto}
+.tab-btn{border:none;background:transparent;color:var(--t2);font-family:var(--sn);font-size:12px;font-weight:700;padding:9px 16px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+.tab-btn:hover{color:var(--t1)}
+.tab-btn.active{background:var(--sf);color:var(--accent);box-shadow:var(--sh1)}
+
+/* ─── Multi-select фильтры ────────────── */
+.filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:14px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:16px;box-shadow:var(--sh1)}
+.filter-bar-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-right:2px;align-self:center}
+.filter-reset{margin-left:auto;padding:8px 14px;background:var(--bg2);color:var(--t2);border:1px solid var(--bd);border-radius:var(--r3);font-family:var(--sn);font-weight:600;font-size:12px;cursor:pointer;transition:all .15s}
+.filter-reset:hover{background:var(--rbg);color:var(--red);border-color:var(--rbd)}
+.filter-reset:disabled{opacity:.4;cursor:not-allowed}
+
+.ms{position:relative;display:flex;flex-direction:column;gap:6px;min-width:200px;flex:1 1 200px;max-width:280px}
+.ms-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.ms-trigger{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);cursor:pointer;font-family:var(--sn);font-size:12px;color:var(--t1);font-weight:500;transition:border-color .15s,box-shadow .15s;min-height:38px}
+.ms-trigger:hover{border-color:var(--bd2)}
+.ms-trigger.active{border-color:var(--accent);background:#f5f6ff}
+.ms-trigger.open{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+.ms-trigger-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-trigger-text.ms-placeholder{color:var(--t3);font-weight:500}
+.ms-count{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;line-height:1}
+.ms-arrow{color:var(--t3);font-size:10px;transition:transform .15s}
+.ms-trigger.open .ms-arrow{transform:rotate(180deg)}
+
+.ms-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);box-shadow:var(--sh3);z-index:40;padding:8px;max-height:340px;display:flex;flex-direction:column;animation:fi .12s ease}
+.ms-search{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-family:var(--sn);font-size:12px;margin-bottom:6px;background:var(--bg2);color:var(--t1)}
+.ms-search:focus{outline:none;border-color:var(--accent);background:var(--sf)}
+.ms-list{overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px}
+.ms-opt{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--t1);font-weight:500;line-height:1.3;user-select:none}
+.ms-opt:hover{background:var(--bg2)}
+.ms-opt.on{background:#f5f6ff;color:var(--accent);font-weight:600}
+.ms-opt-box{width:14px;height:14px;border:1.5px solid var(--bd);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--sf);font-size:10px;color:#fff;font-weight:900;line-height:1}
+.ms-opt.on .ms-opt-box{background:var(--accent);border-color:var(--accent)}
+.ms-opt-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-empty{padding:20px 10px;text-align:center;color:var(--t3);font-size:12px}
+.ms-foot{display:flex;gap:6px;padding-top:6px;border-top:1px solid var(--bd);margin-top:6px}
+.ms-foot-btn{flex:1;padding:6px 10px;background:var(--bg2);color:var(--t2);border:none;border-radius:5px;font-family:var(--sn);font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
+.ms-foot-btn:hover{background:var(--bd);color:var(--t1)}
+
+/* ─── Warning panel ──────────────────── */
+.warn-panel{background:var(--abg);border:1px solid var(--abd);border-radius:var(--r2);padding:12px 16px;margin-bottom:16px;font-size:12px;color:#78350f;display:flex;gap:10px;align-items:flex-start}
+.warn-panel-ico{font-size:16px;flex-shrink:0;line-height:1}
+.warn-panel b{font-family:var(--sn);font-weight:700;display:block;margin-bottom:4px;font-size:12px;color:#78350f}
+.warn-panel ul{margin:0;padding-left:18px}
+.warn-panel li{margin:2px 0;line-height:1.45}
+
+.legend{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:20px;box-shadow:var(--sh1);flex-wrap:wrap;font-size:11px;color:var(--t2)}
+.legend-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-right:4px}
+.legend-item{display:inline-flex;align-items:center;gap:5px;font-weight:500}
+.legend-item b{font-family:var(--sn);font-weight:700;color:var(--t1)}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.legend-dot.s5{background:#10b981}
+.legend-dot.s4{background:#22c55e}
+.legend-dot.s3{background:#f59e0b}
+.legend-dot.s2{background:#f97316}
+.legend-dot.s1{background:#ef4444}
+.legend-sep{width:1px;height:14px;background:var(--bd);margin:0 4px}
+
+/* ─── Blocks ────────────────────────────── */
+.block{margin-bottom:28px}
+.block-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-left:2px}
+.block-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.block-ico.b1{background:#ecfdf5;color:#059669}
+.block-ico.b2{background:#eff6ff;color:#2563eb}
+.block-ico.b3{background:#fef3c7;color:#d97706}
+.block-ico.b4{background:#fce7f3;color:#db2777}
+.block-ico.b5{background:#ede9fe;color:#7c3aed}
+.block-title{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.1px}
+.block-desc{font-size:11px;color:var(--t3);font-weight:500;margin-left:4px}
+
+/* ─── Card ───────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px 16px;box-shadow:var(--sh1);position:relative;transition:box-shadow .18s,transform .18s,border-color .18s;animation:fi .35s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--bd2);z-index:2}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--bg2);border-radius:var(--r) var(--r) 0 0;pointer-events:none}
+.card.s5::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.card.s4::before{background:linear-gradient(90deg,#22c55e,#86efac)}
+.card.s3::before{background:linear-gradient(90deg,#f59e0b,#fcd34d)}
+.card.s2::before{background:linear-gradient(90deg,#f97316,#fdba74)}
+.card.s1::before{background:linear-gradient(90deg,#ef4444,#fca5a5)}
+
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.card-label-wrap{display:flex;align-items:center;gap:6px;flex:1}
+.card-label{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;line-height:1.35}
+.card-info{width:16px;height:16px;border-radius:50%;background:var(--bg2);color:var(--t3);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:help;flex-shrink:0;transition:background .15s,color .15s;position:relative;font-family:var(--sn);border:1px solid var(--bd)}
+.card-info:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.card-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);width:280px;padding:12px 14px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:var(--sn);font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;text-transform:none;box-shadow:0 12px 32px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:30;text-align:left;white-space:normal}
+.card-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#0f172a}
+.card-info:hover .card-tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
+.card-tooltip b{color:#a5b4fc;font-weight:700}
+.card-tooltip .tt-target{display:block;margin-top:8px;padding-top:8px;border-top:1px solid rgba(165,180,252,.2);font-family:var(--mn);font-size:11px;color:#c7d2fe}
+.card-tooltip .tt-target b{color:#a5b4fc}
+.card-score{display:inline-flex;align-items:center;gap:4px;font-family:var(--sn);font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.card-score.s5{background:var(--gbg);color:var(--grn)}
+.card-score.s4{background:#ecfdf5;color:#059669}
+.card-score.s3{background:var(--abg);color:var(--amb)}
+.card-score.s2{background:#fff7ed;color:#ea580c}
+.card-score.s1{background:var(--rbg);color:var(--red)}
+
+.card-value{font-family:var(--mn);font-size:26px;font-weight:700;color:var(--t1);line-height:1.05;letter-spacing:-.5px;margin-bottom:4px}
+.card-unit{font-size:12px;color:var(--t3);font-weight:500;margin-left:5px;letter-spacing:0}
+
+.card-sub{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:12px;font-family:var(--mn)}
+
+.card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--bd);gap:8px}
+.card-foot-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.delta{font-family:var(--mn);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
+.delta.up{background:var(--gbg);color:var(--grn)}
+.delta.down{background:var(--rbg);color:var(--red)}
+.delta.flat{background:var(--bg2);color:var(--t3)}
+.delta.inverse-up{background:var(--rbg);color:var(--red)}
+.delta.inverse-down{background:var(--gbg);color:var(--grn)}
+
+.card.err{border-color:var(--rbd);background:var(--rbg)}
+.card.err .card-value{color:var(--red);font-size:15px}
+.card.err::before{background:var(--red)}
+
+/* ─── Empty state / loading ─────────────── */
+.empty-state{text-align:center;padding:80px 20px;color:var(--t3)}
+.empty-state-ico{font-size:48px;margin-bottom:14px;opacity:.5}
+.empty-state-title{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:6px}
+.empty-state-sub{font-size:13px;color:var(--t3)}
+
+.loading{padding:60px;text-align:center;color:var(--t3)}
+.spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(99,102,241,.18);border-radius:50%;border-top-color:var(--accent);animation:spin .9s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--t2);font-weight:500}
+
+/* ─── Error panels ──────────────────────── */
+.err-panel{background:var(--rbg);border:1px solid var(--rbd);border-radius:var(--r2);padding:14px 18px;margin-bottom:18px;font-size:12px;color:#7f1d1d;font-family:var(--mn)}
+.err-panel b{font-family:var(--sn);font-weight:700;display:block;margin-bottom:6px;font-size:13px}
+.err-panel ul{margin:4px 0 0 20px}
+.err-panel li{margin:3px 0;line-height:1.4}
+
+/* ─── Departments tab ───────────────────── */
+.dept-summary{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.dept-summary-item{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:12px 14px;box-shadow:var(--sh1);min-width:160px}
+.dept-summary-label{font-size:10px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.dept-summary-value{font-family:var(--mn);font-size:18px;font-weight:700;color:var(--t1)}
+.dept-table-wrap{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);overflow:auto}
+.dept-table{width:100%;min-width:1480px;border-collapse:separate;border-spacing:0;font-size:12px}
+.dept-table th{position:sticky;top:0;background:var(--sf);z-index:2;text-align:left;color:var(--t3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.55px;padding:12px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.dept-table td{padding:11px 10px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--t1);white-space:nowrap}
+.dept-table tr:last-child td{border-bottom:none}
+.dept-table tbody tr:hover td{background:#f8fafc}
+.dept-table .num{text-align:right;font-family:var(--mn);font-weight:600}
+.dept-table .rank{width:44px;color:var(--t3);font-family:var(--mn);font-weight:700}
+.dept-table .dept-name{font-weight:700;min-width:230px;white-space:normal;line-height:1.3}
+.dept-table .muted{display:block;color:var(--t3);font-size:10px;font-weight:600;margin-top:2px}
+.dept-table .risk{color:var(--red)}
+.dept-table th.has-tip,.dept-detail-table th.has-tip{cursor:help}
+.th-info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;margin-left:5px;background:var(--bg2);border:1px solid var(--bd);color:var(--t3);font-size:10px;font-weight:900;line-height:1;font-family:var(--sn);text-transform:none;letter-spacing:0;vertical-align:middle}
+.dept-table th.has-tip:hover .th-info,.dept-detail-table th.has-tip:hover .th-info{background:var(--accent);border-color:var(--accent);color:#fff}
+.branch-table{min-width:1900px}
+.dept-note{font-size:11px;color:var(--t3);margin:10px 0 16px;line-height:1.5}
+.dept-main-row{cursor:pointer}
+.dept-main-row:hover td{background:#f8fafc}
+.dept-expander{font-family:var(--mn);font-weight:900;color:var(--accent);margin-right:6px}
+.dept-detail-cell{background:#f8fafc!important;padding:14px 18px!important}
+.dept-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.dept-detail-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px}
+.dept-detail-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
+.dept-detail-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden}
+.dept-detail-table th{background:var(--sf);color:var(--t3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.55px;padding:10px 9px;border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
+.dept-detail-table td{padding:9px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.dept-detail-table tr:last-child td{border-bottom:none}
+.dept-detail-scroll{overflow:auto}
+.status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:800;white-space:nowrap}
+.status-badge.ok{background:var(--gbg);color:var(--grn)}
+.status-badge.warn{background:var(--abg);color:var(--amb)}
+.status-badge.risk{background:var(--rbg);color:var(--red)}
+
+/* ─── Inventory tab ─────────────────────── */
+.stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.stock-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:14px 16px;min-width:0}
+.stock-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.stock-panel-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px}
+.stock-panel-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
+.stock-bars{display:flex;flex-direction:column;gap:10px}
+.stock-bar-row{display:flex;flex-direction:column;gap:5px}
+.stock-bar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:12px}
+.stock-bar-name{font-weight:700;color:var(--t1);line-height:1.3;overflow:hidden;text-overflow:ellipsis}
+.stock-bar-meta{font-family:var(--mn);font-size:11px;color:var(--t2);white-space:nowrap;text-align:right}
+.stock-track{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.stock-fill{height:100%;background:linear-gradient(90deg,#10b981,#2563eb);border-radius:4px}
+.stock-bar-foot{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:var(--t3);font-family:var(--mn)}
+.stock-table{min-width:1320px}
+.stock-table-wrap{margin-top:14px}
+.stock-status-note{font-size:11px;color:var(--t3);line-height:1.5;margin:8px 0 12px}
+
+/* ─── Cash cycle / AR aging ─────────────── */
+.cycle-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:16px;margin-bottom:14px}
+.cycle-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px;margin-bottom:4px}
+.cycle-sub{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:14px}
+.wf{display:flex;flex-direction:column;gap:10px}
+.wf-row{display:grid;grid-template-columns:150px minmax(120px,1fr) 120px;gap:12px;align-items:center}
+.wf-label{font-size:12px;font-weight:800;color:var(--t1)}
+.wf-track{height:20px;background:var(--bg2);border-radius:6px;position:relative;overflow:hidden}
+.wf-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#2563eb,#10b981)}
+.wf-fill.neg{background:linear-gradient(90deg,#f97316,#ef4444)}
+.wf-value{font-family:var(--mn);font-size:12px;font-weight:700;color:var(--t1);text-align:right}
+.wf-row.total{padding-top:10px;border-top:1px solid var(--bd)}
+.wf-row.total .wf-label,.wf-row.total .wf-value{font-size:14px}
+
+@media (max-width:900px){
+  .header{padding:18px 20px}
+  .header-inner{align-items:flex-start}
+  .container{padding:20px}
+  .filters{justify-content:flex-start;width:100%}
+  .preset-group{width:100%;min-width:0}
+  .preset-label{width:auto}
+  .preset-chips{width:100%;overflow-x:auto}
+  .chip{flex:0 0 auto}
+  .tabs{width:100%}
+  .stock-grid{grid-template-columns:1fr}
+  .wf-row{grid-template-columns:1fr;gap:6px}
+  .wf-value{text-align:left}
+  .card-tooltip{left:auto;right:0;transform:none;width:min(260px,calc(100vw - 40px))}
+  .card-info:hover .card-tooltip{transform:none}
+}
+
+/* --- GitHub Pages snapshot picker --- */
+.snapshot-bar{max-width:1640px;margin:14px auto 0;padding:12px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--t1)}
+.snapshot-box{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.snapshot-title{font-weight:800;font-size:12px;color:var(--t1);text-transform:uppercase;letter-spacing:.5px}
+.snapshot-sub{font-size:11px;color:var(--t3);font-weight:600;line-height:1.45;flex:1;min-width:360px}
+.snapshot-file{display:none}
+.snapshot-status{font-family:var(--mn);font-size:11px;font-weight:700;color:var(--t2);background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);padding:8px 10px;max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snapshot-status.ok{background:var(--gbg);border-color:var(--gbd);color:var(--grn)}
+.snapshot-status.err{background:var(--rbg);border-color:var(--rbd);color:var(--red)}
+@media(max-width:900px){.snapshot-bar{padding:10px 14px}.snapshot-sub{min-width:100%}.snapshot-status{max-width:100%}}
 </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-inner">
-    <div class="brand"><div class="logo">KPI</div><div><div class="title">Cash Flow Dashboard</div><div class="sub">GitHub viewer · snapshot files</div></div></div>
-    <div class="actions">
-      <label class="btn primary" for="folderInput">Выбрать папку snapshot</label>
-      <input id="folderInput" class="file-input" type="file" webkitdirectory multiple>
-      <div id="folderName" class="pill">Папка не выбрана</div>
-      <button class="btn" onclick="window.print()">Печать / PDF</button>
-    </div>
+<div class="snapshot-bar">
+  <div class="snapshot-box">
+    <div class="snapshot-title">GitHub Pages</div>
+    <div class="snapshot-sub">Откройте snapshot-папку, созданную через export_snapshot.bat. Интерфейс остается как в рабочем React-дашборде, SQL и Flask здесь не используются.</div>
+    <label class="btn-secondary" for="snapshotFolderInput">Выбрать папку snapshot</label>
+    <input id="snapshotFolderInput" class="snapshot-file" type="file" webkitdirectory multiple>
+    <div id="snapshotStatus" class="snapshot-status">Папка не выбрана</div>
   </div>
-</header>
-<main class="page">
-  <div id="app">
-    <div class="notice">
-      Выберите папку, созданную через <b>export_snapshot.bat</b>. Страница работает полностью в браузере: SQL и Python не нужны.
-      Браузер не разрешает читать путь вида <b>C:\...</b> без выбора папки пользователем, поэтому используется кнопка выбора папки.
-    </div>
-  </div>
-</main>
-<script>
-const state = {files:new Map(), data:null, active:"overview"};
-const tabs = [["overview","Общая панель"],["branches","По БЕ"],["departments","По отделам"],["clients","Клиенты"],["ar-aging","ДЗ"],["inventory","Запасы"],["cycle","Цикл"]];
-const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : null; };
-const ru = (v,d=1) => Number(v).toLocaleString("ru-RU",{maximumFractionDigits:d});
-const fmtRub = (v) => { const n=num(v); if(n==null) return "—"; const a=Math.abs(n); if(a>=1e9) return ru(n/1e9,2)+" млрд"; if(a>=1e6) return ru(n/1e6,2)+" млн"; if(a>=1e3) return ru(n/1e3,1)+" тыс"; return ru(n,0); };
-const fmtDays = (v) => { const n=num(v); return n==null ? "—" : ru(n,1); };
-const fmtPct = (v) => { const n=num(v); return n==null ? "—" : ru(n,1)+"%"; };
-const fmtInt = (v) => { const n=num(v); return n==null ? "—" : ru(n,0); };
-const fmtQty = (v) => { const n=num(v); return n==null ? "—" : ru(n,1); };
-const fmtDate = (s) => !s ? "—" : String(s).slice(0,10).split("-").reverse().join(".");
-const arrow = (p) => p==null ? "" : (p>0.05 ? "↑" : (p<-0.05 ? "↓" : "→"));
-const fmtDelta = (p) => p==null || !Number.isFinite(Number(p)) ? "—" : (p>0?"+":"")+ru(p,1)+"%";
-const cellClass = (key) => key.includes("overdue") ? "num risk" : (["rank"].includes(key) ? "rank" : "num");
-const textKeys = new Set(["branch","department","client","manager","bucket","bucket_label","client_name","tov_name","parent_group_name","category_name","bunk_name","stock_status","status"]);
+</div>
+<div id="root">
+  <div class="loading"><div class="spinner"></div><div class="loading-text">Загрузка…</div></div>
+</div>
 
-function relPath(file){
-  const p = (file.webkitRelativePath || file.name).replaceAll("\\","/");
-  const parts = p.split("/");
-  return parts.length > 1 ? parts.slice(1).join("/") : p;
-}
-function readFile(file){ return new Promise((resolve,reject)=>{ const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsText(file,"utf-8"); }); }
-async function readJson(path){
-  const file = state.files.get(path);
-  if(!file) throw new Error("Не найден файл: "+path);
-  return JSON.parse(await readFile(file));
-}
-async function loadSnapshot(fileList){
-  state.files.clear();
-  for (const file of fileList) state.files.set(relPath(file), file);
-  const required = ["manifest.json","kpi/top.json","kpi/branches.json","kpi/departments.json","kpi/clients.json","kpi/ar-aging.json","kpi/inventory.json"];
-  for (const p of required) if(!state.files.has(p)) throw new Error("В выбранной папке нет "+p);
-  state.data = {
-    manifest: await readJson("manifest.json"),
-    top: await readJson("kpi/top.json"),
-    branches: await readJson("kpi/branches.json"),
-    departments: await readJson("kpi/departments.json"),
-    clients: await readJson("kpi/clients.json"),
-    ar: await readJson("kpi/ar-aging.json"),
-    inventory: await readJson("kpi/inventory.json"),
-    branchDetails: {},
-    deptDetails: {}
-  };
-  for (const [path,file] of state.files.entries()) {
-    let m = path.match(/^details\/branch_(.+)_departments\.json$/);
-    if (m) state.data.branchDetails[m[1]] = JSON.parse(await readFile(file));
-    m = path.match(/^details\/department_(.+)_clients\.json$/);
-    if (m) state.data.deptDetails[m[1]] = JSON.parse(await readFile(file));
-  }
-  render();
-}
-function periodBlock(){
-  const p = state.data.top.period || state.data.manifest.period || {};
-  return `<div class="period">
-    <div class="period-item"><div class="period-label">Период</div><div class="period-value">${fmtDate(p.start)} - ${fmtDate(p.end)} (${fmtInt(p.days)} дн.)</div></div>
-    <div class="sep"></div><div class="period-item"><div class="period-label">Ставка фин.</div><div class="period-value">${fmtPct((p.rate||0)*100)} годовых</div></div>
-    <div class="sep"></div><div class="period-item"><div class="period-label">Выгружено</div><div class="period-value">${esc(state.data.manifest.exported_at || "—")}</div></div>
-  </div>`;
-}
-function messages(payload){
-  let html = "";
-  if((payload.warnings||[]).length) html += `<div class="notice warn"><b>Предупреждения</b><ul>${payload.warnings.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`;
-  if((payload.errors||[]).length) html += `<div class="notice err"><b>Ошибки</b><ul>${payload.errors.map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div>`;
-  return html;
-}
-function card(c){
-  const value = c.unit === "дни" ? fmtDays(c.value) : fmtRub(c.value);
-  const score = c.score == null ? "" : `<span class="score">● ${fmtInt(c.score)}/5</span>`;
-  return `<div class="card ${c.score?`s${c.score}`:""}"><div class="card-head"><div class="card-label">${esc(c.label)}</div>${score}</div>
-    <div class="card-value">${value}<span class="unit">${esc(c.unit||"")}</span></div>
-    <div class="card-sub">${esc(c.id||"")}</div><div class="card-foot"><span>vs прошлый период</span><b>${arrow(c.delta_pct)} ${fmtDelta(c.delta_pct)}</b></div></div>`;
-}
-function summary(items){ return `<div class="summary">${items.map(([l,v])=>`<div class="summary-item"><div class="summary-label">${esc(l)}</div><div class="summary-value">${esc(v)}</div></div>`).join("")}</div>`; }
-function table(cols, rows, empty="Нет данных"){
-  const head = cols.map(c=>`<th class="${c.cls||(!textKeys.has(c.key)&&c.key!=="rank"?"num":"")}">${esc(c.label)}</th>`).join("");
-  const body = !rows?.length ? `<tr><td colspan="${cols.length}" class="muted" style="text-align:center;padding:28px"> ${esc(empty)} </td></tr>` :
-    rows.map(r=>`<tr>${cols.map(c=>{
-      const cls = c.cls || (textKeys.has(c.key) ? "" : cellClass(c.key));
-      const val = c.f ? c.f(r[c.key],r) : (textKeys.has(c.key) ? esc(r[c.key]||"—") : fmtRub(r[c.key]));
-      return `<td class="${cls}">${val}</td>`;
-    }).join("")}</tr>`).join("");
-  return `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
-function nestedTable(title, rows, cols, empty){
-  return `<details><summary>${esc(title)}</summary><div class="nested">${table(cols, rows, empty)}</div></details>`;
-}
-function overview(){
-  return messages(state.data.top) + `<div class="cards">${(state.data.top.cards||[]).map(card).join("")}</div>`;
-}
-const branchCols = [
-  {key:"rank",label:"#",f:fmtInt},{key:"branch",label:"Бизнес-единица",cls:"name",f:esc},{key:"revenue_rub",label:"Выручка",f:fmtRub},{key:"revenue_share_pct",label:"Доля",f:fmtPct},{key:"margin_rub",label:"Маржа",f:fmtRub},{key:"margin_pct",label:"Марж.%",f:fmtPct},{key:"cash_adj_margin_rub",label:"Cash-adj",f:fmtRub},{key:"ar_rub",label:"ДЗ",f:fmtRub},{key:"ar_advance_rub",label:"Авансы пок.",f:fmtRub},{key:"overdue_ar_rub",label:"Проср. ДЗ",f:fmtRub},{key:"dso_days",label:"DSO",f:fmtDays},{key:"inventory_rub",label:"Запасы",f:fmtRub},{key:"dio_days",label:"DIO",f:fmtDays},{key:"ap_rub",label:"КЗ сырье",f:fmtRub},{key:"ap_advance_rub",label:"Авансы пост.",f:fmtRub},{key:"overdue_ap_rub",label:"Проср. КЗ",f:fmtRub},{key:"dpo_days",label:"DPO",f:fmtDays},{key:"ccc_days",label:"CCC",f:fmtDays}
-];
-const deptCols = [
-  {key:"rank",label:"#",f:fmtInt},{key:"department",label:"Отдел",cls:"name",f:esc},{key:"revenue_rub",label:"Выручка",f:fmtRub},{key:"revenue_share_pct",label:"Доля",f:fmtPct},{key:"revenue_delta_pct",label:"Δ выр.",f:fmtDelta},{key:"margin_rub",label:"Маржа",f:fmtRub},{key:"margin_pct",label:"Марж.%",f:fmtPct},{key:"cash_adj_margin_rub",label:"Cash-adj",f:fmtRub},{key:"ar_rub",label:"ДЗ",f:fmtRub},{key:"ar_advance_rub",label:"Авансы пок.",f:fmtRub},{key:"overdue_ar_rub",label:"Просрочка",f:fmtRub},{key:"dso_days",label:"DSO",f:fmtDays},{key:"ar_fin_cost_rub",label:"Ст-ть ДЗ",f:fmtRub}
-];
-const clientCols = [
-  {key:"rank",label:"#",f:fmtInt},{key:"client",label:"Клиент",cls:"name",f:esc},{key:"manager",label:"Менеджер",f:v=>esc(v||"—")},{key:"revenue_rub",label:"Выручка",f:fmtRub},{key:"margin_rub",label:"Маржа",f:fmtRub},{key:"margin_pct",label:"Марж.%",f:fmtPct},{key:"avg_ar_rub",label:"Сред. ДЗ",f:fmtRub},{key:"ar_rub",label:"ДЗ",f:fmtRub},{key:"overdue_ar_rub",label:"Просрочка",f:fmtRub},{key:"dso_days",label:"DSO",f:fmtDays},{key:"ar_fin_cost_rub",label:"Стоимость отсрочки",f:fmtRub},{key:"cash_adj_margin_rub",label:"Cash-adj",f:fmtRub},{key:"cash_adj_margin_pct",label:"Cash.%",f:fmtPct},{key:"status",label:"Статус",f:(v,r)=>`<b>${esc(v||"—")}</b><span class="muted">${esc(r.status_reason||"")}</span>`}
-];
-function branches(){
-  const data = state.data.branches, t=data.totals||{};
-  const rows = data.rows||[];
-  let body = "";
-  for (const r of rows) {
-    body += table(branchCols, [r], "");
-    const det = state.data.branchDetails[String(r.branch_id)];
-    if (det) body += nestedTable(`Отделы БЕ: ${r.branch}`, det.rows||[], deptCols, "Нет отделов");
-  }
-  return messages(data) + summary([["БЕ",fmtInt(t.branches||rows.length)],["Выручка",fmtRub(t.revenue_rub)],["ДЗ",fmtRub(t.ar_rub)],["Запасы",fmtRub(t.inventory_rub)],["КЗ сырье",fmtRub(t.ap_rub)],["CCC",fmtDays(t.ccc_days)+" дн."]]) + (body || table(branchCols, [], "Нет данных по БЕ"));
-}
-function departments(){
-  const data=state.data.departments,t=data.totals||{},rows=data.rows||[];
-  let body="";
-  for (const r of rows) {
-    body += table(deptCols, [r], "");
-    const det = state.data.deptDetails[String(r.department_id)];
-    if (det) body += nestedTable(`Клиенты отдела: ${r.department}`, det.rows||[], clientCols, "Нет клиентов");
-  }
-  return messages(data)+summary([["Отделов",fmtInt(t.departments||rows.length)],["Выручка",fmtRub(t.revenue_rub)],["Маржа",fmtRub(t.margin_rub)],["ДЗ",fmtRub(t.ar_rub)],["Просрочка",fmtRub(t.overdue_ar_rub)]])+(body||table(deptCols,[],"Нет данных по отделам"));
-}
-function clients(){
-  const data=state.data.clients,t=data.totals||{};
-  return messages(data)+summary([["Клиентов",fmtInt(t.clients)],["Риск",fmtInt(t.risk_clients)],["Выручка",fmtRub(t.revenue_rub)],["ДЗ",fmtRub(t.ar_rub)],["Cash-adj",fmtRub(t.cash_adj_margin_rub)]])+table(clientCols,data.rows||[],"Нет данных по клиентам");
-}
-function stockBars(title, sub, rows, labelKey, countKey="sku_count", countLabel="SKU"){
-  rows = rows || []; const max = Math.max(1,...rows.map(r=>Math.abs(Number(r.value_rub)||0)));
-  return `<div class="bar-panel"><div class="bar-title">${esc(title)}</div><div class="bar-sub">${esc(sub)}</div>${rows.slice(0,12).map(r=>{
-    const v=Number(r.value_rub)||0, w=Math.max(1,Math.abs(v)/max*100), name=r[labelKey]||r.bucket||"Без названия";
-    return `<div class="bar-row"><div class="bar-head"><div class="bar-name">${esc(name)}</div><div class="bar-meta">${fmtRub(v)}</div></div><div class="track"><div class="fill" style="width:${w}%"></div></div><div class="bar-foot"><span>${fmtPct(r.share_pct)} от итога</span><span>${fmtInt(r[countKey])} ${countLabel}</span></div></div>`;
-  }).join("") || `<div class="muted">Нет данных</div>`}</div>`;
-}
-function arAging(){
-  const data=state.data.ar,t=data.totals||{};
-  const bucketCols=[{key:"bucket_label",label:"Срок",cls:"name",f:esc},{key:"value_rub",label:"Сумма",f:fmtRub},{key:"share_pct",label:"Доля",f:fmtPct},{key:"client_count",label:"Клиентов",f:fmtInt}];
-  const overdueCols=[{key:"client_name",label:"Клиент",cls:"name",f:esc},{key:"ar_rub",label:"ДЗ",f:fmtRub},{key:"overdue_rub",label:"Просрочка",f:fmtRub},{key:"overdue_share_pct",label:"Доля проср.",f:fmtPct},{key:"d_1_30_rub",label:"1-30",f:fmtRub},{key:"d_31_60_rub",label:"31-60",f:fmtRub},{key:"d_61_90_rub",label:"61-90",f:fmtRub},{key:"d_90_plus_rub",label:"90+",f:fmtRub},{key:"open_docs_count",label:"Док.",f:fmtInt},{key:"max_overdue_days",label:"Макс. срок",f:fmtDays}];
-  return messages(data)+summary([["ДЗ FIFO",fmtRub(t.ar_rub)],["В срок",fmtRub(t.in_terms_rub)],["Просрочка",fmtRub(t.overdue_rub)],["Клиентов с ДЗ",fmtInt(t.clients_count)],["Клиентов с проср.",fmtInt(t.overdue_clients_count)]])+table(bucketCols,data.buckets||[],"Нет данных по срокам")+table(overdueCols,data.top_clients||[],"Нет клиентов с просрочкой");
-}
-function inventory(){
-  const data=state.data.inventory,t=data.totals||{};
-  const skuCols=[{key:"tov_name",label:"SKU",cls:"name",f:esc},{key:"bucket",label:"Бакет",f:esc},{key:"parent_group_name",label:"Группа",f:esc},{key:"value_rub",label:"Остаток",f:fmtRub},{key:"share_pct",label:"Доля",f:fmtPct},{key:"qty_end",label:"Кол-во",f:fmtQty},{key:"bunk_count",label:"Складов",f:fmtInt},{key:"stock_status",label:"Статус",f:esc}];
-  return messages(data)+summary([["Запасы",fmtRub(t.inventory_rub)],["SKU",fmtInt(t.sku_count)],["Складов",fmtInt(t.bunk_count)],["Slow 90+",fmtRub(t.slow_90_rub)],["Неликвид 180+",fmtRub(t.dead_180_rub)]])+`<div class="stock-grid">${stockBars("Бакеты","Сырье, упаковка, товары",data.buckets,"bucket")}${stockBars("Группы","ТОП групп по деньгам",data.groups,"parent_group_name")}${stockBars("Категории","ТОП категорий",data.categories,"category_name")}${stockBars("Склады","Где заморожены деньги",data.warehouses,"bunk_name")}</div>`+table(skuCols,data.top_sku||[],"Нет данных по SKU");
-}
-function cycle(){
-  const by={}; (state.data.top.cards||[]).forEach(c=>by[c.id]=c);
-  const dio=Number(by.dio_days?.value)||0,dso=Number(by.dso_days?.value)||0,dpo=Number(by.dpo_days?.value)||0,ccc=Number(by.ccc_days?.value)||0,max=Math.max(1,Math.abs(dio),Math.abs(dso),Math.abs(dpo),Math.abs(ccc));
-  const row=(label,sub,val,signed=val)=>`<div class="wf-row"><div><div class="wf-label">${label}</div><span class="muted">${sub}</span></div><div class="wf-track"><div class="wf-fill ${signed<0?"neg":""}" style="width:${Math.max(2,Math.abs(signed)/max*100)}%"></div></div><div class="wf-value">${signed<0?"−":""}${fmtDays(Math.abs(val))} дн.</div></div>`;
-  return summary([["DIO",fmtDays(dio)+" дн."],["DSO",fmtDays(dso)+" дн."],["DPO",fmtDays(dpo)+" дн."],["CCC",fmtDays(ccc)+" дн."],["Стоимость ОК",fmtRub(by.wc_fin_cost_rub?.value)]])+`<div class="wf">${row("DIO","запасы",dio)}${row("DSO","клиенты",dso)}${row("− DPO","поставщики",dpo,-dpo)}${row("= CCC","итог",ccc,ccc)}</div>`;
-}
-function panel(id){
-  if(!state.data) return "";
-  return ({overview,branches,departments,clients,"ar-aging":arAging,inventory,cycle}[id] || overview)();
-}
-function render(){
-  const app=document.getElementById("app");
-  if(!state.data) return;
-  app.innerHTML = `<div class="tabs">${tabs.map(([id,label])=>`<button class="tab ${state.active===id?"active":""}" data-tab="${id}">${label}</button>`).join("")}</div>${periodBlock()}<section class="panel active">${panel(state.active)}</section><div class="footer">Данные прочитаны из выбранной snapshot-папки. SQL, Python и Flask не используются.</div>`;
-  app.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{state.active=btn.dataset.tab; render();}));
-}
-document.getElementById("folderInput").addEventListener("change", async (ev)=>{
-  try{
-    const files = Array.from(ev.target.files||[]);
-    if(!files.length) return;
-    document.getElementById("folderName").textContent = files[0].webkitRelativePath?.split("/")[0] || "snapshot";
-    document.getElementById("app").innerHTML = `<div class="notice">Читаю snapshot-файлы...</div>`;
-    await loadSnapshot(files);
-  }catch(e){
-    document.getElementById("app").innerHTML = `<div class="notice err"><b>Не удалось открыть snapshot</b><br>${esc(e.message||e)}</div>`;
-  }
+<script>
+// Глобальный перехват ошибок.
+window.__BOOT_OK = false;
+window.addEventListener("error", function(ev) {
+  if (window.__BOOT_OK) return;
+  var root = document.getElementById("root");
+  if (!root) return;
+  root.innerHTML =
+    '<div style="padding:24px;max-width:760px;margin:40px auto;font-family:system-ui;line-height:1.55;">' +
+      '<h2 style="color:#b91c1c;margin-bottom:10px;">Ошибка инициализации</h2>' +
+      '<div style="padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-family:monospace;font-size:12px;color:#7f1d1d;white-space:pre-wrap;">' +
+        (ev.message || 'unknown') + '\n' + (ev.filename || '') + ':' + (ev.lineno || '?') + ':' + (ev.colno || '?') +
+      '</div></div>';
 });
+setTimeout(function() {
+  if (window.__BOOT_OK) return;
+  var root = document.getElementById("root");
+  if (root && root.querySelector(".spinner")) {
+    root.innerHTML = '<div style="padding:24px;max-width:760px;margin:40px auto;font-family:system-ui;"><h2 style="color:#b91c1c;">Интерфейс не смонтировался за 10 секунд</h2><p>F12 → Console.</p></div>';
+  }
+}, 10000);
+</script>
+
+
+<script>
+(function(){
+  window.KPI_GITHUB_SNAPSHOT = true;
+  const STORE = {files:new Map(), cache:new Map(), ready:false, manifest:null, folderName:""};
+  window.KPI_SNAPSHOT_STORE = STORE;
+  const REQUIRED = ["manifest.json","kpi/top.json","kpi/branches.json","kpi/departments.json","kpi/clients.json","kpi/ar-aging.json","kpi/inventory.json"];
+  const DICT_MAP = {
+    "/api/dict/branches":"dict/branches.json",
+    "/api/dict/managers":"dict/managers.json",
+    "/api/dict/departments":"dict/departments.json",
+    "/api/dict/clients":"dict/clients.json",
+    "/api/dict/counterparties":"dict/counterparties.json",
+    "/api/dict/sale-types":"dict/sale_types.json",
+    "/api/dict/auction":"dict/auction.json"
+  };
+  const FILTER_KEYS = ["bu_ids","mol_ids","dept_ids","parole_ids","pred_ids","sale_type_ids","auction_flags"];
+  const statusEl = () => document.getElementById("snapshotStatus");
+  const setStatus = (text, cls) => {
+    const el = statusEl();
+    if (!el) return;
+    el.textContent = text;
+    el.className = "snapshot-status" + (cls ? " " + cls : "");
+  };
+  const relPath = (file) => {
+    const p = String(file.webkitRelativePath || file.name || "").replace(/\\/g,"/");
+    const parts = p.split("/").filter(Boolean);
+    return parts.length > 1 ? parts.slice(1).join("/") : p;
+  };
+  const readFile = (file) => new Promise((resolve,reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = () => reject(r.error || new Error("File read error"));
+    r.readAsText(file, "utf-8");
+  });
+  const readJson = async (path) => {
+    if (STORE.cache.has(path)) return STORE.cache.get(path);
+    const file = STORE.files.get(path);
+    if (!file) throw new Error("В snapshot-папке нет файла: " + path);
+    const payload = JSON.parse(await readFile(file));
+    STORE.cache.set(path, payload);
+    return payload;
+  };
+  const clone = (payload) => JSON.parse(JSON.stringify(payload || {}));
+  const jsonResponse = (payload, status) => new Response(JSON.stringify(payload), {
+    status: status || 200,
+    headers: {"Content-Type":"application/json; charset=utf-8"}
+  });
+  const fail = (message, status) => jsonResponse({ok:false, snapshot_mode:true, source:"github-pages", error:message}, status || 400);
+  const hasFilters = (params, allow) => {
+    const allowed = new Set(allow || []);
+    return FILTER_KEYS.some(k => !allowed.has(k) && String(params.get(k) || "").trim());
+  };
+  const singleValue = (params, key) => {
+    const raw = String(params.get(key) || "").trim();
+    if (!raw || raw.includes(",")) return null;
+    return raw;
+  };
+  const withNotice = (payload) => {
+    const p = clone(payload);
+    p.snapshot_mode = true;
+    p.source = "github-pages";
+    const period = STORE.manifest && STORE.manifest.period;
+    if (period) {
+      const msg = `GitHub Pages: показан заранее выгруженный snapshot ${period.start} - ${period.end}. Новые периоды и произвольные фильтры без SQL не пересчитываются.`;
+      p.warnings = [...(p.warnings || []), msg];
+    }
+    return p;
+  };
+  const unsupported = () => fail("Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и раскрытия БЕ/отделов, которые заранее экспортированы. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.", 422);
+  const payloadForApi = async (url) => {
+    const path = url.pathname;
+    const params = url.searchParams;
+    if (path === "/api/ping") {
+      return {ok:true, db:false, snapshot_mode:true, source:"github-pages", folder:STORE.folderName, manifest:STORE.manifest};
+    }
+    if (DICT_MAP[path]) {
+      try { return withNotice(await readJson(DICT_MAP[path])); }
+      catch (e) { return {ok:true, items:[], count:0, snapshot_mode:true, source:"github-pages", warning:String(e.message || e)}; }
+    }
+    if (path === "/api/kpi/top") {
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/top.json"));
+    }
+    if (path === "/api/kpi/branches") {
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/branches.json"));
+    }
+    if (path === "/api/kpi/departments") {
+      const buId = singleValue(params, "bu_ids");
+      if (buId && !hasFilters(params, ["bu_ids"])) {
+        return withNotice(await readJson(`details/branch_${buId}_departments.json`));
+      }
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/departments.json"));
+    }
+    if (path === "/api/kpi/clients") {
+      const deptId = singleValue(params, "dept_ids");
+      if (deptId && !hasFilters(params, ["dept_ids"])) {
+        return withNotice(await readJson(`details/department_${deptId}_clients.json`));
+      }
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/clients.json"));
+    }
+    if (path === "/api/kpi/ar-aging") {
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/ar-aging.json"));
+    }
+    if (path === "/api/kpi/inventory") {
+      if (hasFilters(params)) return unsupported();
+      return withNotice(await readJson("kpi/inventory.json"));
+    }
+    return null;
+  };
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = async function(input, init) {
+    const raw = typeof input === "string" ? input : (input && input.url) || "";
+    let url;
+    try { url = new URL(raw, window.location.href); } catch(e) { return nativeFetch(input, init); }
+    if (!url.pathname.startsWith("/api/")) return nativeFetch(input, init);
+    if (!STORE.ready) return fail("Сначала нажмите 'Выбрать папку snapshot' и выберите папку с manifest.json.", 428);
+    try {
+      const payload = await payloadForApi(url);
+      return payload ? jsonResponse(payload) : fail("Неизвестный API endpoint в snapshot-режиме: " + url.pathname, 404);
+    } catch(e) {
+      return fail(e.message || String(e), 500);
+    }
+  };
+  const onFolderChange = async (ev) => {
+    try {
+      STORE.files.clear();
+      STORE.cache.clear();
+      STORE.ready = false;
+      STORE.manifest = null;
+      const files = Array.from(ev.target.files || []);
+      if (!files.length) return;
+      STORE.folderName = (files[0].webkitRelativePath || "snapshot").split("/")[0] || "snapshot";
+      for (const file of files) STORE.files.set(relPath(file), file);
+      const missing = REQUIRED.filter(p => !STORE.files.has(p));
+      if (missing.length) throw new Error("Не хватает файлов: " + missing.join(", "));
+      STORE.manifest = await readJson("manifest.json");
+      STORE.ready = true;
+      const p = STORE.manifest.period || {};
+      setStatus(`Готово: ${STORE.folderName} · ${p.start || "?"} - ${p.end || "?"}`, "ok");
+      window.dispatchEvent(new CustomEvent("kpi-snapshot-ready", {detail:{manifest:STORE.manifest, period:p}}));
+    } catch(e) {
+      STORE.ready = false;
+      setStatus(e.message || String(e), "err");
+    }
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("snapshotFolderInput");
+    if (input) input.addEventListener("change", onFolderChange);
+  });
+})();
+</script>
+<script type="text/babel">
+const {useState, useMemo, useCallback, useEffect, useRef} = React;
+
+const API = "/api";
+
+// ─── Описание фильтров ────────────────────────────
+const FILTER_DEFS = [
+  {key:"bu_ids",     endpoint:"/dict/branches",       label:"Бизнес-единицы", placeholder:"Все БЕ"},
+  {key:"mol_ids",    endpoint:"/dict/managers",       label:"Менеджеры",    placeholder:"Все менеджеры"},
+  {key:"dept_ids",   endpoint:"/dict/departments",    label:"Отделы",       placeholder:"Все отделы"},
+  {key:"parole_ids", endpoint:"/dict/clients",        label:"Клиенты",      placeholder:"Все клиенты"},
+  {key:"pred_ids",   endpoint:"/dict/counterparties", label:"Контрагенты",  placeholder:"Все контрагенты"},
+  {key:"sale_type_ids", endpoint:"/dict/sale-types",  label:"Тип продажи",  placeholder:"Все типы"},
+  {key:"auction_flags", endpoint:"/dict/auction",     label:"Аукцион",      placeholder:"Все продажи"},
+];
+
+// ─── Пресеты периодов ──────────────────────────────
+const PRESETS = [
+  {id:"w",   label:"Неделя",     days:7},
+  {id:"2w",  label:"2 недели",   days:14},
+  {id:"m",   label:"Месяц",      days:30},
+  {id:"q",   label:"Квартал",    days:90},
+  {id:"h",   label:"Полугодие",  days:180},
+  {id:"y",   label:"Год",        days:365},
+  {id:"cst", label:"Свой",       days:null},
+];
+
+// ─── Группировка карточек по блокам ───────────────
+// sub — короткая формула, tip — описание смысла для всплывашки при ⓘ.
+const BLOCKS = [
+  {
+    id:"result", title:"Результат", desc:"выручка и маржа за период", icoClass:"b1", ico:"💰",
+    cards:[
+      {
+        id:"revenue_rub",
+        sub:"SUM строк продаж SDOC_TOV",
+        tip:"Общая сумма отгрузок клиентам за период. Отвечает на вопрос «сколько продали», но НЕ на «сколько получили денег». Выручка может расти, а денег на счету — нет."
+      },
+      {
+        id:"margin_rub",
+        sub:"Выручка − себестоимость (COGS)",
+        tip:"Выручка минус прямые переменные затраты (сырьё, упаковка, производство). Показывает заработок ДО учёта затрат на финансирование оборотного капитала."
+      },
+      {
+        id:"cash_adj_margin_rub",
+        sub:"Маржа − ст-ть ДЗ − ст-ть запаса",
+        tip:"Денежная маржа: бумажная маржа минус плата за деньги, замороженные в дебиторке и запасах. Показывает РЕАЛЬНЫЙ денежный эффект, а не виртуальную прибыль."
+      },
+    ]
+  },
+  {
+    id:"clients", title:"Деньги в клиентах", desc:"дебиторка, авансы и качество ДЗ", icoClass:"b2", ico:"👥",
+    cards:[
+      {
+        id:"ar_rub",
+        sub:"Открытый долг FIFO по R_DBT_BOOK",
+        tip:"Сколько клиенты должны нам прямо сейчас. Это «чужие» деньги, которые мы вынуждены финансировать собственными. Чем больше — тем больше кассового давления."
+      },
+      {
+        id:"ar_advance_rub",
+        sub:"Кредиторка покупателей: авансы по FIFO",
+        tip:"Сколько клиенты уже заплатили вперёд по договорам. Это наша кредиторка перед покупателями: деньги уже у нас, но обязательство отгрузить или зачесть оплату ещё осталось."
+      },
+      {
+        id:"overdue_ar_rub",
+        sub:"Просроченный открытый долг FIFO",
+        tip:"Часть дебиторки, срок оплаты которой уже прошёл. Самый рисковый кусок — может превратиться в невозврат. Цель — держать на уровне, близком к нулю."
+      },
+      {
+        id:"dso_days",
+        sub:"Сред. ДЗ / Выручка × дни периода",
+        tip:"Days Sales Outstanding — сколько дней в среднем клиент держит у себя наши деньги между отгрузкой и оплатой. Чем меньше — тем быстрее деньги возвращаются в оборот."
+      },
+    ]
+  },
+  {
+    id:"stock", title:"Деньги в запасах", desc:"остатки складов и их оборачиваемость", icoClass:"b3", ico:"📦",
+    cards:[
+      {
+        id:"inventory_rub",
+        sub:"Товары, сырьё, упаковка × цена USD × курс",
+        tip:"Денежная оценка коммерческих складских остатков: товары, сырьё и упаковка. ТМЦ, запчасти, стройка, ОС, животноводство и стоповые категории исключены."
+      },
+      {
+        id:"dio_days",
+        sub:"Сред. запас / COGS × дни периода",
+        tip:"Days Inventory Outstanding — сколько дней товар лежит на складе до отгрузки. Чем меньше — тем быстрее цикл. Большой DIO = либо затарились, либо медленно продаём."
+      },
+    ]
+  },
+  {
+    id:"suppliers", title:"Деньги от поставщиков", desc:"кредиторка и условия закупки", icoClass:"b4", ico:"🏭",
+    cards:[
+      {
+        id:"ap_rub",
+        sub:"Активные сырьевые поставщики: открытый долг FIFO",
+        tip:"Сколько мы должны активным сырьевым поставщикам прямо сейчас. Архивные и удалённые контрагенты не входят в расчёт."
+      },
+      {
+        id:"ap_advance_rub",
+        sub:"Предоплаты активным сырьевым поставщикам",
+        tip:"Сколько денег мы уже заплатили активным сырьевым поставщикам вперёд, но поставка или зачёт ещё не закрыли аванс. Это не кредиторка, а наши деньги у поставщиков."
+      },
+      {
+        id:"overdue_ap_rub",
+        sub:"Просрочка активных сырьевых поставщиков FIFO",
+        tip:"Часть кредиторки активным сырьевым поставщикам, срок оплаты которой уже прошёл. Архивные и удалённые контрагенты не входят в расчёт."
+      },
+      {
+        id:"dpo_days",
+        sub:"Сред. КЗ / COGS × дни периода",
+        tip:"Days Payable Outstanding — сколько дней мы в среднем тянем с оплатой поставщикам. Больше — лучше (меньше потребность в своих деньгах), но в разумных пределах, чтобы не испортить отношения."
+      },
+    ]
+  },
+  {
+    id:"cycle", title:"Денежный цикл", desc:"сколько дней мы финансируем бизнес сами", icoClass:"b5", ico:"⏱",
+    cards:[
+      {
+        id:"ccc_days",
+        sub:"DIO + DSO − DPO",
+        tip:"Cash Conversion Cycle — главный показатель. Сколько дней между «заплатили поставщику» и «получили деньги от клиента». CCC > 0 — финансируем сами своими деньгами; CCC = 0 — идеальный баланс; CCC < 0 — сильная модель (сначала получаем, потом платим)."
+      },
+      {
+        id:"wc_fin_cost_rub",
+        sub:"(ДЗ + Запас + авансы пост. − КЗ − авансы пок.) × ставка",
+        tip:"Денежный эффект оборотного капитала за период. Плюс означает стоимость замороженных денег, минус — нас финансируют авансы покупателей и кредиторка поставщиков."
+      },
+    ]
+  },
+];
+
+// ─── Утилиты форматирования ───────────────────────
+const fmtRub = (n) => {
+  if (n == null || isNaN(n)) return "—";
+  const abs = Math.abs(n);
+  if (abs >= 1e9) return (n/1e9).toLocaleString("ru-RU",{maximumFractionDigits:2}) + " млрд";
+  if (abs >= 1e6) return (n/1e6).toLocaleString("ru-RU",{maximumFractionDigits:2}) + " млн";
+  if (abs >= 1e3) return (n/1e3).toLocaleString("ru-RU",{maximumFractionDigits:1}) + " тыс";
+  return n.toLocaleString("ru-RU",{maximumFractionDigits:0});
+};
+const fmtDays = (n) => (n==null||isNaN(n)) ? "—" : n.toLocaleString("ru-RU",{maximumFractionDigits:1});
+const fmtVal  = (card) => card.unit === "дни" ? fmtDays(card.value) : fmtRub(card.value);
+const fmtDelta = (p) => (p==null||isNaN(p)) ? "—" : (p>0?"+":"") + p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
+const fmtPct = (p) => (p==null||isNaN(p)) ? "—" : p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
+const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
+const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
+const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
+const fmtDate = (s) => {
+  if (!s) return "—";
+  const [y,m,d] = s.split("-");
+  return d + "." + m + "." + y;
+};
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const pad2 = (n) => String(n).padStart(2, "0");
+const todayIso = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+};
+const dateValue = (iso) => {
+  if (!DATE_RE.test(iso || "")) return NaN;
+  const [y,m,d] = iso.split("-").map(Number);
+  return Date.UTC(y, m-1, d);
+};
+const addDaysIso = (iso, days) => new Date(dateValue(iso) + days*86400000).toISOString().slice(0,10);
+const daysInclusive = (start, end) => {
+  const startValue = dateValue(start);
+  const endValue = dateValue(end);
+  if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return NaN;
+  return Math.floor((endValue - startValue) / 86400000) + 1;
+};
+
+const deltaClass = (card) => {
+  const p = card.delta_pct;
+  if (p == null) return "flat";
+  if (Math.abs(p) < 0.01) return "flat";
+  if (card.lower_better) return p < 0 ? "inverse-down" : "inverse-up";
+  return p > 0 ? "up" : "down";
+};
+const deltaClassRaw = (p, lowerBetter=false) => {
+  if (p == null || isNaN(p)) return "flat";
+  if (Math.abs(p) < 0.01) return "flat";
+  if (lowerBetter) return p < 0 ? "inverse-down" : "inverse-up";
+  return p > 0 ? "up" : "down";
+};
+
+const COL_TIPS = {
+  revenue: "Выручка за выбранный период: сколько отгрузили/продали по строкам SDOC_TOV. Это не поступление денег.",
+  revenueShare: "Доля строки в выручке текущей вкладки. Например, доля клиента в выручке отдела или БЕ.",
+  revenueDelta: "Как изменилась выручка относительно предыдущего такого же периода.",
+  margin: "Маржа = выручка − себестоимость (COGS). Это прибыль до учета стоимости отсрочек, ДЗ и запасов.",
+  marginPct: "Марж.% = маржа / выручка × 100%. Показывает, какая часть продаж остается маржей.",
+  cashAdj: "Cash-adj — денежная маржа. Это маржа минус расчетная стоимость денег, замороженных в ДЗ и запасах. Если показатель около нуля или в минусе, бумажная маржа почти съедена отсрочками/запасами.",
+  cashPct: "Cash.% = Cash-adj / выручка × 100%. Денежная рентабельность после стоимости замороженных денег.",
+  ar: "ДЗ — открытый долг покупателей по FIFO на дату окончания периода. Это остаток долга на дату, а не продажи за период.",
+  avgAr: "Сред. ДЗ — среднее между ДЗ на начало и конец периода. Используется для DSO и стоимости отсрочки.",
+  arAdvance: "Авансы покупателей — деньги, полученные вперед. Это наша обязанность отгрузить товар или зачесть оплату, а не обычная ДЗ.",
+  overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
+  overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
+  dso: "DSO — сколько дней в среднем деньги клиента находятся в ДЗ. Чем выше DSO, тем дольше мы финансируем клиента.",
+  arFinCost: "Стоимость отсрочки — расчетная цена денег, замороженных в ДЗ. Это не бухгалтерский убыток, а оценка: сколько стоила отсрочка при выбранной ставке финансирования.",
+  inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
+  dio: "DIO — сколько дней деньги в среднем лежат в запасах до продажи/расхода. Чем выше DIO, тем медленнее оборачивается склад.",
+  ap: "КЗ сырье — наш открытый долг активным сырьевым поставщикам по FIFO на дату окончания периода.",
+  apAdvance: "Авансы поставщикам — наши предоплаты поставщикам, которые еще не закрыты поставкой или зачетом. Это наши деньги у поставщика.",
+  overdueAp: "Просроченная КЗ — часть текущего долга поставщикам, где срок оплаты уже прошел.",
+  dpo: "DPO — сколько дней в среднем мы оплачиваем поставщиков. Чем выше DPO, тем дольше поставщики финансируют наш оборот, но слишком высокий DPO может быть риском отношений.",
+  ccc: "CCC = DIO + DSO − DPO. Показывает, сколько дней бизнесу нужно финансировать оборот своими деньгами.",
+  status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. Риск означает, что клиент давит на cash flow.",
+  agingBucket: "Aging — текущая открытая ДЗ по FIFO, разложенная по срокам просрочки на дату окончания периода.",
+  bucketValue: "Сумма текущего открытого остатка в выбранном бакете.",
+  docs: "Количество открытых документов, из которых сложилась текущая ДЗ/просрочка.",
+  maxOverdue: "Самая большая просрочка в днях среди открытых документов клиента.",
+  stockValue: "Остаток в рублях: текущий складской остаток × складская цена × курс.",
+  stockShare: "Доля SKU/бакета/склада в общей сумме запасов.",
+  qty: "Количество остатка в базовой единице.",
+  warehouses: "Количество складов, где лежит остаток SKU.",
+  out90: "Расход 90д: количество, списанное или отгруженное за последние 90 дней.",
+  lastOut: "Дата последнего расхода по SKU.",
+  stockStatus: "Статус по движению остатка: оборот есть, Slow 90+ или неликвид 180+.",
+};
+
+function Th({children, className="", tip}) {
+  const cls = (className + (tip ? " has-tip" : "")).trim();
+  return (
+    <th className={cls || undefined} title={tip || undefined}>
+      {children}
+      {tip && <span className="th-info">?</span>}
+    </th>
+  );
+}
+
+// ─── MultiSelect с поиском ───────────────────────
+function MultiSelect({def, value, onChange, dictQuery}) {
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const rootRef = useRef(null);
+  const searchRef = useRef(null);
+
+  // Загружаем справочник при первом открытии.
+  const fetchItems = useCallback(async (q) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(dictQuery || "");
+      if (q) params.set("q", q);
+      const query = params.toString();
+      const url = API + def.endpoint + (query ? `?${query}` : "");
+      const r = await fetch(url);
+      const j = await r.json();
+      if (j.ok) setItems(j.items || []);
+      else setItems([]);
+    } catch (e) {
+      console.error("[MS]", def.key, e);
+      setItems([]);
+    } finally {
+      setLoading(false);
+      setLoaded(true);
+    }
+  }, [def.endpoint, def.key, dictQuery]);
+
+  useEffect(() => {
+    setItems([]);
+    setLoaded(false);
+  }, [dictQuery, def.endpoint]);
+
+  // Открытие поповера — грузим данные один раз.
+  useEffect(() => {
+    if (open && !loaded) fetchItems("");
+    if (open && searchRef.current) setTimeout(() => searchRef.current?.focus(), 10);
+  }, [open, loaded, fetchItems]);
+
+  // Debounce-поиск: при изменении search перезапрашиваем (если >= 2 символов или пусто).
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(() => {
+      if (search.length === 0 || search.length >= 2) fetchItems(search);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [search, open, fetchItems]);
+
+  // Клик вне поповера — закрываем.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const selectedSet = useMemo(() => new Set(value), [value]);
+
+  const toggle = (id) => {
+    const next = selectedSet.has(id)
+      ? value.filter(v => v !== id)
+      : [...value, id];
+    onChange(next);
+  };
+
+  const clearAll = () => onChange([]);
+  const selectVisible = () => {
+    const add = items.filter(i => !selectedSet.has(i.id)).map(i => i.id);
+    if (add.length) onChange([...value, ...add]);
+  };
+
+  // Текст триггера: "3 выбрано" или имя первого, или placeholder.
+  let triggerText;
+  if (value.length === 0) {
+    triggerText = def.placeholder;
+  } else if (value.length === 1) {
+    const found = items.find(i => i.id === value[0]);
+    triggerText = found ? found.name : `ID ${value[0]}`;
+  } else {
+    triggerText = `Выбрано: ${value.length}`;
+  }
+
+  const triggerCls =
+    "ms-trigger" +
+    (value.length > 0 ? " active" : "") +
+    (open ? " open" : "");
+
+  return (
+    <div className="ms" ref={rootRef}>
+      <div className="ms-label">{def.label}</div>
+      <div className={triggerCls} onClick={() => setOpen(o => !o)}>
+        <span className={"ms-trigger-text"+(value.length===0?" ms-placeholder":"")}>{triggerText}</span>
+        {value.length > 0 && <span className="ms-count">{value.length}</span>}
+        <span className="ms-arrow">▼</span>
+      </div>
+      {open && (
+        <div className="ms-pop" onClick={e => e.stopPropagation()}>
+          <input
+            ref={searchRef}
+            className="ms-search"
+            placeholder="Поиск…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <div className="ms-list">
+            {loading && <div className="ms-empty">Загрузка…</div>}
+            {!loading && items.length === 0 && <div className="ms-empty">Ничего не найдено</div>}
+            {!loading && items.map(it => {
+              const on = selectedSet.has(it.id);
+              return (
+                <div key={it.id}
+                     className={"ms-opt"+(on?" on":"")}
+                     onClick={() => toggle(it.id)}
+                     title={it.name}>
+                  <span className="ms-opt-box">{on ? "✓" : ""}</span>
+                  <span className="ms-opt-text">{it.name || "—"}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="ms-foot">
+            <button className="ms-foot-btn" onClick={selectVisible}>Добавить всё</button>
+            <button className="ms-foot-btn" onClick={clearAll}>Очистить</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Форматирование цели для тултипа ──────────────
+const fmtTargetVal = (target, unit) => {
+  if (target == null) return "";
+  return unit === "дни" ? fmtDays(target) + " дн." : fmtRub(target) + " руб";
+};
+
+// Текст «Цель: ≤ 45 дн.» / «Цель: ≥ 45 дн.» / «Цель: 0 руб».
+const targetLine = (card) => {
+  if (card.target == null) return null;
+  const val = fmtTargetVal(card.target, card.unit);
+  if (card.target === 0) return "Цель: " + val;
+  const sign = card.lower_better ? "≤" : "≥";
+  return "Цель: " + sign + " " + val;
+};
+
+// ─── Тултип с описанием и целью ───────────────────
+function CardTooltip({card, tip}) {
+  const tline = targetLine(card);
+  return (
+    <span className="card-tooltip">
+      <b>{card.label}.</b> {tip}
+      {tline && <span className="tt-target"><b>●</b> {tline}</span>}
+    </span>
+  );
+}
+
+// ─── Одна карточка ───────────────────────────────
+function Card({card, sub, tip}) {
+  if (card.error) {
+    return (
+      <div className="card err">
+        <div className="card-head">
+          <div className="card-label-wrap">
+            <div className="card-label">{card.label}</div>
+            {tip && (
+              <span className="card-info" aria-label="Описание">
+                ?
+                <CardTooltip card={card} tip={tip}/>
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="card-value">ошибка</div>
+        <div className="card-sub" style={{color:"#b91c1c"}}>{card.error}</div>
+      </div>
+    );
+  }
+  const cls = "card" + (card.score ? " s"+card.score : "");
+  return (
+    <div className={cls}>
+      <div className="card-head">
+        <div className="card-label-wrap">
+          <div className="card-label">{card.label}</div>
+          {tip && (
+            <span className="card-info" aria-label="Описание">
+              ?
+              <CardTooltip card={card} tip={tip}/>
+            </span>
+          )}
+        </div>
+        {card.score != null && (
+          <span className={"card-score s"+card.score}>● {card.score}/5</span>
+        )}
+      </div>
+      <div className="card-value">
+        {fmtVal(card)}<span className="card-unit">{card.unit}</span>
+      </div>
+      {sub && <div className="card-sub">{sub}</div>}
+      <div className="card-foot">
+        <span className="card-foot-label">vs прошлый период</span>
+        <span className={"delta "+deltaClass(card)}>
+          {arrow(card.delta_pct)} {fmtDelta(card.delta_pct)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Легенда светофора ──────────────────────────
+function ScoreLegend() {
+  return (
+    <div className="legend">
+      <span className="legend-title">Светофор</span>
+      <span className="legend-item"><span className="legend-dot s5"/><b>5/5</b> — цель достигнута</span>
+      <span className="legend-sep"/>
+      <span className="legend-item"><span className="legend-dot s4"/><b>4/5</b> — откл. ≤ 5%</span>
+      <span className="legend-sep"/>
+      <span className="legend-item"><span className="legend-dot s3"/><b>3/5</b> — 5–10%</span>
+      <span className="legend-sep"/>
+      <span className="legend-item"><span className="legend-dot s2"/><b>2/5</b> — 10–15%</span>
+      <span className="legend-sep"/>
+      <span className="legend-item"><span className="legend-dot s1"/><b>1/5</b> — больше 15%</span>
+    </div>
+  );
+}
+
+function DeltaBadge({value, lowerBetter=false}) {
+  return (
+    <span className={"delta " + deltaClassRaw(value, lowerBetter)}>
+      {arrow(value)} {fmtDelta(value)}
+    </span>
+  );
+}
+
+function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel="SKU"}) {
+  const safeRows = rows || [];
+  const maxValue = Math.max(1, ...safeRows.map(r => Math.abs(r.value_rub || 0)));
+  return (
+    <div className="stock-panel">
+      <div className="stock-panel-head">
+        <div>
+          <div className="stock-panel-title">{title}</div>
+          {sub && <div className="stock-panel-sub">{sub}</div>}
+        </div>
+      </div>
+      <div className="stock-bars">
+        {safeRows.length === 0 && <div className="ms-empty">Нет данных</div>}
+        {safeRows.map((r, i) => {
+          const value = r.value_rub || 0;
+          const width = Math.max(1, Math.abs(value) / maxValue * 100);
+          const name = r[labelKey] || r.bucket || "Без названия";
+          return (
+            <div className="stock-bar-row" key={(name || "") + i}>
+              <div className="stock-bar-head">
+                <div className="stock-bar-name" title={name}>{name}</div>
+                <div className="stock-bar-meta">{fmtRub(value)}</div>
+              </div>
+              <div className="stock-track">
+                <div className="stock-fill" style={{width: width + "%"}}/>
+              </div>
+              <div className="stock-bar-foot">
+                <span>{fmtPct(r.share_pct)} от итога</span>
+                <span>{r[countKey] == null ? "" : `${fmtInt(r[countKey])} ${countLabel}`}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const stockStatusClass = (status) => {
+  if ((status || "").includes("Неликвид")) return "risk";
+  if ((status || "").includes("Slow")) return "warn";
+  return "ok";
+};
+
+function DepartmentView({data, loading, err, requestKey}) {
+  const [expandedDeptId, setExpandedDeptId] = useState(null);
+  const [detailByDept, setDetailByDept] = useState({});
+  const [detailLoadingDept, setDetailLoadingDept] = useState(null);
+  const [detailErr, setDetailErr] = useState(null);
+
+  useEffect(() => {
+    setExpandedDeptId(null);
+    setDetailByDept({});
+    setDetailLoadingDept(null);
+    setDetailErr(null);
+  }, [requestKey]);
+
+  const loadDepartmentClients = useCallback(async (deptId) => {
+    const key = String(deptId);
+    if (detailByDept[key]) return;
+    setDetailLoadingDept(deptId);
+    setDetailErr(null);
+    try {
+      const params = new URLSearchParams(requestKey || "");
+      params.set("dept_ids", key);
+      params.set("limit", "30");
+      params.set("sort", "revenue");
+      const url = `${API}/kpi/clients?${params.toString()}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setDetailByDept(prev => ({...prev, [key]: j}));
+    } catch (e) {
+      setDetailErr(e.message || String(e));
+    } finally {
+      setDetailLoadingDept(null);
+    }
+  }, [requestKey, detailByDept]);
+
+  const toggleDepartment = (row) => {
+    const deptId = row.department_id;
+    if (expandedDeptId === deptId) {
+      setExpandedDeptId(null);
+      return;
+    }
+    setExpandedDeptId(deptId);
+    loadDepartmentClients(deptId);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Считаю KPI по отделам. FIFO по задолженности может занять до минуты…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка расчёта отделов:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▦</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть сравнение отделов</div>
+        <div className="empty-state-sub">Раскладка строится по тем же датам и фильтрам</div>
+      </div>
+    );
+  }
+
+  const rows = data.rows || [];
+  const totals = data.totals || {};
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Особенности сравнения отделов:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть показателей по отделам не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Отделов</div>
+          <div className="dept-summary-value">{totals.departments || rows.length}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Выручка</div>
+          <div className="dept-summary-value">{fmtRub(totals.revenue_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Маржа</div>
+          <div className="dept-summary-value">{fmtRub(totals.margin_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ДЗ</div>
+          <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Просрочка</div>
+          <div className="dept-summary-value">{fmtRub(totals.overdue_ar_rub)}</div>
+        </div>
+      </div>
+
+      <div className="dept-note">
+        Кликните на отдел, чтобы раскрыть клиентов внутри него. Таблица отсортирована по выручке, от крупных клиентов к меньшим.
+      </div>
+
+      <div className="dept-table-wrap">
+        <table className="dept-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Отдел</th>
+              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueShare}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.revenueDelta}>Δ выр.</Th>
+              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost}>Ст-ть ДЗ</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan="13" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет отделов с продажами за выбранный период</td></tr>
+            )}
+            {rows.map(r => {
+              const open = expandedDeptId === r.department_id;
+              const detail = detailByDept[String(r.department_id)];
+              const detailRows = detail?.rows || [];
+              return (
+                <React.Fragment key={r.department_id}>
+                  <tr className="dept-main-row" onClick={() => toggleDepartment(r)}>
+                    <td className="rank">{r.rank}</td>
+                    <td className="dept-name">
+                      <span className="dept-expander">{open ? "▾" : "▸"}</span>
+                      {r.department}
+                      <span className="muted">Нажмите для детализации по клиентам</span>
+                    </td>
+                    <td className="num">{fmtRub(r.revenue_rub)}</td>
+                    <td className="num">{fmtPct(r.revenue_share_pct)}</td>
+                    <td className="num"><DeltaBadge value={r.revenue_delta_pct}/></td>
+                    <td className="num">{fmtRub(r.margin_rub)}</td>
+                    <td className="num">{fmtPct(r.margin_pct)}</td>
+                    <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_advance_rub)}</td>
+                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
+                      {fmtRub(r.overdue_ar_rub)}
+                      <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
+                    </td>
+                    <td className="num">{fmtDays(r.dso_days)}</td>
+                    <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                  </tr>
+                  {open && (
+                    <tr>
+                      <td className="dept-detail-cell" colSpan="13">
+                        <div className="dept-detail-head">
+                          <div>
+                            <div className="dept-detail-title">Клиенты отдела</div>
+                            <div className="dept-detail-sub">Сортировка по выручке за выбранный период</div>
+                          </div>
+                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detail.rows?.length || 0)}</div>}
+                        </div>
+                        {detailLoadingDept === r.department_id && (
+                          <div className="loading" style={{padding:"24px"}}>
+                            <div className="spinner"></div>
+                            <div className="loading-text">Загружаю клиентов отдела…</div>
+                          </div>
+                        )}
+                        {detailErr && detailLoadingDept == null && (
+                          <div className="err-panel"><b>Ошибка детализации:</b> {detailErr}</div>
+                        )}
+                        {detail && detailRows.length === 0 && (
+                          <div className="ms-empty">Нет клиентов в выбранном отделе за период</div>
+                        )}
+                        {detailRows.length > 0 && (
+                          <div className="dept-detail-scroll">
+                            <table className="dept-detail-table">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Клиент</th>
+                                  <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+                                  <Th className="num" tip={COL_TIPS.revenueShare}>Доля отд.</Th>
+                                  <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
+                                  <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
+                                  <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+                                  <Th tip={COL_TIPS.status}>Статус</Th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {detailRows.map((c, idx) => (
+                                  <tr key={c.client_id || idx}>
+                                    <td className="rank">{idx + 1}</td>
+                                    <td className="dept-name">{c.client}</td>
+                                    <td className="num">{fmtRub(c.revenue_rub)}</td>
+                                    <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
+                                    <td className="num">{fmtRub(c.margin_rub)}</td>
+                                    <td className="num">{fmtPct(c.margin_pct)}</td>
+                                    <td className="num">{fmtRub(c.ar_rub)}</td>
+                                    <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
+                                    <td className="num">{fmtDays(c.dso_days)}</td>
+                                    <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
+                                    <td>
+                                      <span className={"status-badge " + c.status_code}>{c.status}</span>
+                                      <span className="muted">{c.status_reason}</span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function BranchView({data, loading, err, requestKey}) {
+  const [expandedBranchId, setExpandedBranchId] = useState(null);
+  const [detailByBranch, setDetailByBranch] = useState({});
+  const [detailLoadingBranch, setDetailLoadingBranch] = useState(null);
+  const [detailErr, setDetailErr] = useState(null);
+
+  useEffect(() => {
+    setExpandedBranchId(null);
+    setDetailByBranch({});
+    setDetailLoadingBranch(null);
+    setDetailErr(null);
+  }, [requestKey]);
+
+  const loadBranchDepartments = useCallback(async (branchId) => {
+    const key = String(branchId);
+    if (detailByBranch[key]) return;
+    setDetailLoadingBranch(branchId);
+    setDetailErr(null);
+    try {
+      const params = new URLSearchParams(requestKey || "");
+      params.set("bu_ids", key);
+      const url = `${API}/kpi/departments?${params.toString()}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setDetailByBranch(prev => ({...prev, [key]: j}));
+    } catch (e) {
+      setDetailErr(e.message || String(e));
+    } finally {
+      setDetailLoadingBranch(null);
+    }
+  }, [requestKey, detailByBranch]);
+
+  const toggleBranch = (row) => {
+    const branchId = row.branch_id;
+    if (expandedBranchId === branchId) {
+      setExpandedBranchId(null);
+      return;
+    }
+    setExpandedBranchId(branchId);
+    loadBranchDepartments(branchId);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Собираю KPI по бизнес-единицам: продажи, ДЗ, запасы, КЗ и денежный цикл…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка расчёта БЕ:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▥</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть бизнес-единицы</div>
+        <div className="empty-state-sub">БЕ можно раскрыть до отделов продаж</div>
+      </div>
+    );
+  }
+
+  const rows = data.rows || [];
+  const totals = data.totals || {};
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Особенности контроля по БЕ:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть показателей по БЕ не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">БЕ</div>
+          <div className="dept-summary-value">{totals.branches || rows.length}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Выручка</div>
+          <div className="dept-summary-value">{fmtRub(totals.revenue_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ДЗ</div>
+          <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Запасы</div>
+          <div className="dept-summary-value">{fmtRub(totals.inventory_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">КЗ сырье</div>
+          <div className="dept-summary-value">{fmtRub(totals.ap_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">CCC</div>
+          <div className="dept-summary-value">{fmtDays(totals.ccc_days)} дн.</div>
+        </div>
+      </div>
+
+      <div className="dept-note">
+        Кликните на БЕ, чтобы раскрыть отделы внутри неё. КЗ и авансы поставщикам остаются на уровне БЕ, в отделах показывается коммерческий блок продаж.
+      </div>
+
+      <div className="dept-table-wrap">
+        <table className="dept-table branch-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Бизнес-единица</th>
+              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueShare}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr}>Проср. ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.inventory}>Запасы</Th>
+              <Th className="num" tip={COL_TIPS.dio}>DIO</Th>
+              <Th className="num" tip={COL_TIPS.ap}>КЗ сырье</Th>
+              <Th className="num" tip={COL_TIPS.apAdvance}>Авансы пост.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAp}>Проср. КЗ</Th>
+              <Th className="num" tip={COL_TIPS.dpo}>DPO</Th>
+              <Th className="num" tip={COL_TIPS.ccc}>CCC</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan="18" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
+            )}
+            {rows.map(r => {
+              const open = expandedBranchId === r.branch_id;
+              const detail = detailByBranch[String(r.branch_id)];
+              const detailRows = detail?.rows || [];
+              return (
+                <React.Fragment key={r.branch_id}>
+                  <tr className="dept-main-row" onClick={() => toggleBranch(r)}>
+                    <td className="rank">{r.rank}</td>
+                    <td className="dept-name">
+                      <span className="dept-expander">{open ? "▾" : "▸"}</span>
+                      {r.branch}
+                      <span className="muted">Нажмите для отделов БЕ</span>
+                    </td>
+                    <td className="num">{fmtRub(r.revenue_rub)}</td>
+                    <td className="num">{fmtPct(r.revenue_share_pct)}</td>
+                    <td className="num">{fmtRub(r.margin_rub)}</td>
+                    <td className="num">{fmtPct(r.margin_pct)}</td>
+                    <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_advance_rub)}</td>
+                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
+                      {fmtRub(r.overdue_ar_rub)}
+                      <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
+                    </td>
+                    <td className="num">{fmtDays(r.dso_days)}</td>
+                    <td className="num">{fmtRub(r.inventory_rub)}</td>
+                    <td className="num">{fmtDays(r.dio_days)}</td>
+                    <td className="num">{fmtRub(r.ap_rub)}</td>
+                    <td className="num">{fmtRub(r.ap_advance_rub)}</td>
+                    <td className={"num " + (r.overdue_ap_rub > 0 ? "risk" : "")}>
+                      {fmtRub(r.overdue_ap_rub)}
+                      <span className="muted">{fmtPct(r.overdue_ap_share_pct)} от КЗ</span>
+                    </td>
+                    <td className="num">{fmtDays(r.dpo_days)}</td>
+                    <td className={"num " + ((r.ccc_days || 0) > 60 ? "risk" : "")}>{fmtDays(r.ccc_days)}</td>
+                  </tr>
+                  {open && (
+                    <tr>
+                      <td className="dept-detail-cell" colSpan="18">
+                        <div className="dept-detail-head">
+                          <div>
+                            <div className="dept-detail-title">Отделы БЕ</div>
+                            <div className="dept-detail-sub">Коммерческие показатели отделов внутри выбранной БЕ</div>
+                          </div>
+                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detail.rows?.length || 0)}</div>}
+                        </div>
+                        {detailLoadingBranch === r.branch_id && (
+                          <div className="loading" style={{padding:"24px"}}>
+                            <div className="spinner"></div>
+                            <div className="loading-text">Загружаю отделы БЕ…</div>
+                          </div>
+                        )}
+                        {detailErr && detailLoadingBranch == null && (
+                          <div className="err-panel"><b>Ошибка детализации:</b> {detailErr}</div>
+                        )}
+                        {detail && detailRows.length === 0 && (
+                          <div className="ms-empty">Нет отделов в выбранной БЕ за период</div>
+                        )}
+                        {detailRows.length > 0 && (
+                          <div className="dept-detail-scroll">
+                            <table className="dept-detail-table">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Отдел</th>
+                                  <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+                                  <Th className="num" tip={COL_TIPS.revenueShare}>Доля БЕ</Th>
+                                  <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
+                                  <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {detailRows.map((d, idx) => (
+                                  <tr key={d.department_id || idx}>
+                                    <td className="rank">{idx + 1}</td>
+                                    <td className="dept-name">{d.department}</td>
+                                    <td className="num">{fmtRub(d.revenue_rub)}</td>
+                                    <td className="num">{fmtPct(r.revenue_rub ? d.revenue_rub / r.revenue_rub * 100 : null)}</td>
+                                    <td className="num">{fmtRub(d.margin_rub)}</td>
+                                    <td className="num">{fmtRub(d.ar_rub)}</td>
+                                    <td className="num">{fmtRub(d.ar_advance_rub)}</td>
+                                    <td className={"num " + (d.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(d.overdue_ar_rub)}</td>
+                                    <td className="num">{fmtDays(d.dso_days)}</td>
+                                    <td className="num">{fmtRub(d.cash_adj_margin_rub)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function ClientView({data, loading, err}) {
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Считаю денежную эффективность клиентов. Ищу, где прибыль есть, а деньги зависли…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка расчёта клиентов:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▤</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть клиентов</div>
+        <div className="empty-state-sub">Таблица покажет, где продажи создают кассовое давление</div>
+      </div>
+    );
+  }
+
+  const rows = data.rows || [];
+  const totals = data.totals || {};
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Особенности клиентской модели:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть клиентских показателей не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Клиентов в таблице</div>
+          <div className="dept-summary-value">{totals.clients || rows.length}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Риск</div>
+          <div className="dept-summary-value">{totals.risk_clients || 0}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Выручка</div>
+          <div className="dept-summary-value">{fmtRub(totals.revenue_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ДЗ</div>
+          <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Cash-adj</div>
+          <div className="dept-summary-value">{fmtRub(totals.cash_adj_margin_rub)}</div>
+        </div>
+      </div>
+
+      <div className="dept-note">
+        Статус подсвечивает клиентов, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ.
+      </div>
+
+      <div className="dept-table-wrap">
+        <table className="dept-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Клиент</th>
+              <th>Менеджер</th>
+              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueDelta}>Δ выр.</Th>
+              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.avgAr}>Сред. ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost}>Стоимость отсрочки</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.cashPct}>Cash.%</Th>
+              <Th tip={COL_TIPS.status}>Статус</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
+            )}
+            {rows.map(r => (
+              <tr key={r.client_id}>
+                <td className="rank">{r.rank}</td>
+                <td className="dept-name">
+                  {r.client}
+                  {r.department && <span className="muted">{r.department}</span>}
+                </td>
+                <td>{r.manager || "—"}</td>
+                <td className="num">{fmtRub(r.revenue_rub)}</td>
+                <td className="num"><DeltaBadge value={r.revenue_delta_pct}/></td>
+                <td className="num">{fmtRub(r.margin_rub)}</td>
+                <td className="num">{fmtPct(r.margin_pct)}</td>
+                <td className="num">{fmtRub(r.avg_ar_rub)}</td>
+                <td className="num">{fmtRub(r.ar_rub)}</td>
+                <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
+                  {fmtRub(r.overdue_ar_rub)}
+                  <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
+                </td>
+                <td className="num">{fmtDays(r.dso_days)}</td>
+                <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                <td className="num">{fmtPct(r.cash_adj_margin_pct)}</td>
+                <td>
+                  <span className={"status-badge " + r.status_code}>{r.status}</span>
+                  <span className="muted">{r.status_reason}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function ArAgingView({data, loading, err}) {
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Раскладываю дебиторку по срокам оплаты FIFO…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка aging ДЗ:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▧</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть aging дебиторки</div>
+        <div className="empty-state-sub">Суммы строятся по открытым FIFO-остаткам ДЗ</div>
+      </div>
+    );
+  }
+
+  const totals = data.totals || {};
+  const rows = data.top_clients || [];
+
+  const agingStatus = (days) => {
+    if ((days || 0) > 90) return "risk";
+    if ((days || 0) > 30) return "warn";
+    return "ok";
+  };
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Методика aging ДЗ:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть aging не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ДЗ FIFO</div>
+          <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">В срок</div>
+          <div className="dept-summary-value">{fmtRub(totals.in_terms_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Просрочка</div>
+          <div className="dept-summary-value">{fmtRub(totals.overdue_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Клиентов с ДЗ</div>
+          <div className="dept-summary-value">{fmtInt(totals.clients_count)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Клиентов с проср.</div>
+          <div className="dept-summary-value">{fmtInt(totals.overdue_clients_count)}</div>
+        </div>
+      </div>
+
+      <StockBars
+        title="Aging дебиторки"
+        sub="Открытая ДЗ по FIFO, разложенная по дате оплаты"
+        rows={data.buckets}
+        labelKey="bucket_label"
+        countKey="client_count"
+        countLabel="клиентов"
+      />
+
+      <div className="stock-status-note">
+        Просрочка считается строго после даты оплаты: если срок оплаты сегодня, строка остаётся в сроке; если срок был вчера или раньше, попадает в просрочку.
+      </div>
+
+      <div className="dept-table-wrap stock-table-wrap">
+        <table className="dept-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Клиент</th>
+              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.overdueShare}>Доля проср.</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket}>1–30</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket}>31–60</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket}>61–90</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket}>90+</Th>
+              <Th className="num" tip={COL_TIPS.docs}>Док.</Th>
+              <Th tip={COL_TIPS.maxOverdue}>Макс. срок</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan="11" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов с просроченной ДЗ</td></tr>
+            )}
+            {rows.map((r, i) => (
+              <tr key={r.client_id || i}>
+                <td className="rank">{i + 1}</td>
+                <td className="dept-name">{r.client_name || "Без клиента"}</td>
+                <td className="num">{fmtRub(r.ar_rub)}</td>
+                <td className="num risk">{fmtRub(r.overdue_rub)}</td>
+                <td className="num">{fmtPct(r.overdue_share_pct)}</td>
+                <td className="num">{fmtRub(r.d_1_30_rub)}</td>
+                <td className="num">{fmtRub(r.d_31_60_rub)}</td>
+                <td className="num">{fmtRub(r.d_61_90_rub)}</td>
+                <td className="num">{fmtRub(r.d_90_plus_rub)}</td>
+                <td className="num">{fmtInt(r.open_docs_count)}</td>
+                <td>
+                  <span className={"status-badge " + agingStatus(r.max_overdue_days)}>
+                    {fmtDays(r.max_overdue_days)} дн.
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+function CycleView({data, loading, err}) {
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Собираю DIO, DSO, DPO и CCC…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка денежного цикла:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">↔</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть денежный цикл</div>
+        <div className="empty-state-sub">Waterfall покажет вклад запасов, клиентов и поставщиков</div>
+      </div>
+    );
+  }
+
+  const byId = {};
+  (data.cards || []).forEach(c => { byId[c.id] = c; });
+  const dio = byId.dio_days?.value || 0;
+  const dso = byId.dso_days?.value || 0;
+  const dpo = byId.dpo_days?.value || 0;
+  const ccc = byId.ccc_days?.value || 0;
+  const rows = [
+    {label:"DIO", sub:"запасы", value:dio, signed:dio},
+    {label:"DSO", sub:"клиенты", value:dso, signed:dso},
+    {label:"− DPO", sub:"поставщики", value:dpo, signed:-dpo},
+  ];
+  const maxAbs = Math.max(1, ...rows.map(r => Math.abs(r.signed)), Math.abs(ccc));
+
+  return (
+    <>
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">DIO</div>
+          <div className="dept-summary-value">{fmtDays(dio)} дн.</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">DSO</div>
+          <div className="dept-summary-value">{fmtDays(dso)} дн.</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">DPO</div>
+          <div className="dept-summary-value">{fmtDays(dpo)} дн.</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">CCC</div>
+          <div className="dept-summary-value">{fmtDays(ccc)} дн.</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Стоимость ОК</div>
+          <div className="dept-summary-value">{fmtRub(byId.wc_fin_cost_rub?.value)}</div>
+        </div>
+      </div>
+
+      <div className="cycle-panel">
+        <div className="cycle-title">Денежный цикл</div>
+        <div className="cycle-sub">CCC = DIO + DSO − DPO. Положительное значение означает, что бизнес финансируется своими деньгами.</div>
+        <div className="wf">
+          {rows.map(r => (
+            <div className="wf-row" key={r.label}>
+              <div>
+                <div className="wf-label">{r.label}</div>
+                <span className="muted">{r.sub}</span>
+              </div>
+              <div className="wf-track">
+                <div className={"wf-fill" + (r.signed < 0 ? " neg" : "")}
+                     style={{width: Math.max(2, Math.abs(r.signed) / maxAbs * 100) + "%"}}/>
+              </div>
+              <div className="wf-value">{r.signed < 0 ? "−" : ""}{fmtDays(Math.abs(r.value))} дн.</div>
+            </div>
+          ))}
+          <div className="wf-row total">
+            <div className="wf-label">= CCC</div>
+            <div className="wf-track">
+              <div className={"wf-fill" + (ccc < 0 ? " neg" : "")}
+                   style={{width: Math.max(2, Math.abs(ccc) / maxAbs * 100) + "%"}}/>
+            </div>
+            <div className="wf-value">{fmtDays(ccc)} дн.</div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function InventoryView({data, loading, err}) {
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Раскладываю запасы по сырью, упаковке, группам и SKU…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка расчёта запасов:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▥</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть структуру запасов</div>
+        <div className="empty-state-sub">Разбивка покажет, где именно заморожены деньги</div>
+      </div>
+    );
+  }
+
+  const totals = data.totals || {};
+  const topSku = data.top_sku || [];
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Методика запасов:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть складских показателей не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Запасы</div>
+          <div className="dept-summary-value">{fmtRub(totals.inventory_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">SKU</div>
+          <div className="dept-summary-value">{fmtInt(totals.sku_count)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Складов</div>
+          <div className="dept-summary-value">{fmtInt(totals.bunk_count)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Slow 90+</div>
+          <div className="dept-summary-value">{fmtRub(totals.slow_90_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Неликвид 180+</div>
+          <div className="dept-summary-value">{fmtRub(totals.dead_180_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Без цены</div>
+          <div className="dept-summary-value">{fmtInt(totals.zero_cost_rows)}</div>
+        </div>
+      </div>
+
+      <div className="stock-grid">
+        <StockBars
+          title="Сырьё / упаковка / товары"
+          sub="Коммерческие остатки после исключения ТМЦ и ОС"
+          rows={data.buckets}
+          labelKey="bucket"
+        />
+        <StockBars
+          title="Товарные группы"
+          sub="Где лежит основной денежный запас"
+          rows={data.groups}
+          labelKey="parent_group_name"
+        />
+      </div>
+
+      <div className="stock-grid">
+        <StockBars
+          title="Категории"
+          sub="Классификация из справочника товаров"
+          rows={data.categories}
+          labelKey="category_name"
+        />
+        <StockBars
+          title="Склады"
+          sub="ТОП складов по сумме остатка"
+          rows={data.warehouses}
+          labelKey="bunk_name"
+        />
+      </div>
+
+      <div className="stock-status-note">
+        ТОП SKU отсортирован по замороженным деньгам. Slow 90+ означает, что за последние 90 дней по текущему остатку не было расхода; неликвид 180+ — не было расхода 180 дней.
+      </div>
+
+      <div className="dept-table-wrap stock-table-wrap">
+        <table className="dept-table stock-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>SKU</th>
+              <th>Бакет</th>
+              <th>Группа</th>
+              <Th className="num" tip={COL_TIPS.stockValue}>Остаток, руб</Th>
+              <Th className="num" tip={COL_TIPS.stockShare}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.qty}>Кол-во</Th>
+              <Th className="num" tip={COL_TIPS.warehouses}>Складов</Th>
+              <Th className="num" tip={COL_TIPS.out90}>Расход 90д</Th>
+              <Th tip={COL_TIPS.lastOut}>Последний расход</Th>
+              <Th tip={COL_TIPS.stockStatus}>Статус</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {topSku.length === 0 && (
+              <tr><td colSpan="11" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет SKU с остатками</td></tr>
+            )}
+            {topSku.map((r, i) => (
+              <tr key={r.tov_id || i}>
+                <td className="rank">{i + 1}</td>
+                <td className="dept-name">{r.tov_name || "Без товара"}</td>
+                <td>{r.bucket || "—"}</td>
+                <td>{r.parent_group_name || "—"}</td>
+                <td className="num">{fmtRub(r.value_rub)}</td>
+                <td className="num">{fmtPct(r.share_pct)}</td>
+                <td className="num">{fmtQty(r.qty_end)}</td>
+                <td className="num">{fmtInt(r.bunk_count)}</td>
+                <td className="num">{fmtQty(r.out_qty_90)}</td>
+                <td>
+                  {r.last_out_date ? fmtDate(r.last_out_date) : "нет расхода"}
+                  <span className="muted">{r.days_since_last_out == null ? "—" : fmtDays(r.days_since_last_out) + " дн. назад"}</span>
+                </td>
+                <td>
+                  <span className={"status-badge " + stockStatusClass(r.stock_status)}>{r.stock_status || "—"}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+// ─── Главный компонент ──────────────────────────
+function App() {
+  const [preset, setPreset] = useState("m");    // активный чип
+  const [customEnd, setCustomEnd] = useState(() => todayIso());
+  const [customStart, setCustomStart] = useState(() => addDaysIso(todayIso(), -29));
+  const [rate, setRate] = useState(24);         // процентов годовых
+  const [activeTab, setActiveTab] = useState("overview");
+  const [data, setData] = useState(null);
+  const [branchData, setBranchData] = useState(null);
+  const [deptData, setDeptData] = useState(null);
+  const [clientData, setClientData] = useState(null);
+  const [inventoryData, setInventoryData] = useState(null);
+  const [arAgingData, setArAgingData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [branchLoading, setBranchLoading] = useState(false);
+  const [deptLoading, setDeptLoading] = useState(false);
+  const [clientLoading, setClientLoading] = useState(false);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [arAgingLoading, setArAgingLoading] = useState(false);
+  const [err, setErr] = useState(null);
+  const [branchErr, setBranchErr] = useState(null);
+  const [deptErr, setDeptErr] = useState(null);
+  const [clientErr, setClientErr] = useState(null);
+  const [inventoryErr, setInventoryErr] = useState(null);
+  const [arAgingErr, setArAgingErr] = useState(null);
+  const [autoReloadEnabled, setAutoReloadEnabled] = useState(false);
+  const lastLoadedKeyRef = useRef(null);
+  const branchLoadedKeyRef = useRef(null);
+  const deptLoadedKeyRef = useRef(null);
+  const clientLoadedKeyRef = useRef(null);
+  const inventoryLoadedKeyRef = useRef(null);
+  const arAgingLoadedKeyRef = useRef(null);
+  const requestSeqRef = useRef(0);
+  const branchSeqRef = useRef(0);
+  const deptSeqRef = useRef(0);
+  const clientSeqRef = useRef(0);
+  const inventorySeqRef = useRef(0);
+  const arAgingSeqRef = useRef(0);
+
+  // Состояние фильтров: {mol_ids:[], dept_ids:[], parole_ids:[], pred_ids:[]}
+  const [filters, setFilters] = useState(() => {
+    const o = {};
+    FILTER_DEFS.forEach(f => { o[f.key] = []; });
+    return o;
+  });
+
+  const setFilter = (key, val) => setFilters(f => ({...f, [key]: val}));
+  const resetFilters = () => {
+    const o = {};
+    FILTER_DEFS.forEach(f => { o[f.key] = []; });
+    setFilters(o);
+  };
+  const filtersActive = useMemo(
+    () => FILTER_DEFS.some(f => (filters[f.key] || []).length > 0),
+    [filters]
+  );
+
+  const customPeriodDays = useMemo(() => daysInclusive(customStart, customEnd), [customStart, customEnd]);
+  const customPeriodInvalid = preset === "cst" && (!Number.isFinite(customPeriodDays) || customPeriodDays < 1);
+  const customPeriodError = !customPeriodInvalid
+    ? null
+    : Number.isFinite(customPeriodDays)
+      ? "дата начала позже даты окончания."
+      : "заполните обе даты периода.";
+  const effectiveDays = useMemo(() => {
+    if (preset === "cst") return customPeriodInvalid ? 1 : customPeriodDays;
+    return PRESETS.find(p => p.id===preset)?.days || 30;
+  }, [preset, customPeriodDays, customPeriodInvalid]);
+  const effectiveEnd = preset === "cst" && !customPeriodInvalid ? customEnd : null;
+
+  const requestKey = useMemo(() => {
+    const parts = [`period_days=${effectiveDays}`, `rate=${rate/100}`];
+    if (effectiveEnd) parts.push(`end=${effectiveEnd}`);
+    FILTER_DEFS.forEach(f => {
+      const ids = filters[f.key];
+      if (ids && ids.length) parts.push(`${f.key}=${ids.join(",")}`);
+    });
+    return parts.join("&");
+  }, [effectiveDays, effectiveEnd, rate, filters]);
+
+  const dictQuery = useMemo(() => {
+    const parts = [`period_days=${effectiveDays}`];
+    if (effectiveEnd) parts.push(`end=${effectiveEnd}`);
+    return parts.join("&");
+  }, [effectiveDays, effectiveEnd]);
+  useEffect(() => {
+    const onSnapshotReady = (ev) => {
+      const p = ev.detail?.period || {};
+      if (p.start && p.end) {
+        setPreset("cst");
+        setCustomStart(p.start);
+        setCustomEnd(p.end);
+      }
+      if (p.rate != null && !isNaN(Number(p.rate))) {
+        setRate(Math.round(Number(p.rate) * 1000) / 10);
+      }
+      const empty = {};
+      FILTER_DEFS.forEach(f => { empty[f.key] = []; });
+      setFilters(empty);
+      setData(null); setBranchData(null); setDeptData(null); setClientData(null); setInventoryData(null); setArAgingData(null);
+      setErr(null); setBranchErr(null); setDeptErr(null); setClientErr(null); setInventoryErr(null); setArAgingErr(null);
+      lastLoadedKeyRef.current = null;
+      branchLoadedKeyRef.current = null;
+      deptLoadedKeyRef.current = null;
+      clientLoadedKeyRef.current = null;
+      inventoryLoadedKeyRef.current = null;
+      arAgingLoadedKeyRef.current = null;
+      setActiveTab("overview");
+      setAutoReloadEnabled(true);
+    };
+    window.addEventListener("kpi-snapshot-ready", onSnapshotReady);
+    return () => window.removeEventListener("kpi-snapshot-ready", onSnapshotReady);
+  }, []);
+
+  const loadBranches = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setBranchErr(customPeriodError);
+      return;
+    }
+    const seq = ++branchSeqRef.current;
+    setBranchLoading(true);
+    setBranchErr(null);
+    const url = `${API}/kpi/branches?${requestKey}`;
+    console.log("[KPI branches] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI branches] payload:", j);
+      if (seq !== branchSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setBranchData(j);
+      branchLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== branchSeqRef.current) return;
+      console.error("[KPI branches] fetch error:", e);
+      setBranchErr(e.message || String(e));
+    } finally {
+      if (seq === branchSeqRef.current) setBranchLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadDepartments = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setDeptErr(customPeriodError);
+      return;
+    }
+    const seq = ++deptSeqRef.current;
+    setDeptLoading(true);
+    setDeptErr(null);
+    const url = `${API}/kpi/departments?${requestKey}`;
+    console.log("[KPI departments] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI departments] payload:", j);
+      if (seq !== deptSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setDeptData(j);
+      deptLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== deptSeqRef.current) return;
+      console.error("[KPI departments] fetch error:", e);
+      setDeptErr(e.message || String(e));
+    } finally {
+      if (seq === deptSeqRef.current) setDeptLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadClients = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setClientErr(customPeriodError);
+      return;
+    }
+    const seq = ++clientSeqRef.current;
+    setClientLoading(true);
+    setClientErr(null);
+    const url = `${API}/kpi/clients?${requestKey}&limit=100`;
+    console.log("[KPI clients] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI clients] payload:", j);
+      if (seq !== clientSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setClientData(j);
+      clientLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== clientSeqRef.current) return;
+      console.error("[KPI clients] fetch error:", e);
+      setClientErr(e.message || String(e));
+    } finally {
+      if (seq === clientSeqRef.current) setClientLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadInventory = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setInventoryErr(customPeriodError);
+      return;
+    }
+    const seq = ++inventorySeqRef.current;
+    setInventoryLoading(true);
+    setInventoryErr(null);
+    const url = `${API}/kpi/inventory?${requestKey}&limit=20`;
+    console.log("[KPI inventory] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI inventory] payload:", j);
+      if (seq !== inventorySeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setInventoryData(j);
+      inventoryLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== inventorySeqRef.current) return;
+      console.error("[KPI inventory] fetch error:", e);
+      setInventoryErr(e.message || String(e));
+    } finally {
+      if (seq === inventorySeqRef.current) setInventoryLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadArAging = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setArAgingErr(customPeriodError);
+      return;
+    }
+    const seq = ++arAgingSeqRef.current;
+    setArAgingLoading(true);
+    setArAgingErr(null);
+    const url = `${API}/kpi/ar-aging?${requestKey}&limit=20`;
+    console.log("[KPI AR aging] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI AR aging] payload:", j);
+      if (seq !== arAgingSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setArAgingData(j);
+      arAgingLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== arAgingSeqRef.current) return;
+      console.error("[KPI AR aging] fetch error:", e);
+      setArAgingErr(e.message || String(e));
+    } finally {
+      if (seq === arAgingSeqRef.current) setArAgingLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const load = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setErr(customPeriodError);
+      return;
+    }
+    const seq = ++requestSeqRef.current;
+    lastLoadedKeyRef.current = requestKey;
+    setAutoReloadEnabled(true);
+    setLoading(true); setErr(null);
+    const url = `${API}/kpi/top?${requestKey}`;
+    console.log("[KPI] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI] payload:", j);
+      if (seq !== requestSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setData(j);
+    } catch (e) {
+      if (seq !== requestSeqRef.current) return;
+      console.error("[KPI] fetch error:", e);
+      setErr(e.message || String(e));
+    } finally {
+      if (seq === requestSeqRef.current) setLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const downloadHtml = useCallback(() => {
+    if (customPeriodInvalid) return;
+    if (window.KPI_GITHUB_SNAPSHOT) {
+      alert("В GitHub Pages режиме HTML уже открыт как статическая страница. Для другого периода выберите другую snapshot-папку.");
+      return;
+    }
+    window.location.href = `${API}/export/dashboard.html?${requestKey}`;
+  }, [requestKey, customPeriodInvalid]);
+
+  useEffect(() => {
+    if (!autoReloadEnabled && !filtersActive) return;
+    if (customPeriodInvalid) return;
+    if (lastLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => load(), 450);
+    return () => clearTimeout(t);
+  }, [autoReloadEnabled, filtersActive, customPeriodInvalid, requestKey, load]);
+
+  useEffect(() => {
+    if (activeTab !== "branches") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (branchLoading) return;
+    if (branchLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadBranches(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, branchLoading, requestKey, loadBranches]);
+
+  useEffect(() => {
+    if (activeTab !== "departments") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (deptLoading) return;
+    if (deptLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadDepartments(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, deptLoading, requestKey, loadDepartments]);
+
+  useEffect(() => {
+    if (activeTab !== "clients") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (clientLoading) return;
+    if (clientLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadClients(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, clientLoading, requestKey, loadClients]);
+
+  useEffect(() => {
+    if (activeTab !== "inventory") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (inventoryLoading) return;
+    if (inventoryLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadInventory(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, inventoryLoading, requestKey, loadInventory]);
+
+  useEffect(() => {
+    if (activeTab !== "ar-aging") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (arAgingLoading) return;
+    if (arAgingLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadArAging(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, arAgingLoading, requestKey, loadArAging]);
+
+  // Строим индекс карточек по id (для быстрого доступа по блокам).
+  const cardMap = useMemo(() => {
+    const m = {};
+    (data?.cards || []).forEach(c => { m[c.id] = c; });
+    return m;
+  }, [data]);
+  const visibleBranchData = branchLoadedKeyRef.current === requestKey ? branchData : null;
+  const visibleDeptData = deptLoadedKeyRef.current === requestKey ? deptData : null;
+  const visibleClientData = clientLoadedKeyRef.current === requestKey ? clientData : null;
+  const visibleInventoryData = inventoryLoadedKeyRef.current === requestKey ? inventoryData : null;
+  const visibleArAgingData = arAgingLoadedKeyRef.current === requestKey ? arAgingData : null;
+
+  return (
+    <>
+      <header className="header">
+        <div className="header-inner">
+          <div className="brand">
+            <div className="brand-logo">KPI</div>
+            <div className="brand-text">
+              <div className="brand-title">Cash Flow Dashboard</div>
+              <div className="brand-sub">Этап 1 · Верхняя панель</div>
+            </div>
+          </div>
+          <div className="filters">
+            <div className="preset-group">
+              <div className="preset-label">Период</div>
+              <div className="preset-chips">
+                {PRESETS.map(p => (
+                  <button key={p.id}
+                          className={"chip"+(preset===p.id?" active":"")}
+                          onClick={()=>setPreset(p.id)}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {preset==="cst" && (
+              <>
+                <div className="fld date">
+                  <label>Дата с</label>
+                  <input type="date" value={customStart}
+                         onChange={e=>setCustomStart(e.target.value)}/>
+                </div>
+                <div className="fld date">
+                  <label>Дата по</label>
+                  <input type="date" value={customEnd}
+                         onChange={e=>setCustomEnd(e.target.value)}/>
+                </div>
+              </>
+            )}
+            <div className="fld">
+              <label>Ставка, % годовых</label>
+              <input type="number" min="0" max="100" step="0.5" value={rate}
+                     onChange={e=>setRate(Math.max(0, parseFloat(e.target.value)||0))}/>
+            </div>
+            <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid}>
+              {loading ? "Считаю…" : "Рассчитать"}
+            </button>
+            <button className="btn-secondary" onClick={downloadHtml} disabled={customPeriodInvalid}>
+              Скачать HTML
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="container">
+        <div className="tabs">
+          <button className={"tab-btn" + (activeTab==="overview" ? " active" : "")}
+                  onClick={() => setActiveTab("overview")}>
+            Общая панель
+          </button>
+          <button className={"tab-btn" + (activeTab==="branches" ? " active" : "")}
+                  onClick={() => setActiveTab("branches")}>
+            По БЕ
+          </button>
+          <button className={"tab-btn" + (activeTab==="departments" ? " active" : "")}
+                  onClick={() => setActiveTab("departments")}>
+            По отделам
+          </button>
+          <button className={"tab-btn" + (activeTab==="clients" ? " active" : "")}
+                  onClick={() => setActiveTab("clients")}>
+            Клиенты
+          </button>
+          <button className={"tab-btn" + (activeTab==="ar-aging" ? " active" : "")}
+                  onClick={() => setActiveTab("ar-aging")}>
+            ДЗ
+          </button>
+          <button className={"tab-btn" + (activeTab==="inventory" ? " active" : "")}
+                  onClick={() => setActiveTab("inventory")}>
+            Запасы
+          </button>
+          <button className={"tab-btn" + (activeTab==="cycle" ? " active" : "")}
+                  onClick={() => setActiveTab("cycle")}>
+            Цикл
+          </button>
+        </div>
+
+        <div className="filter-bar">
+          <div className="filter-bar-title">Фильтры</div>
+          {FILTER_DEFS.map(def => (
+            <MultiSelect key={def.key}
+                         def={def}
+                         value={filters[def.key]}
+                         onChange={v => setFilter(def.key, v)}
+                         dictQuery={dictQuery}/>
+          ))}
+          <button className="filter-reset"
+                  onClick={resetFilters}
+                  disabled={!filtersActive}>
+            Сбросить
+          </button>
+        </div>
+
+        {data?.period && (
+          <div className="period-info">
+            <div className="period-info-item">
+              <div className="period-info-label">Период</div>
+              <div className="period-info-value">{fmtDate(data.period.start)} — {fmtDate(data.period.end)} ({data.period.days} дн.)</div>
+            </div>
+            <div className="period-info-sep"/>
+            <div className="period-info-item">
+              <div className="period-info-label">Сравнение с</div>
+              <div className="period-info-value">{fmtDate(data.period.prev_start)} — {fmtDate(data.period.prev_end)}</div>
+            </div>
+            <div className="period-info-sep"/>
+            <div className="period-info-item">
+              <div className="period-info-label">Ставка фин.</div>
+              <div className="period-info-value">{(data.period.rate*100).toFixed(1)}% годовых</div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "overview" && data && <ScoreLegend/>}
+
+        {err && <div className="err-panel"><b>Ошибка запроса:</b> {err}</div>}
+        {customPeriodInvalid && <div className="err-panel"><b>Некорректный период:</b> {customPeriodError}</div>}
+
+        {activeTab === "overview" && data?.warnings && data.warnings.length > 0 && (
+          <div className="warn-panel">
+            <span className="warn-panel-ico">⚠</span>
+            <div style={{flex:1}}>
+              <b>Применены фильтры — обратите внимание:</b>
+              <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "overview" && data?.errors && data.errors.length > 0 && (
+          <div className="err-panel">
+            <b>Часть показателей не рассчиталась:</b>
+            <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+          </div>
+        )}
+
+        {activeTab === "overview" && loading && (
+          <div className="loading">
+            <div className="spinner"></div>
+            <div className="loading-text">Считаю KPI за {effectiveDays} дн. Это может занять до 30 секунд…</div>
+          </div>
+        )}
+
+        {activeTab === "overview" && !loading && !data && !err && (
+          <div className="empty-state">
+            <div className="empty-state-ico">📊</div>
+            <div className="empty-state-title">Выберите период и нажмите «Рассчитать»</div>
+            <div className="empty-state-sub">Можно выбрать один из пресетов или задать свой диапазон дат</div>
+          </div>
+        )}
+
+        {activeTab === "overview" && !loading && data && BLOCKS.map(block => (
+          <div key={block.id} className="block">
+            <div className="block-head">
+              <div className={"block-ico "+block.icoClass}>{block.ico}</div>
+              <div className="block-title">{block.title}</div>
+              <div className="block-desc">· {block.desc}</div>
+            </div>
+            <div className="grid">
+              {block.cards.map(bc => {
+                const c = cardMap[bc.id];
+                if (!c) return null;
+                return <Card key={bc.id} card={c} sub={bc.sub} tip={bc.tip}/>;
+              })}
+            </div>
+          </div>
+        ))}
+
+        {activeTab === "branches" && (
+          <BranchView
+            data={visibleBranchData}
+            loading={loading || branchLoading}
+            err={branchErr || (!data && err ? err : null)}
+            requestKey={requestKey}
+          />
+        )}
+
+        {activeTab === "departments" && (
+          <DepartmentView
+            data={visibleDeptData}
+            loading={loading || deptLoading}
+            err={deptErr || (!data && err ? err : null)}
+            requestKey={requestKey}
+          />
+        )}
+
+        {activeTab === "clients" && (
+          <ClientView
+            data={visibleClientData}
+            loading={loading || clientLoading}
+            err={clientErr || (!data && err ? err : null)}
+          />
+        )}
+
+        {activeTab === "ar-aging" && (
+          <ArAgingView
+            data={visibleArAgingData}
+            loading={loading || arAgingLoading}
+            err={arAgingErr || (!data && err ? err : null)}
+          />
+        )}
+
+        {activeTab === "inventory" && (
+          <InventoryView
+            data={visibleInventoryData}
+            loading={loading || inventoryLoading}
+            err={inventoryErr || (!data && err ? err : null)}
+          />
+        )}
+
+        {activeTab === "cycle" && (
+          <CycleView
+            data={data}
+            loading={loading}
+            err={err}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+try {
+  ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  window.__BOOT_OK = true;
+  console.log("[KPI] React mounted");
+} catch (e) {
+  console.error("[KPI] Mount failed:", e);
+  document.getElementById("root").innerHTML =
+    '<div style="padding:24px;color:#b91c1c;font-family:system-ui;">Mount failed: ' + e.message + '</div>';
+}
 </script>
 </body>
 </html>
