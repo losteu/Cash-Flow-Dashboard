@@ -437,7 +437,7 @@ setTimeout(function() {
     headers: {"Content-Type":"application/json; charset=utf-8"}
   });
   const fail = (message, status) => jsonResponse({ok:false, snapshot_mode:true, source:"github-pages", error:message}, status || 400);
-  const DEFAULT_FILTER_KEYS = ["sale_type_ids","product_group_ids"];
+  const DEFAULT_FILTER_KEYS = ["parole_ids","sale_type_ids","product_group_ids"];
   const parseIds = (raw) => String(raw || "")
     .split(",")
     .map(x => Number(String(x).trim()))
@@ -625,7 +625,7 @@ const FILTER_DEFS = [
   {key:"bu_ids",     endpoint:"/dict/branches",       label:"Бизнес-единицы", placeholder:"Все БЕ"},
   {key:"mol_ids",    endpoint:"/dict/managers",       label:"Менеджеры",    placeholder:"Все менеджеры"},
   {key:"dept_ids",   endpoint:"/dict/departments",    label:"Отделы",       placeholder:"Все отделы"},
-  {key:"parole_ids", endpoint:"/dict/clients",        label:"Клиенты",      placeholder:"Все клиенты"},
+  {key:"parole_ids", endpoint:"/dict/clients",        label:"Клиенты",      placeholder:"Все клиенты без маркетплейса"},
   {key:"pred_ids",   endpoint:"/dict/counterparties", label:"Контрагенты",  placeholder:"Все контрагенты"},
   {key:"sale_type_ids", endpoint:"/dict/sale-types",  label:"Тип продажи",  placeholder:"Все типы без маркетплейса"},
   {key:"product_group_ids", endpoint:"/dict/product-groups", label:"Товарная группа", placeholder:"Все группы без с/х животных"},
@@ -633,6 +633,10 @@ const FILTER_DEFS = [
 ];
 
 const DEFAULT_FILTER_RULES = {
+  parole_ids: {
+    enabled: (items) => items.some(item => Object.prototype.hasOwnProperty.call(item, "is_marketplace")),
+    exclude: (item) => Boolean(item.is_marketplace),
+  },
   sale_type_ids: {
     exclude: (item) => String(item.name || "").toLowerCase().includes("маркетплейс"),
   },
@@ -701,8 +705,8 @@ const BLOCKS = [
       },
       {
         id:"dso_days",
-        sub:"Сред. ДЗ / Выручка × дни периода",
-        tip:"Days Sales Outstanding — сколько дней в среднем клиент держит у себя наши деньги между отгрузкой и оплатой. Чем меньше — тем быстрее деньги возвращаются в оборот."
+        sub:"ДЗ на конец / Выручка × дни периода",
+        tip:"Days Sales Outstanding — сколько дней продаж заморожено в текущей ДЗ. Для группы пересчитывается от общей ДЗ и общей выручки, а не суммируется по строкам."
       },
       {
         id:"cei_pct",
@@ -831,13 +835,13 @@ const COL_TIPS = {
   cashAdj: "Cash-adj — денежная маржа. Это маржа минус расчетная стоимость денег, замороженных в ДЗ и запасах. Если показатель около нуля или в минусе, бумажная маржа почти съедена отсрочками/запасами.",
   cashPct: "Cash.% = Cash-adj / выручка × 100%. Денежная рентабельность после стоимости замороженных денег.",
   ar: "ДЗ — открытый долг покупателей по FIFO на дату окончания периода. Это остаток долга на дату, а не продажи за период.",
-  avgAr: "Сред. ДЗ — среднее между ДЗ на начало и конец периода. Используется для DSO и стоимости отсрочки.",
+  avgAr: "Сред. ДЗ — среднее между ДЗ на начало и конец периода. Используется для стоимости отсрочки и финансирования оборотного капитала.",
   arAdvance: "Авансы покупателей — деньги, полученные вперед. Это наша обязанность отгрузить товар или зачесть оплату, а не обычная ДЗ.",
   overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
   overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
-  dso: "DSO — сколько дней в среднем деньги клиента находятся в ДЗ. Чем выше DSO, тем дольше мы финансируем клиента.",
+  dso: "DSO — сколько дней продаж заморожено в текущей ДЗ: ДЗ на конец периода / выручка периода × дни. Не суммируется по строкам: для отдела, менеджера или БЕ пересчитывается от их общей ДЗ и общей выручки. Средняя ДЗ используется отдельно для стоимости отсрочки.",
   cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. Чем ближе к 100%, тем лучше сбор.",
-  arFinCost: "Стоимость отсрочки — расчетная цена денег, замороженных в ДЗ. Это не бухгалтерский убыток, а оценка: сколько стоила отсрочка при выбранной ставке финансирования.",
+  arFinCost: "Стоимость отсрочки — расчетная цена денег, замороженных в ДЗ за период: средняя ДЗ × ставка × дни периода / 365. Это не бухгалтерский убыток, а оценка стоимости капитала.",
   inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
   dio: "DIO — сколько дней деньги в среднем лежат в запасах до продажи/расхода. Чем выше DIO, тем медленнее оборачивается склад.",
   ap: "КЗ сырье — наш открытый долг активным сырьевым поставщикам по FIFO на дату окончания периода.",
@@ -2203,7 +2207,6 @@ function ClientView({data, loading, err}) {
               <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
               <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
               <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
-              <Th className="num" tip={COL_TIPS.avgAr} {...sortable(sortState, requestSort, "avg_ar_rub")}>Сред. ДЗ</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
@@ -2216,7 +2219,7 @@ function ClientView({data, loading, err}) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="16" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
+              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => (
               <tr key={r.client_id}>
@@ -2230,7 +2233,6 @@ function ClientView({data, loading, err}) {
                 <td className="num"><DeltaBadge value={r.revenue_delta_pct}/></td>
                 <td className="num">{fmtRub(r.margin_rub)}</td>
                 <td className="num">{fmtPct(r.margin_pct)}</td>
-                <td className="num">{fmtRub(r.avg_ar_rub)}</td>
                 <td className="num">{fmtRub(r.ar_rub)}</td>
                 <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
                   {fmtRub(r.overdue_ar_rub)}
@@ -2782,7 +2784,9 @@ function App() {
           const r = await fetch(url);
           const j = await r.json();
           if (!j.ok) continue;
-          nextDefaults[def.key] = (j.items || [])
+          const items = j.items || [];
+          if (rule.enabled && !rule.enabled(items)) continue;
+          nextDefaults[def.key] = items
             .filter(item => !rule.exclude(item))
             .map(item => item.id);
         } catch (e) {
