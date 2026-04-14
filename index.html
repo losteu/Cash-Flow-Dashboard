@@ -266,6 +266,28 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .status-badge.warn{background:var(--abg);color:var(--amb)}
 .status-badge.risk{background:var(--rbg);color:var(--red)}
 
+/* ─── Benchmark highlighting ─────────────── */
+.bench-good{background:rgba(5,150,105,.07)}
+.bench-bad{background:rgba(220,38,38,.07)}
+.dept-table tfoot td{background:var(--bg2);font-weight:700;border-top:2px solid var(--bd2);color:var(--t2);font-size:11px;padding:10px 10px}
+.dept-table tfoot .avg-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);font-weight:800}
+.bench-legend{display:inline-flex;align-items:center;gap:12px;margin-left:12px;font-size:11px;color:var(--t3);font-weight:500}
+.bench-legend-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.bench-legend-dot.good{background:rgba(5,150,105,.35)}
+.bench-legend-dot.bad{background:rgba(220,38,38,.35)}
+
+/* ─── Concentration risk panel ────────────── */
+.conc-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh1)}
+.conc-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2);margin-bottom:10px}
+.conc-grid{display:flex;flex-wrap:wrap;gap:10px}
+.conc-card{flex:1;min-width:180px;background:var(--bg2);border-radius:var(--r3);padding:12px 14px;border:1px solid var(--bd)}
+.conc-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);margin-bottom:6px}
+.conc-card-value{font-family:var(--mn);font-size:22px;font-weight:700;color:var(--t1);line-height:1.1}
+.conc-card-value.conc-high{color:var(--red)}
+.conc-card-value.conc-mid{color:var(--amb)}
+.conc-card-sub{font-size:10px;color:var(--t3);font-weight:500;margin-top:3px}
+.conc-clients{font-size:10px;color:var(--t2);margin-top:6px;line-height:1.4;font-weight:500;border-top:1px solid var(--bd);padding-top:6px}
+
 /* ─── Inventory tab ─────────────────────── */
 .stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .stock-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:14px 16px;min-width:0}
@@ -477,7 +499,7 @@ setTimeout(function() {
     }
     return p;
   };
-  const unsupported = () => fail("Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и раскрытия БЕ/отделов, которые заранее экспортированы. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.", 422);
+  const unsupported = () => fail("Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и раскрытия БЕ/отделов/менеджеров, которые заранее экспортированы. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.", 422);
   const payloadForApi = async (url) => {
     const path = url.pathname;
     const params = url.searchParams;
@@ -512,14 +534,27 @@ setTimeout(function() {
       const rel = defaultOnly ? "kpi/default/departments.json" : "kpi/departments.json";
       return withNotice(await readJson(rel));
     }
+    if (path === "/api/kpi/managers") {
+      const defaultOnly = hasOnlyDefaultFilters(params);
+      if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
+      const rel = defaultOnly ? "kpi/default/managers.json" : "kpi/managers.json";
+      return withNotice(await readJson(rel));
+    }
     if (path === "/api/kpi/clients") {
       const deptId = singleValue(params, "dept_ids");
+      const managerId = singleValue(params, "mol_ids");
       if (String(params.get("dept_ids") || "").trim() && !deptId) return unsupported();
-      const defaultOnly = hasOnlyDefaultFilters(params, ["dept_ids"]);
-      if (hasUnsupportedFilters(params, ["dept_ids"]) || (hasFilters(params, ["dept_ids"]) && !defaultOnly)) return unsupported();
+      if (String(params.get("mol_ids") || "").trim() && !managerId) return unsupported();
+      if (deptId && managerId) return unsupported();
+      const defaultOnly = hasOnlyDefaultFilters(params, ["dept_ids", "mol_ids"]);
+      if (hasUnsupportedFilters(params, ["dept_ids", "mol_ids"]) || (hasFilters(params, ["dept_ids", "mol_ids"]) && !defaultOnly)) return unsupported();
       if (deptId) {
         const prefix = defaultOnly ? "details/default_department_" : "details/department_";
         return withNotice(await readJson(`${prefix}${deptId}_clients.json`));
+      }
+      if (managerId) {
+        const prefix = defaultOnly ? "details/default_manager_" : "details/manager_";
+        return withNotice(await readJson(`${prefix}${managerId}_clients.json`));
       }
       const rel = defaultOnly ? "kpi/default/clients.json" : "kpi/clients.json";
       return withNotice(await readJson(rel));
@@ -669,6 +704,11 @@ const BLOCKS = [
         sub:"Сред. ДЗ / Выручка × дни периода",
         tip:"Days Sales Outstanding — сколько дней в среднем клиент держит у себя наши деньги между отгрузкой и оплатой. Чем меньше — тем быстрее деньги возвращаются в оборот."
       },
+      {
+        id:"cei_pct",
+        sub:"Собрано / доступно к сбору",
+        tip:"Collection Effectiveness Index — насколько эффективно собрали деньги за период. 100% означает, что почти всё доступное к сбору закрыто; низкий CEI показывает, что продажи превращаются в ДЗ."
+      },
     ]
   },
   {
@@ -738,7 +778,7 @@ const fmtRub = (n) => {
   return n.toLocaleString("ru-RU",{maximumFractionDigits:0});
 };
 const fmtDays = (n) => (n==null||isNaN(n)) ? "—" : n.toLocaleString("ru-RU",{maximumFractionDigits:1});
-const fmtVal  = (card) => card.unit === "дни" ? fmtDays(card.value) : fmtRub(card.value);
+const fmtVal  = (card) => card.unit === "дни" ? fmtDays(card.value) : card.unit === "%" ? fmtQty(card.value) : fmtRub(card.value);
 const fmtDelta = (p) => (p==null||isNaN(p)) ? "—" : (p>0?"+":"") + p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtPct = (p) => (p==null||isNaN(p)) ? "—" : p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
@@ -796,6 +836,7 @@ const COL_TIPS = {
   overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
   overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
   dso: "DSO — сколько дней в среднем деньги клиента находятся в ДЗ. Чем выше DSO, тем дольше мы финансируем клиента.",
+  cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. Чем ближе к 100%, тем лучше сбор.",
   arFinCost: "Стоимость отсрочки — расчетная цена денег, замороженных в ДЗ. Это не бухгалтерский убыток, а оценка: сколько стоила отсрочка при выбранной ставке финансирования.",
   inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
   dio: "DIO — сколько дней деньги в среднем лежат в запасах до продажи/расхода. Чем выше DIO, тем медленнее оборачивается склад.",
@@ -851,6 +892,15 @@ function useSortedRows(rows, defaultKey="rank", defaultDir="asc") {
 }
 
 const sortable = (sortState, requestSort, key) => ({sortKey:key, sortState, onSort:requestSort});
+
+// Benchmark: подсветка ячеек относительно среднего по компании.
+function benchCls(value, avg, lowerIsBetter) {
+  if (value == null || avg == null || avg === 0) return "";
+  const diff = (value - avg) / Math.abs(avg);
+  if (Math.abs(diff) < 0.05) return "";
+  if (lowerIsBetter) return diff < 0 ? "bench-good" : "bench-bad";
+  return diff > 0 ? "bench-good" : "bench-bad";
+}
 
 function Th({children, className="", tip, sortKey, sortState, onSort}) {
   const active = Boolean(sortKey && sortState?.key === sortKey);
@@ -1018,6 +1068,7 @@ function MultiSelect({def, value, onChange, dictQuery}) {
 // ─── Форматирование цели для тултипа ──────────────
 const fmtTargetVal = (target, unit) => {
   if (target == null) return "";
+  if (unit === "%") return fmtPct(target);
   return unit === "дни" ? fmtDays(target) + " дн." : fmtRub(target) + " руб";
 };
 
@@ -1188,6 +1239,20 @@ function DepartmentView({data, loading, err, requestKey}) {
   const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
   const requestDetailSort = useCallback((key) => setDetailSortState(prev => nextSortState(prev, key)), []);
   const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
+  const rows = sortedRows;
+  const totals = data?.totals || {};
+  const avg = useMemo(() => {
+    if (!rows.length) return null;
+    const n = rows.length;
+    const sum = (k) => rows.reduce((s, r) => s + (r[k] || 0), 0);
+    return {
+      margin_pct: totals.revenue_rub ? (totals.margin_rub / totals.revenue_rub * 100) : sum("margin_pct") / n,
+      revenue_delta_pct: sum("revenue_delta_pct") / n,
+      dso_days: sum("dso_days") / n,
+      cei_pct: totals.cei_pct,
+      overdue_share_pct: totals.ar_rub ? (totals.overdue_ar_rub / totals.ar_rub * 100) : sum("overdue_share_pct") / n,
+    };
+  }, [rows, totals]);
 
   useEffect(() => {
     setExpandedDeptId(null);
@@ -1248,9 +1313,6 @@ function DepartmentView({data, loading, err, requestKey}) {
     );
   }
 
-  const rows = sortedRows;
-  const totals = data.totals || {};
-
   return (
     <>
       {data.warnings && data.warnings.length > 0 && (
@@ -1291,10 +1353,18 @@ function DepartmentView({data, loading, err, requestKey}) {
           <div className="dept-summary-label">Просрочка</div>
           <div className="dept-summary-value">{fmtRub(totals.overdue_ar_rub)}</div>
         </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">CEI</div>
+          <div className="dept-summary-value">{fmtPct(totals.cei_pct)}</div>
+        </div>
       </div>
 
       <div className="dept-note">
         Кликните на отдел, чтобы раскрыть клиентов внутри него. По заголовкам можно сортировать таблицу.
+        <span className="bench-legend">
+          <span><span className="bench-legend-dot good"></span>лучше среднего</span>
+          <span><span className="bench-legend-dot bad"></span>хуже среднего</span>
+        </span>
       </div>
 
       <div className="dept-table-wrap">
@@ -1313,12 +1383,13 @@ function DepartmentView({data, loading, err, requestKey}) {
               <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
               <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Ст-ть ДЗ</Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="13" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет отделов с продажами за выбранный период</td></tr>
+              <tr><td colSpan="14" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет отделов с продажами за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => {
               const open = expandedDeptId === r.department_id;
@@ -1335,22 +1406,23 @@ function DepartmentView({data, loading, err, requestKey}) {
                     </td>
                     <td className="num">{fmtRub(r.revenue_rub)}</td>
                     <td className="num">{fmtPct(r.revenue_share_pct)}</td>
-                    <td className="num"><DeltaBadge value={r.revenue_delta_pct}/></td>
+                    <td className={"num " + benchCls(r.revenue_delta_pct, avg?.revenue_delta_pct, false)}><DeltaBadge value={r.revenue_delta_pct}/></td>
                     <td className="num">{fmtRub(r.margin_rub)}</td>
-                    <td className="num">{fmtPct(r.margin_pct)}</td>
+                    <td className={"num " + benchCls(r.margin_pct, avg?.margin_pct, false)}>{fmtPct(r.margin_pct)}</td>
                     <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
                     <td className="num">{fmtRub(r.ar_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
-                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
+                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>
                       {fmtRub(r.overdue_ar_rub)}
                       <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
                     </td>
-                    <td className="num">{fmtDays(r.dso_days)}</td>
+                    <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
+                    <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)}>{fmtPct(r.cei_pct)}</td>
                     <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
                   </tr>
                   {open && (
                     <tr>
-                      <td className="dept-detail-cell" colSpan="13">
+                      <td className="dept-detail-cell" colSpan="14">
                         <div className="dept-detail-head">
                           <div>
                             <div className="dept-detail-title">Клиенты отдела</div>
@@ -1384,6 +1456,7 @@ function DepartmentView({data, loading, err, requestKey}) {
                                   <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
                                   <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
                                   <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
                                   <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
                                   <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
                                 </tr>
@@ -1400,6 +1473,7 @@ function DepartmentView({data, loading, err, requestKey}) {
                                     <td className="num">{fmtRub(c.ar_rub)}</td>
                                     <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
                                     <td className="num">{fmtDays(c.dso_days)}</td>
+                                    <td className="num">{fmtPct(c.cei_pct)}</td>
                                     <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
                                     <td>
                                       <span className={"status-badge " + c.status_code}>{c.status}</span>
@@ -1418,6 +1492,322 @@ function DepartmentView({data, loading, err, requestKey}) {
               );
             })}
           </tbody>
+          {avg && rows.length > 1 && (
+            <tfoot>
+              <tr>
+                <td></td>
+                <td className="avg-label">Среднее</td>
+                <td className="num">{fmtRub(totals.revenue_rub / rows.length)}</td>
+                <td className="num">—</td>
+                <td className="num">{fmtPct(avg.revenue_delta_pct)}</td>
+                <td className="num">{fmtRub(totals.margin_rub / rows.length)}</td>
+                <td className="num">{fmtPct(avg.margin_pct)}</td>
+                <td className="num">{fmtRub((totals.cash_adj_margin_rub || 0) / rows.length)}</td>
+                <td className="num">{fmtRub(totals.ar_rub / rows.length)}</td>
+                <td className="num">{fmtRub((totals.ar_advance_rub || 0) / rows.length)}</td>
+                <td className="num">
+                  {fmtRub(totals.overdue_ar_rub / rows.length)}
+                  <span className="muted">{fmtPct(avg.overdue_share_pct)} от ДЗ</span>
+                </td>
+                <td className="num">{fmtDays(avg.dso_days)}</td>
+                <td className="num">{fmtPct(avg.cei_pct)}</td>
+                <td className="num">{fmtRub((totals.ar_fin_cost_rub || 0) / rows.length)}</td>
+              </tr>
+            </tfoot>
+          )}
+        </table>
+      </div>
+    </>
+  );
+}
+
+function ManagerView({data, loading, err, requestKey}) {
+  const [expandedManagerId, setExpandedManagerId] = useState(null);
+  const [detailByManager, setDetailByManager] = useState({});
+  const [detailLoadingManager, setDetailLoadingManager] = useState(null);
+  const [detailErr, setDetailErr] = useState(null);
+  const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
+  const requestDetailSort = useCallback((key) => setDetailSortState(prev => nextSortState(prev, key)), []);
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
+  const rows = sortedRows;
+  const totals = data?.totals || {};
+  const avg = useMemo(() => {
+    if (!rows.length) return null;
+    const n = rows.length;
+    const sum = (k) => rows.reduce((s, r) => s + (r[k] || 0), 0);
+    return {
+      margin_pct: totals.revenue_rub ? (totals.margin_rub / totals.revenue_rub * 100) : sum("margin_pct") / n,
+      revenue_delta_pct: sum("revenue_delta_pct") / n,
+      dso_days: sum("dso_days") / n,
+      cei_pct: totals.cei_pct,
+      overdue_share_pct: totals.ar_rub ? (totals.overdue_ar_rub / totals.ar_rub * 100) : sum("overdue_share_pct") / n,
+    };
+  }, [rows, totals]);
+
+  useEffect(() => {
+    setExpandedManagerId(null);
+    setDetailByManager({});
+    setDetailLoadingManager(null);
+    setDetailErr(null);
+  }, [requestKey]);
+
+  const loadManagerClients = useCallback(async (managerId) => {
+    const key = String(managerId);
+    if (detailByManager[key]) return;
+    setDetailLoadingManager(managerId);
+    setDetailErr(null);
+    try {
+      const params = new URLSearchParams(requestKey || "");
+      params.set("mol_ids", key);
+      params.set("sort", "revenue");
+      const url = `${API}/kpi/clients?${params.toString()}`;
+      const r = await fetch(url);
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setDetailByManager(prev => ({...prev, [key]: j}));
+    } catch (e) {
+      setDetailErr(e.message || String(e));
+    } finally {
+      setDetailLoadingManager(null);
+    }
+  }, [requestKey, detailByManager]);
+
+  const toggleManager = (row) => {
+    const managerId = row.manager_id;
+    if (expandedManagerId === managerId) {
+      setExpandedManagerId(null);
+      return;
+    }
+    setExpandedManagerId(managerId);
+    loadManagerClients(managerId);
+  };
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <div className="loading-text">Считаю KPI по менеджерам. Сверяю продажи, ДЗ и просрочку…</div>
+      </div>
+    );
+  }
+  if (err) {
+    return <div className="err-panel"><b>Ошибка расчёта менеджеров:</b> {err}</div>;
+  }
+  if (!data) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-ico">▧</div>
+        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть сравнение менеджеров</div>
+        <div className="empty-state-sub">Менеджера можно раскрыть до клиентов</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="warn-panel">
+          <span className="warn-panel-ico">!</span>
+          <div style={{flex:1}}>
+            <b>Особенности сравнения менеджеров:</b>
+            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
+          </div>
+        </div>
+      )}
+
+      {data.errors && data.errors.length > 0 && (
+        <div className="err-panel">
+          <b>Часть показателей по менеджерам не рассчиталась:</b>
+          <ul>{data.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+        </div>
+      )}
+
+      <div className="dept-summary">
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Менеджеров</div>
+          <div className="dept-summary-value">{totals.managers || rows.length}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Выручка</div>
+          <div className="dept-summary-value">{fmtRub(totals.revenue_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Маржа</div>
+          <div className="dept-summary-value">{fmtRub(totals.margin_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ДЗ</div>
+          <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Просрочка</div>
+          <div className="dept-summary-value">{fmtRub(totals.overdue_ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">CEI</div>
+          <div className="dept-summary-value">{fmtPct(totals.cei_pct)}</div>
+        </div>
+      </div>
+
+      <div className="dept-note">
+        Кликните на менеджера, чтобы раскрыть его клиентов. По заголовкам можно сортировать таблицу.
+        <span className="bench-legend">
+          <span><span className="bench-legend-dot good"></span>лучше среднего</span>
+          <span><span className="bench-legend-dot bad"></span>хуже среднего</span>
+        </span>
+      </div>
+
+      <div className="dept-table-wrap">
+        <table className="dept-table">
+          <thead>
+            <tr>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "manager")}>Менеджер</Th>
+              <Th {...sortable(sortState, requestSort, "department")}>Отдел</Th>
+              <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(sortState, requestSort, "revenue_share_pct")}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
+              <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Ст-ть ДЗ</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет менеджеров с данными за выбранный период</td></tr>
+            )}
+            {rows.map((r, idx) => {
+              const open = expandedManagerId === r.manager_id;
+              const detail = detailByManager[String(r.manager_id)];
+              const detailRows = sortRows(detail?.rows || [], detailSortState);
+              return (
+                <React.Fragment key={r.manager_id}>
+                  <tr className="dept-main-row" onClick={() => toggleManager(r)}>
+                    <td className="rank">{idx + 1}</td>
+                    <td className="dept-name">
+                      <span className="dept-expander">{open ? "▾" : "▸"}</span>
+                      {r.manager}
+                      <span className="muted">Нажмите для детализации по клиентам</span>
+                    </td>
+                    <td>{r.department || "—"}</td>
+                    <td className="num">{fmtRub(r.revenue_rub)}</td>
+                    <td className="num">{fmtPct(r.revenue_share_pct)}</td>
+                    <td className={"num " + benchCls(r.revenue_delta_pct, avg?.revenue_delta_pct, false)}><DeltaBadge value={r.revenue_delta_pct}/></td>
+                    <td className="num">{fmtRub(r.margin_rub)}</td>
+                    <td className={"num " + benchCls(r.margin_pct, avg?.margin_pct, false)}>{fmtPct(r.margin_pct)}</td>
+                    <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_rub)}</td>
+                    <td className="num">{fmtRub(r.ar_advance_rub)}</td>
+                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>
+                      {fmtRub(r.overdue_ar_rub)}
+                      <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
+                    </td>
+                    <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
+                    <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)}>{fmtPct(r.cei_pct)}</td>
+                    <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                  </tr>
+                  {open && (
+                    <tr>
+                      <td className="dept-detail-cell" colSpan="15">
+                        <div className="dept-detail-head">
+                          <div>
+                            <div className="dept-detail-title">Клиенты менеджера</div>
+                            <div className="dept-detail-sub">Сортировка по выручке за выбранный период</div>
+                          </div>
+                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detail.rows?.length || 0)}</div>}
+                        </div>
+                        {detailLoadingManager === r.manager_id && (
+                          <div className="loading" style={{padding:"24px"}}>
+                            <div className="spinner"></div>
+                            <div className="loading-text">Загружаю клиентов менеджера…</div>
+                          </div>
+                        )}
+                        {detailErr && detailLoadingManager == null && (
+                          <div className="err-panel"><b>Ошибка детализации:</b> {detailErr}</div>
+                        )}
+                        {detail && detailRows.length === 0 && (
+                          <div className="ms-empty">Нет клиентов у выбранного менеджера за период</div>
+                        )}
+                        {detailRows.length > 0 && (
+                          <div className="dept-detail-scroll">
+                            <table className="dept-detail-table">
+                              <thead>
+                                <tr>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                  <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
+                                  <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля мен.</Th>
+                                  <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
+                                  <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
+                                  <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
+                                  <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+                                  <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {detailRows.map((c, idx) => (
+                                  <tr key={c.client_id || idx}>
+                                    <td className="rank">{idx + 1}</td>
+                                    <td className="dept-name">{c.client}</td>
+                                    <td className="num">{fmtRub(c.revenue_rub)}</td>
+                                    <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
+                                    <td className="num">{fmtRub(c.margin_rub)}</td>
+                                    <td className="num">{fmtPct(c.margin_pct)}</td>
+                                    <td className="num">{fmtRub(c.ar_rub)}</td>
+                                    <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
+                                    <td className="num">{fmtDays(c.dso_days)}</td>
+                                    <td className="num">{fmtPct(c.cei_pct)}</td>
+                                    <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
+                                    <td>
+                                      <span className={"status-badge " + c.status_code}>{c.status}</span>
+                                      <span className="muted">{c.status_reason}</span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+          {avg && rows.length > 1 && (
+            <tfoot>
+              <tr>
+                <td></td>
+                <td className="avg-label">Среднее</td>
+                <td></td>
+                <td className="num">{fmtRub(totals.revenue_rub / rows.length)}</td>
+                <td className="num">—</td>
+                <td className="num">{fmtPct(avg.revenue_delta_pct)}</td>
+                <td className="num">{fmtRub(totals.margin_rub / rows.length)}</td>
+                <td className="num">{fmtPct(avg.margin_pct)}</td>
+                <td className="num">{fmtRub((totals.cash_adj_margin_rub || 0) / rows.length)}</td>
+                <td className="num">{fmtRub(totals.ar_rub / rows.length)}</td>
+                <td className="num">{fmtRub((totals.ar_advance_rub || 0) / rows.length)}</td>
+                <td className="num">
+                  {fmtRub(totals.overdue_ar_rub / rows.length)}
+                  <span className="muted">{fmtPct(avg.overdue_share_pct)} от ДЗ</span>
+                </td>
+                <td className="num">{fmtDays(avg.dso_days)}</td>
+                <td className="num">{fmtPct(avg.cei_pct)}</td>
+                <td className="num">{fmtRub((totals.ar_fin_cost_rub || 0) / rows.length)}</td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
     </>
@@ -1527,6 +1917,10 @@ function BranchView({data, loading, err, requestKey}) {
           <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
         </div>
         <div className="dept-summary-item">
+          <div className="dept-summary-label">CEI</div>
+          <div className="dept-summary-value">{fmtPct(totals.cei_pct)}</div>
+        </div>
+        <div className="dept-summary-item">
           <div className="dept-summary-label">Запасы</div>
           <div className="dept-summary-value">{fmtRub(totals.inventory_rub)}</div>
         </div>
@@ -1559,6 +1953,7 @@ function BranchView({data, loading, err, requestKey}) {
               <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Проср. ДЗ</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
               <Th className="num" tip={COL_TIPS.inventory} {...sortable(sortState, requestSort, "inventory_rub")}>Запасы</Th>
               <Th className="num" tip={COL_TIPS.dio} {...sortable(sortState, requestSort, "dio_days")}>DIO</Th>
               <Th className="num" tip={COL_TIPS.ap} {...sortable(sortState, requestSort, "ap_rub")}>КЗ сырье</Th>
@@ -1570,7 +1965,7 @@ function BranchView({data, loading, err, requestKey}) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="18" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
+              <tr><td colSpan="19" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => {
               const open = expandedBranchId === r.branch_id;
@@ -1597,6 +1992,7 @@ function BranchView({data, loading, err, requestKey}) {
                       <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
                     </td>
                     <td className="num">{fmtDays(r.dso_days)}</td>
+                    <td className="num">{fmtPct(r.cei_pct)}</td>
                     <td className="num">{fmtRub(r.inventory_rub)}</td>
                     <td className="num">{fmtDays(r.dio_days)}</td>
                     <td className="num">{fmtRub(r.ap_rub)}</td>
@@ -1610,7 +2006,7 @@ function BranchView({data, loading, err, requestKey}) {
                   </tr>
                   {open && (
                     <tr>
-                      <td className="dept-detail-cell" colSpan="18">
+                      <td className="dept-detail-cell" colSpan="19">
                         <div className="dept-detail-head">
                           <div>
                             <div className="dept-detail-title">Отделы БЕ</div>
@@ -1644,6 +2040,7 @@ function BranchView({data, loading, err, requestKey}) {
                                   <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы пок.</Th>
                                   <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
                                   <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
                                   <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
                                 </tr>
                               </thead>
@@ -1659,6 +2056,7 @@ function BranchView({data, loading, err, requestKey}) {
                                     <td className="num">{fmtRub(d.ar_advance_rub)}</td>
                                     <td className={"num " + (d.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(d.overdue_ar_rub)}</td>
                                     <td className="num">{fmtDays(d.dso_days)}</td>
+                                    <td className="num">{fmtPct(d.cei_pct)}</td>
                                     <td className="num">{fmtRub(d.cash_adj_margin_rub)}</td>
                                   </tr>
                                 ))}
@@ -1743,10 +2141,52 @@ function ClientView({data, loading, err}) {
           <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
         </div>
         <div className="dept-summary-item">
+          <div className="dept-summary-label">CEI</div>
+          <div className="dept-summary-value">{fmtPct(totals.cei_pct)}</div>
+        </div>
+        <div className="dept-summary-item">
           <div className="dept-summary-label">Cash-adj</div>
           <div className="dept-summary-value">{fmtRub(totals.cash_adj_margin_rub)}</div>
         </div>
       </div>
+
+      {(totals.top5_ar_share_pct != null || totals.top5_overdue_share_pct != null) && (
+        <div className="conc-panel">
+          <div className="conc-title">Концентрация риска ДЗ</div>
+          <div className="conc-grid">
+            <div className="conc-card">
+              <div className="conc-card-label">Top-5 клиентов по ДЗ</div>
+              <div className={"conc-card-value" + (totals.top5_ar_share_pct > 70 ? " conc-high" : totals.top5_ar_share_pct > 50 ? " conc-mid" : "")}>{fmtPct(totals.top5_ar_share_pct)}</div>
+              <div className="conc-card-sub">от общей ДЗ {fmtRub(totals.ar_rub)}</div>
+              {totals.top5_ar_clients && totals.top5_ar_clients.length > 0 && (
+                <div className="conc-clients">{totals.top5_ar_clients.join(", ")}</div>
+              )}
+            </div>
+            <div className="conc-card">
+              <div className="conc-card-label">Top-10 клиентов по ДЗ</div>
+              <div className={"conc-card-value" + (totals.top10_ar_share_pct > 85 ? " conc-high" : totals.top10_ar_share_pct > 70 ? " conc-mid" : "")}>{fmtPct(totals.top10_ar_share_pct)}</div>
+              <div className="conc-card-sub">от общей ДЗ</div>
+            </div>
+            {totals.top5_overdue_share_pct != null && (
+              <div className="conc-card">
+                <div className="conc-card-label">Top-5 по просрочке</div>
+                <div className={"conc-card-value" + (totals.top5_overdue_share_pct > 70 ? " conc-high" : totals.top5_overdue_share_pct > 50 ? " conc-mid" : "")}>{fmtPct(totals.top5_overdue_share_pct)}</div>
+                <div className="conc-card-sub">от общей просрочки {fmtRub(totals.overdue_ar_rub)}</div>
+                {totals.top5_overdue_clients && totals.top5_overdue_clients.length > 0 && (
+                  <div className="conc-clients">{totals.top5_overdue_clients.join(", ")}</div>
+                )}
+              </div>
+            )}
+            {totals.top10_overdue_share_pct != null && (
+              <div className="conc-card">
+                <div className="conc-card-label">Top-10 по просрочке</div>
+                <div className={"conc-card-value" + (totals.top10_overdue_share_pct > 85 ? " conc-high" : totals.top10_overdue_share_pct > 70 ? " conc-mid" : "")}>{fmtPct(totals.top10_overdue_share_pct)}</div>
+                <div className="conc-card-sub">от общей просрочки</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="dept-note">
         Статус подсвечивает клиентов, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ. По заголовкам можно сортировать таблицу.
@@ -1767,6 +2207,7 @@ function ClientView({data, loading, err}) {
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
               <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Стоимость отсрочки</Th>
               <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
               <Th className="num" tip={COL_TIPS.cashPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
@@ -1775,7 +2216,7 @@ function ClientView({data, loading, err}) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
+              <tr><td colSpan="16" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => (
               <tr key={r.client_id}>
@@ -1796,6 +2237,7 @@ function ClientView({data, loading, err}) {
                   <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
                 </td>
                 <td className="num">{fmtDays(r.dso_days)}</td>
+                <td className="num">{fmtPct(r.cei_pct)}</td>
                 <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
                 <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
                 <td className="num">{fmtPct(r.cash_adj_margin_pct)}</td>
@@ -2206,22 +2648,25 @@ function App() {
   const [preset, setPreset] = useState("m");    // активный чип
   const [customEnd, setCustomEnd] = useState(() => todayIso());
   const [customStart, setCustomStart] = useState(() => addDaysIso(todayIso(), -29));
-  const [rate, setRate] = useState(24);         // процентов годовых
+  const [rate, setRate] = useState(20);         // процентов годовых
   const [activeTab, setActiveTab] = useState("overview");
   const [data, setData] = useState(null);
   const [branchData, setBranchData] = useState(null);
+  const [managerData, setManagerData] = useState(null);
   const [deptData, setDeptData] = useState(null);
   const [clientData, setClientData] = useState(null);
   const [inventoryData, setInventoryData] = useState(null);
   const [arAgingData, setArAgingData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [branchLoading, setBranchLoading] = useState(false);
+  const [managerLoading, setManagerLoading] = useState(false);
   const [deptLoading, setDeptLoading] = useState(false);
   const [clientLoading, setClientLoading] = useState(false);
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [arAgingLoading, setArAgingLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [branchErr, setBranchErr] = useState(null);
+  const [managerErr, setManagerErr] = useState(null);
   const [deptErr, setDeptErr] = useState(null);
   const [clientErr, setClientErr] = useState(null);
   const [inventoryErr, setInventoryErr] = useState(null);
@@ -2229,12 +2674,14 @@ function App() {
   const [autoReloadEnabled, setAutoReloadEnabled] = useState(false);
   const lastLoadedKeyRef = useRef(null);
   const branchLoadedKeyRef = useRef(null);
+  const managerLoadedKeyRef = useRef(null);
   const deptLoadedKeyRef = useRef(null);
   const clientLoadedKeyRef = useRef(null);
   const inventoryLoadedKeyRef = useRef(null);
   const arAgingLoadedKeyRef = useRef(null);
   const requestSeqRef = useRef(0);
   const branchSeqRef = useRef(0);
+  const managerSeqRef = useRef(0);
   const deptSeqRef = useRef(0);
   const clientSeqRef = useRef(0);
   const inventorySeqRef = useRef(0);
@@ -2390,6 +2837,33 @@ function App() {
       setBranchErr(e.message || String(e));
     } finally {
       if (seq === branchSeqRef.current) setBranchLoading(false);
+    }
+  }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadManagers = useCallback(async () => {
+    if (customPeriodInvalid) {
+      setManagerErr(customPeriodError);
+      return;
+    }
+    const seq = ++managerSeqRef.current;
+    setManagerLoading(true);
+    setManagerErr(null);
+    const url = `${API}/kpi/managers?${requestKey}`;
+    console.log("[KPI managers] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI managers] payload:", j);
+      if (seq !== managerSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setManagerData(j);
+      managerLoadedKeyRef.current = requestKey;
+    } catch (e) {
+      if (seq !== managerSeqRef.current) return;
+      console.error("[KPI managers] fetch error:", e);
+      setManagerErr(e.message || String(e));
+    } finally {
+      if (seq === managerSeqRef.current) setManagerLoading(false);
     }
   }, [requestKey, customPeriodInvalid, customPeriodError]);
 
@@ -2556,6 +3030,16 @@ function App() {
   }, [activeTab, data, customPeriodInvalid, branchLoading, requestKey, loadBranches]);
 
   useEffect(() => {
+    if (activeTab !== "managers") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (managerLoading) return;
+    if (managerLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadManagers(), 120);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, managerLoading, requestKey, loadManagers]);
+
+  useEffect(() => {
     if (activeTab !== "departments") return;
     if (!data) return;
     if (customPeriodInvalid) return;
@@ -2602,6 +3086,7 @@ function App() {
     return m;
   }, [data]);
   const visibleBranchData = branchLoadedKeyRef.current === requestKey ? branchData : null;
+  const visibleManagerData = managerLoadedKeyRef.current === requestKey ? managerData : null;
   const visibleDeptData = deptLoadedKeyRef.current === requestKey ? deptData : null;
   const visibleClientData = clientLoadedKeyRef.current === requestKey ? clientData : null;
   const visibleInventoryData = inventoryLoadedKeyRef.current === requestKey ? inventoryData : null;
@@ -2669,6 +3154,10 @@ function App() {
           <button className={"tab-btn" + (activeTab==="branches" ? " active" : "")}
                   onClick={() => setActiveTab("branches")}>
             По БЕ
+          </button>
+          <button className={"tab-btn" + (activeTab==="managers" ? " active" : "")}
+                  onClick={() => setActiveTab("managers")}>
+            По менеджерам
           </button>
           <button className={"tab-btn" + (activeTab==="departments" ? " active" : "")}
                   onClick={() => setActiveTab("departments")}>
@@ -2786,6 +3275,15 @@ function App() {
             data={visibleBranchData}
             loading={loading || branchLoading}
             err={branchErr || (!data && err ? err : null)}
+            requestKey={requestKey}
+          />
+        )}
+
+        {activeTab === "managers" && (
+          <ManagerView
+            data={visibleManagerData}
+            loading={loading || managerLoading}
+            err={managerErr || (!data && err ? err : null)}
             requestKey={requestKey}
           />
         )}

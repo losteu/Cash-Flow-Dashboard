@@ -1,6 +1,7 @@
 .env
 __pycache__/
 *.pyc
+server_debug_*.log
 .playwright-mcp/
 snapshots/
 tmp_snapshot_test_*/
