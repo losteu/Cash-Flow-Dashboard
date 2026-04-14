@@ -94,6 +94,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .filter-reset:disabled{opacity:.4;cursor:not-allowed}
 
 .ms{position:relative;display:flex;flex-direction:column;gap:6px;min-width:200px;flex:1 1 200px;max-width:280px}
+.ms.ms-sale_type_ids{max-width:360px}
+.ms.ms-product_group_ids{max-width:340px}
 .ms-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
 .ms-trigger{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);cursor:pointer;font-family:var(--sn);font-size:12px;color:var(--t1);font-weight:500;transition:border-color .15s,box-shadow .15s;min-height:38px}
 .ms-trigger:hover{border-color:var(--bd2)}
@@ -105,16 +107,16 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .ms-arrow{color:var(--t3);font-size:10px;transition:transform .15s}
 .ms-trigger.open .ms-arrow{transform:rotate(180deg)}
 
-.ms-pop{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);box-shadow:var(--sh3);z-index:40;padding:8px;max-height:340px;display:flex;flex-direction:column;animation:fi .12s ease}
+.ms-pop{position:absolute;top:calc(100% + 4px);left:0;right:auto;width:min(420px,calc(100vw - 32px));background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);box-shadow:var(--sh3);z-index:40;padding:8px;max-height:380px;display:flex;flex-direction:column;animation:fi .12s ease}
 .ms-search{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-family:var(--sn);font-size:12px;margin-bottom:6px;background:var(--bg2);color:var(--t1)}
 .ms-search:focus{outline:none;border-color:var(--accent);background:var(--sf)}
 .ms-list{overflow-y:auto;flex:1;margin:0 -2px;padding:0 2px}
-.ms-opt{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--t1);font-weight:500;line-height:1.3;user-select:none}
+.ms-opt{display:flex;align-items:flex-start;gap:8px;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--t1);font-weight:500;line-height:1.35;user-select:none}
 .ms-opt:hover{background:var(--bg2)}
 .ms-opt.on{background:#f5f6ff;color:var(--accent);font-weight:600}
-.ms-opt-box{width:14px;height:14px;border:1.5px solid var(--bd);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--sf);font-size:10px;color:#fff;font-weight:900;line-height:1}
+.ms-opt-box{width:14px;height:14px;border:1.5px solid var(--bd);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--sf);font-size:10px;color:#fff;font-weight:900;line-height:1;margin-top:1px}
 .ms-opt.on .ms-opt-box{background:var(--accent);border-color:var(--accent)}
-.ms-opt-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ms-opt-text{flex:1;min-width:0;overflow:visible;text-overflow:clip;white-space:normal;word-break:break-word}
 .ms-empty{padding:20px 10px;text-align:center;color:var(--t3);font-size:12px}
 .ms-foot{display:flex;gap:6px;padding-top:6px;border-top:1px solid var(--bd);margin-top:6px}
 .ms-foot-btn{flex:1;padding:6px 10px;background:var(--bg2);color:var(--t2);border:none;border-radius:5px;font-family:var(--sn);font-size:11px;font-weight:600;cursor:pointer;transition:background .15s}
@@ -168,9 +170,15 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .card-label{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;line-height:1.35}
 .card-info{width:16px;height:16px;border-radius:50%;background:var(--bg2);color:var(--t3);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:help;flex-shrink:0;transition:background .15s,color .15s;position:relative;font-family:var(--sn);border:1px solid var(--bd)}
 .card-info:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-.card-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);width:280px;padding:12px 14px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:var(--sn);font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;text-transform:none;box-shadow:0 12px 32px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:30;text-align:left;white-space:normal}
+.card-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);width:min(320px,calc(100vw - 32px));padding:12px 14px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:var(--sn);font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;text-transform:none;box-shadow:0 12px 32px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:80;text-align:left;white-space:normal}
 .card-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#0f172a}
 .card-info:hover .card-tooltip{opacity:1;transform:translateX(-50%) translateY(0)}
+.card-info.tt-left .card-tooltip{left:0;transform:translateY(4px)}
+.card-info.tt-left .card-tooltip::after{left:8px;transform:none}
+.card-info.tt-left:hover .card-tooltip{transform:translateY(0)}
+.card-info.tt-right .card-tooltip{left:auto;right:0;transform:translateY(4px)}
+.card-info.tt-right .card-tooltip::after{left:auto;right:8px;transform:none}
+.card-info.tt-right:hover .card-tooltip{transform:translateY(0)}
 .card-tooltip b{color:#a5b4fc;font-weight:700}
 .card-tooltip .tt-target{display:block;margin-top:8px;padding-top:8px;border-top:1px solid rgba(165,180,252,.2);font-family:var(--mn);font-size:11px;color:#c7d2fe}
 .card-tooltip .tt-target b{color:#a5b4fc}
@@ -233,6 +241,10 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .dept-table .muted{display:block;color:var(--t3);font-size:10px;font-weight:600;margin-top:2px}
 .dept-table .risk{color:var(--red)}
 .dept-table th.has-tip,.dept-detail-table th.has-tip{cursor:help}
+.dept-table th.sortable,.dept-detail-table th.sortable{cursor:pointer;user-select:none}
+.dept-table th.sortable:hover,.dept-detail-table th.sortable:hover{color:var(--accent);background:#f8fafc}
+.sort-mark{display:inline-flex;align-items:center;justify-content:center;margin-left:5px;color:var(--t3);font-size:10px;font-family:var(--sn);letter-spacing:0;text-transform:none}
+.sortable.active .sort-mark{color:var(--accent)}
 .th-info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;margin-left:5px;background:var(--bg2);border:1px solid var(--bd);color:var(--t3);font-size:10px;font-weight:900;line-height:1;font-family:var(--sn);text-transform:none;letter-spacing:0;vertical-align:middle}
 .dept-table th.has-tip:hover .th-info,.dept-detail-table th.has-tip:hover .th-info{background:var(--accent);border-color:var(--accent);color:#fff}
 .branch-table{min-width:1900px}
@@ -299,8 +311,9 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .stock-grid{grid-template-columns:1fr}
   .wf-row{grid-template-columns:1fr;gap:6px}
   .wf-value{text-align:left}
-  .card-tooltip{left:auto;right:0;transform:none;width:min(260px,calc(100vw - 40px))}
-  .card-info:hover .card-tooltip{transform:none}
+  .ms-pop{position:fixed;left:16px;right:16px;width:auto;max-height:60vh}
+  .card-tooltip,.card-info.tt-left .card-tooltip,.card-info.tt-right .card-tooltip{left:auto;right:0;transform:none;width:min(280px,calc(100vw - 40px))}
+  .card-info:hover .card-tooltip,.card-info.tt-left:hover .card-tooltip,.card-info.tt-right:hover .card-tooltip{transform:none}
 }
 
 /* --- GitHub Pages snapshot picker --- */
@@ -366,9 +379,10 @@ setTimeout(function() {
     "/api/dict/clients":"dict/clients.json",
     "/api/dict/counterparties":"dict/counterparties.json",
     "/api/dict/sale-types":"dict/sale_types.json",
+    "/api/dict/product-groups":"dict/product_groups.json",
     "/api/dict/auction":"dict/auction.json"
   };
-  const FILTER_KEYS = ["bu_ids","mol_ids","dept_ids","parole_ids","pred_ids","sale_type_ids","auction_flags"];
+  const FILTER_KEYS = ["bu_ids","mol_ids","dept_ids","parole_ids","pred_ids","sale_type_ids","product_group_ids","auction_flags"];
   const statusEl = () => document.getElementById("snapshotStatus");
   const setStatus = (text, cls) => {
     const el = statusEl();
@@ -401,9 +415,51 @@ setTimeout(function() {
     headers: {"Content-Type":"application/json; charset=utf-8"}
   });
   const fail = (message, status) => jsonResponse({ok:false, snapshot_mode:true, source:"github-pages", error:message}, status || 400);
+  const DEFAULT_FILTER_KEYS = ["sale_type_ids","product_group_ids"];
+  const parseIds = (raw) => String(raw || "")
+    .split(",")
+    .map(x => Number(String(x).trim()))
+    .filter(x => Number.isFinite(x));
+  const sameIdSet = (a, b) => {
+    if (a.length !== b.length) return false;
+    const aa = [...a].sort((x,y) => x-y);
+    const bb = [...b].map(Number).sort((x,y) => x-y);
+    return aa.every((v, i) => v === bb[i]);
+  };
+  const matchesDefaultFilter = (params, key) => {
+    const raw = String(params.get(key) || "").trim();
+    if (!raw) return false;
+    const defaults = STORE.manifest?.default_filters || {};
+    const expected = defaults[key] || [];
+    return expected.length > 0 && sameIdSet(parseIds(raw), expected);
+  };
   const hasFilters = (params, allow) => {
     const allowed = new Set(allow || []);
     return FILTER_KEYS.some(k => !allowed.has(k) && String(params.get(k) || "").trim());
+  };
+  const hasUnsupportedFilters = (params, allow) => {
+    const allowed = new Set(allow || []);
+    return FILTER_KEYS.some(k => {
+      const raw = String(params.get(k) || "").trim();
+      if (!raw || allowed.has(k)) return false;
+      return !(DEFAULT_FILTER_KEYS.includes(k) && matchesDefaultFilter(params, k));
+    });
+  };
+  const hasOnlyDefaultFilters = (params, allow) => {
+    const allowed = new Set(allow || []);
+    let found = false;
+    for (const k of FILTER_KEYS) {
+      const raw = String(params.get(k) || "").trim();
+      if (!raw || allowed.has(k)) continue;
+      if (DEFAULT_FILTER_KEYS.includes(k) && matchesDefaultFilter(params, k)) {
+        found = true;
+        continue;
+      }
+      return false;
+    }
+    if (!found) return false;
+    const defaults = STORE.manifest?.default_filters || {};
+    return DEFAULT_FILTER_KEYS.every(k => !(defaults[k] || []).length || matchesDefaultFilter(params, k));
   };
   const singleValue = (params, key) => {
     const raw = String(params.get(key) || "").trim();
@@ -433,36 +489,52 @@ setTimeout(function() {
       catch (e) { return {ok:true, items:[], count:0, snapshot_mode:true, source:"github-pages", warning:String(e.message || e)}; }
     }
     if (path === "/api/kpi/top") {
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/top.json"));
+      const defaultOnly = hasOnlyDefaultFilters(params);
+      if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
+      const rel = defaultOnly ? "kpi/default/top.json" : "kpi/top.json";
+      return withNotice(await readJson(rel));
     }
     if (path === "/api/kpi/branches") {
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/branches.json"));
+      const defaultOnly = hasOnlyDefaultFilters(params);
+      if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
+      const rel = defaultOnly ? "kpi/default/branches.json" : "kpi/branches.json";
+      return withNotice(await readJson(rel));
     }
     if (path === "/api/kpi/departments") {
       const buId = singleValue(params, "bu_ids");
-      if (buId && !hasFilters(params, ["bu_ids"])) {
-        return withNotice(await readJson(`details/branch_${buId}_departments.json`));
+      if (String(params.get("bu_ids") || "").trim() && !buId) return unsupported();
+      const defaultOnly = hasOnlyDefaultFilters(params, ["bu_ids"]);
+      if (hasUnsupportedFilters(params, ["bu_ids"]) || (hasFilters(params, ["bu_ids"]) && !defaultOnly)) return unsupported();
+      if (buId) {
+        const prefix = defaultOnly ? "details/default_branch_" : "details/branch_";
+        return withNotice(await readJson(`${prefix}${buId}_departments.json`));
       }
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/departments.json"));
+      const rel = defaultOnly ? "kpi/default/departments.json" : "kpi/departments.json";
+      return withNotice(await readJson(rel));
     }
     if (path === "/api/kpi/clients") {
       const deptId = singleValue(params, "dept_ids");
-      if (deptId && !hasFilters(params, ["dept_ids"])) {
-        return withNotice(await readJson(`details/department_${deptId}_clients.json`));
+      if (String(params.get("dept_ids") || "").trim() && !deptId) return unsupported();
+      const defaultOnly = hasOnlyDefaultFilters(params, ["dept_ids"]);
+      if (hasUnsupportedFilters(params, ["dept_ids"]) || (hasFilters(params, ["dept_ids"]) && !defaultOnly)) return unsupported();
+      if (deptId) {
+        const prefix = defaultOnly ? "details/default_department_" : "details/department_";
+        return withNotice(await readJson(`${prefix}${deptId}_clients.json`));
       }
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/clients.json"));
+      const rel = defaultOnly ? "kpi/default/clients.json" : "kpi/clients.json";
+      return withNotice(await readJson(rel));
     }
     if (path === "/api/kpi/ar-aging") {
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/ar-aging.json"));
+      const defaultOnly = hasOnlyDefaultFilters(params);
+      if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
+      const rel = defaultOnly ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json";
+      return withNotice(await readJson(rel));
     }
     if (path === "/api/kpi/inventory") {
-      if (hasFilters(params)) return unsupported();
-      return withNotice(await readJson("kpi/inventory.json"));
+      const defaultOnly = hasOnlyDefaultFilters(params);
+      if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
+      const rel = defaultOnly ? "kpi/default/inventory.json" : "kpi/inventory.json";
+      return withNotice(await readJson(rel));
     }
     return null;
   };
@@ -520,9 +592,25 @@ const FILTER_DEFS = [
   {key:"dept_ids",   endpoint:"/dict/departments",    label:"Отделы",       placeholder:"Все отделы"},
   {key:"parole_ids", endpoint:"/dict/clients",        label:"Клиенты",      placeholder:"Все клиенты"},
   {key:"pred_ids",   endpoint:"/dict/counterparties", label:"Контрагенты",  placeholder:"Все контрагенты"},
-  {key:"sale_type_ids", endpoint:"/dict/sale-types",  label:"Тип продажи",  placeholder:"Все типы"},
+  {key:"sale_type_ids", endpoint:"/dict/sale-types",  label:"Тип продажи",  placeholder:"Все типы без маркетплейса"},
+  {key:"product_group_ids", endpoint:"/dict/product-groups", label:"Товарная группа", placeholder:"Все группы без с/х животных"},
   {key:"auction_flags", endpoint:"/dict/auction",     label:"Аукцион",      placeholder:"Все продажи"},
 ];
+
+const DEFAULT_FILTER_RULES = {
+  sale_type_ids: {
+    exclude: (item) => String(item.name || "").toLowerCase().includes("маркетплейс"),
+  },
+  product_group_ids: {
+    exclude: (item) => Number(item.id) === 1700,
+  },
+};
+
+const makeEmptyFilters = () => {
+  const o = {};
+  FILTER_DEFS.forEach(f => { o[f.key] = []; });
+  return o;
+};
 
 // ─── Пресеты периодов ──────────────────────────────
 const PRESETS = [
@@ -730,12 +818,57 @@ const COL_TIPS = {
   stockStatus: "Статус по движению остатка: оборот есть, Slow 90+ или неликвид 180+.",
 };
 
-function Th({children, className="", tip}) {
-  const cls = (className + (tip ? " has-tip" : "")).trim();
+const compareSortValues = (a, b) => {
+  const an = a == null || a === "";
+  const bn = b == null || b === "";
+  if (an && bn) return 0;
+  if (an) return 1;
+  if (bn) return -1;
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  const av = String(a).toLowerCase();
+  const bv = String(b).toLowerCase();
+  return av.localeCompare(bv, "ru", {numeric:true, sensitivity:"base"});
+};
+
+const sortRows = (rows, sortState) => {
+  const list = [...(rows || [])];
+  const key = sortState?.key;
+  if (!key) return list;
+  const dir = sortState.dir === "asc" ? 1 : -1;
+  return list.sort((a, b) => compareSortValues(a?.[key], b?.[key]) * dir);
+};
+
+const nextSortState = (prev, key) => ({
+  key,
+  dir: prev?.key === key && prev?.dir === "desc" ? "asc" : "desc",
+});
+
+function useSortedRows(rows, defaultKey="rank", defaultDir="asc") {
+  const [sortState, setSortState] = useState({key:defaultKey, dir:defaultDir});
+  const sortedRows = useMemo(() => sortRows(rows, sortState), [rows, sortState]);
+  const requestSort = useCallback((key) => setSortState(prev => nextSortState(prev, key)), []);
+  return {rows:sortedRows, sortState, requestSort};
+}
+
+const sortable = (sortState, requestSort, key) => ({sortKey:key, sortState, onSort:requestSort});
+
+function Th({children, className="", tip, sortKey, sortState, onSort}) {
+  const active = Boolean(sortKey && sortState?.key === sortKey);
+  const cls = (
+    className +
+    (tip ? " has-tip" : "") +
+    (sortKey ? " sortable" : "") +
+    (active ? " active" : "")
+  ).trim();
   return (
-    <th className={cls || undefined} title={tip || undefined}>
+    <th
+      className={cls || undefined}
+      title={tip || undefined}
+      onClick={sortKey && onSort ? () => onSort(sortKey) : undefined}
+    >
       {children}
       {tip && <span className="th-info">?</span>}
+      {sortKey && <span className="sort-mark">{active ? (sortState.dir === "asc" ? "↑" : "↓") : "↕"}</span>}
     </th>
   );
 }
@@ -745,6 +878,7 @@ function MultiSelect({def, value, onChange, dictQuery}) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
   const rootRef = useRef(null);
@@ -753,6 +887,7 @@ function MultiSelect({def, value, onChange, dictQuery}) {
   // Загружаем справочник при первом открытии.
   const fetchItems = useCallback(async (q) => {
     setLoading(true);
+    setLoadError("");
     try {
       const params = new URLSearchParams(dictQuery || "");
       if (q) params.set("q", q);
@@ -761,9 +896,13 @@ function MultiSelect({def, value, onChange, dictQuery}) {
       const r = await fetch(url);
       const j = await r.json();
       if (j.ok) setItems(j.items || []);
-      else setItems([]);
+      else {
+        setLoadError(j.error || "Ошибка загрузки справочника");
+        setItems([]);
+      }
     } catch (e) {
       console.error("[MS]", def.key, e);
+      setLoadError(e.message || String(e));
       setItems([]);
     } finally {
       setLoading(false);
@@ -833,7 +972,7 @@ function MultiSelect({def, value, onChange, dictQuery}) {
     (open ? " open" : "");
 
   return (
-    <div className="ms" ref={rootRef}>
+    <div className={"ms ms-" + def.key} ref={rootRef}>
       <div className="ms-label">{def.label}</div>
       <div className={triggerCls} onClick={() => setOpen(o => !o)}>
         <span className={"ms-trigger-text"+(value.length===0?" ms-placeholder":"")}>{triggerText}</span>
@@ -851,7 +990,8 @@ function MultiSelect({def, value, onChange, dictQuery}) {
           />
           <div className="ms-list">
             {loading && <div className="ms-empty">Загрузка…</div>}
-            {!loading && items.length === 0 && <div className="ms-empty">Ничего не найдено</div>}
+            {!loading && loadError && <div className="ms-empty">Ошибка загрузки</div>}
+            {!loading && !loadError && items.length === 0 && <div className="ms-empty">Ничего не найдено</div>}
             {!loading && items.map(it => {
               const on = selectedSet.has(it.id);
               return (
@@ -901,6 +1041,33 @@ function CardTooltip({card, tip}) {
   );
 }
 
+function CardInfo({card, tip}) {
+  const ref = useRef(null);
+  const [edge, setEdge] = useState("center");
+  const alignTooltip = () => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const width = Math.min(320, Math.max(240, window.innerWidth - 32));
+    const center = rect.left + rect.width / 2;
+    if (center - width / 2 < 16) setEdge("left");
+    else if (center + width / 2 > window.innerWidth - 16) setEdge("right");
+    else setEdge("center");
+  };
+  return (
+    <span
+      ref={ref}
+      className={"card-info" + (edge === "center" ? "" : " tt-" + edge)}
+      aria-label="Описание"
+      onMouseEnter={alignTooltip}
+      onFocus={alignTooltip}
+    >
+      ?
+      <CardTooltip card={card} tip={tip}/>
+    </span>
+  );
+}
+
 // ─── Одна карточка ───────────────────────────────
 function Card({card, sub, tip}) {
   if (card.error) {
@@ -909,12 +1076,7 @@ function Card({card, sub, tip}) {
         <div className="card-head">
           <div className="card-label-wrap">
             <div className="card-label">{card.label}</div>
-            {tip && (
-              <span className="card-info" aria-label="Описание">
-                ?
-                <CardTooltip card={card} tip={tip}/>
-              </span>
-            )}
+            {tip && <CardInfo card={card} tip={tip}/>}
           </div>
         </div>
         <div className="card-value">ошибка</div>
@@ -928,12 +1090,7 @@ function Card({card, sub, tip}) {
       <div className="card-head">
         <div className="card-label-wrap">
           <div className="card-label">{card.label}</div>
-          {tip && (
-            <span className="card-info" aria-label="Описание">
-              ?
-              <CardTooltip card={card} tip={tip}/>
-            </span>
-          )}
+          {tip && <CardInfo card={card} tip={tip}/>}
         </div>
         {card.score != null && (
           <span className={"card-score s"+card.score}>● {card.score}/5</span>
@@ -1028,6 +1185,9 @@ function DepartmentView({data, loading, err, requestKey}) {
   const [detailByDept, setDetailByDept] = useState({});
   const [detailLoadingDept, setDetailLoadingDept] = useState(null);
   const [detailErr, setDetailErr] = useState(null);
+  const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
+  const requestDetailSort = useCallback((key) => setDetailSortState(prev => nextSortState(prev, key)), []);
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
 
   useEffect(() => {
     setExpandedDeptId(null);
@@ -1044,7 +1204,6 @@ function DepartmentView({data, loading, err, requestKey}) {
     try {
       const params = new URLSearchParams(requestKey || "");
       params.set("dept_ids", key);
-      params.set("limit", "30");
       params.set("sort", "revenue");
       const url = `${API}/kpi/clients?${params.toString()}`;
       const r = await fetch(url);
@@ -1089,7 +1248,7 @@ function DepartmentView({data, loading, err, requestKey}) {
     );
   }
 
-  const rows = data.rows || [];
+  const rows = sortedRows;
   const totals = data.totals || {};
 
   return (
@@ -1135,40 +1294,40 @@ function DepartmentView({data, loading, err, requestKey}) {
       </div>
 
       <div className="dept-note">
-        Кликните на отдел, чтобы раскрыть клиентов внутри него. Таблица отсортирована по выручке, от крупных клиентов к меньшим.
+        Кликните на отдел, чтобы раскрыть клиентов внутри него. По заголовкам можно сортировать таблицу.
       </div>
 
       <div className="dept-table-wrap">
         <table className="dept-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Отдел</th>
-              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
-              <Th className="num" tip={COL_TIPS.revenueShare}>Доля</Th>
-              <Th className="num" tip={COL_TIPS.revenueDelta}>Δ выр.</Th>
-              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
-              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
-              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
-              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
-              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
-              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
-              <Th className="num" tip={COL_TIPS.arFinCost}>Ст-ть ДЗ</Th>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "department")}>Отдел</Th>
+              <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(sortState, requestSort, "revenue_share_pct")}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
+              <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Ст-ть ДЗ</Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr><td colSpan="13" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет отделов с продажами за выбранный период</td></tr>
             )}
-            {rows.map(r => {
+            {rows.map((r, idx) => {
               const open = expandedDeptId === r.department_id;
               const detail = detailByDept[String(r.department_id)];
-              const detailRows = detail?.rows || [];
+              const detailRows = sortRows(detail?.rows || [], detailSortState);
               return (
                 <React.Fragment key={r.department_id}>
                   <tr className="dept-main-row" onClick={() => toggleDepartment(r)}>
-                    <td className="rank">{r.rank}</td>
+                    <td className="rank">{idx + 1}</td>
                     <td className="dept-name">
                       <span className="dept-expander">{open ? "▾" : "▸"}</span>
                       {r.department}
@@ -1216,17 +1375,17 @@ function DepartmentView({data, loading, err, requestKey}) {
                             <table className="dept-detail-table">
                               <thead>
                                 <tr>
-                                  <th>#</th>
-                                  <th>Клиент</th>
-                                  <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
-                                  <Th className="num" tip={COL_TIPS.revenueShare}>Доля отд.</Th>
-                                  <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
-                                  <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
-                                  <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-                                  <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
-                                  <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
-                                  <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
-                                  <Th tip={COL_TIPS.status}>Статус</Th>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                  <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
+                                  <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля отд.</Th>
+                                  <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
+                                  <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
+                                  <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+                                  <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -1270,6 +1429,9 @@ function BranchView({data, loading, err, requestKey}) {
   const [detailByBranch, setDetailByBranch] = useState({});
   const [detailLoadingBranch, setDetailLoadingBranch] = useState(null);
   const [detailErr, setDetailErr] = useState(null);
+  const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
+  const requestDetailSort = useCallback((key) => setDetailSortState(prev => nextSortState(prev, key)), []);
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
 
   useEffect(() => {
     setExpandedBranchId(null);
@@ -1329,7 +1491,7 @@ function BranchView({data, loading, err, requestKey}) {
     );
   }
 
-  const rows = data.rows || [];
+  const rows = sortedRows;
   const totals = data.totals || {};
 
   return (
@@ -1379,45 +1541,45 @@ function BranchView({data, loading, err, requestKey}) {
       </div>
 
       <div className="dept-note">
-        Кликните на БЕ, чтобы раскрыть отделы внутри неё. КЗ и авансы поставщикам остаются на уровне БЕ, в отделах показывается коммерческий блок продаж.
+        Кликните на БЕ, чтобы раскрыть отделы внутри неё. По заголовкам можно сортировать таблицу.
       </div>
 
       <div className="dept-table-wrap">
         <table className="dept-table branch-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Бизнес-единица</th>
-              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
-              <Th className="num" tip={COL_TIPS.revenueShare}>Доля</Th>
-              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
-              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
-              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
-              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
-              <Th className="num" tip={COL_TIPS.overdueAr}>Проср. ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
-              <Th className="num" tip={COL_TIPS.inventory}>Запасы</Th>
-              <Th className="num" tip={COL_TIPS.dio}>DIO</Th>
-              <Th className="num" tip={COL_TIPS.ap}>КЗ сырье</Th>
-              <Th className="num" tip={COL_TIPS.apAdvance}>Авансы пост.</Th>
-              <Th className="num" tip={COL_TIPS.overdueAp}>Проср. КЗ</Th>
-              <Th className="num" tip={COL_TIPS.dpo}>DPO</Th>
-              <Th className="num" tip={COL_TIPS.ccc}>CCC</Th>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "branch")}>Бизнес-единица</Th>
+              <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(sortState, requestSort, "revenue_share_pct")}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Проср. ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.inventory} {...sortable(sortState, requestSort, "inventory_rub")}>Запасы</Th>
+              <Th className="num" tip={COL_TIPS.dio} {...sortable(sortState, requestSort, "dio_days")}>DIO</Th>
+              <Th className="num" tip={COL_TIPS.ap} {...sortable(sortState, requestSort, "ap_rub")}>КЗ сырье</Th>
+              <Th className="num" tip={COL_TIPS.apAdvance} {...sortable(sortState, requestSort, "ap_advance_rub")}>Авансы пост.</Th>
+              <Th className="num" tip={COL_TIPS.overdueAp} {...sortable(sortState, requestSort, "overdue_ap_rub")}>Проср. КЗ</Th>
+              <Th className="num" tip={COL_TIPS.dpo} {...sortable(sortState, requestSort, "dpo_days")}>DPO</Th>
+              <Th className="num" tip={COL_TIPS.ccc} {...sortable(sortState, requestSort, "ccc_days")}>CCC</Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr><td colSpan="18" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
             )}
-            {rows.map(r => {
+            {rows.map((r, idx) => {
               const open = expandedBranchId === r.branch_id;
               const detail = detailByBranch[String(r.branch_id)];
-              const detailRows = detail?.rows || [];
+              const detailRows = sortRows(detail?.rows || [], detailSortState);
               return (
                 <React.Fragment key={r.branch_id}>
                   <tr className="dept-main-row" onClick={() => toggleBranch(r)}>
-                    <td className="rank">{r.rank}</td>
+                    <td className="rank">{idx + 1}</td>
                     <td className="dept-name">
                       <span className="dept-expander">{open ? "▾" : "▸"}</span>
                       {r.branch}
@@ -1473,16 +1635,16 @@ function BranchView({data, loading, err, requestKey}) {
                             <table className="dept-detail-table">
                               <thead>
                                 <tr>
-                                  <th>#</th>
-                                  <th>Отдел</th>
-                                  <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
-                                  <Th className="num" tip={COL_TIPS.revenueShare}>Доля БЕ</Th>
-                                  <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
-                                  <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-                                  <Th className="num" tip={COL_TIPS.arAdvance}>Авансы пок.</Th>
-                                  <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
-                                  <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
-                                  <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
+                                  <Th {...sortable(detailSortState, requestDetailSort, "department")}>Отдел</Th>
+                                  <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
+                                  <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля БЕ</Th>
+                                  <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
+                                  <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы пок.</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                  <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -1518,6 +1680,8 @@ function BranchView({data, loading, err, requestKey}) {
 }
 
 function ClientView({data, loading, err}) {
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
+
   if (loading) {
     return (
       <div className="loading">
@@ -1539,7 +1703,7 @@ function ClientView({data, loading, err}) {
     );
   }
 
-  const rows = data.rows || [];
+  const rows = sortedRows;
   const totals = data.totals || {};
 
   return (
@@ -1585,37 +1749,37 @@ function ClientView({data, loading, err}) {
       </div>
 
       <div className="dept-note">
-        Статус подсвечивает клиентов, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ.
+        Статус подсвечивает клиентов, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ. По заголовкам можно сортировать таблицу.
       </div>
 
       <div className="dept-table-wrap">
         <table className="dept-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Клиент</th>
-              <th>Менеджер</th>
-              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
-              <Th className="num" tip={COL_TIPS.revenueDelta}>Δ выр.</Th>
-              <Th className="num" tip={COL_TIPS.margin}>Маржа</Th>
-              <Th className="num" tip={COL_TIPS.marginPct}>Марж.%</Th>
-              <Th className="num" tip={COL_TIPS.avgAr}>Сред. ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
-              <Th className="num" tip={COL_TIPS.dso}>DSO</Th>
-              <Th className="num" tip={COL_TIPS.arFinCost}>Стоимость отсрочки</Th>
-              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
-              <Th className="num" tip={COL_TIPS.cashPct}>Cash.%</Th>
-              <Th tip={COL_TIPS.status}>Статус</Th>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "client")}>Клиент</Th>
+              <Th {...sortable(sortState, requestSort, "manager")}>Менеджер</Th>
+              <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
+              <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
+              <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
+              <Th className="num" tip={COL_TIPS.avgAr} {...sortable(sortState, requestSort, "avg_ar_rub")}>Сред. ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Стоимость отсрочки</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.cashPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
+              <Th tip={COL_TIPS.status} {...sortable(sortState, requestSort, "status")}>Статус</Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
             )}
-            {rows.map(r => (
+            {rows.map((r, idx) => (
               <tr key={r.client_id}>
-                <td className="rank">{r.rank}</td>
+                <td className="rank">{idx + 1}</td>
                 <td className="dept-name">
                   {r.client}
                   {r.department && <span className="muted">{r.department}</span>}
@@ -1649,6 +1813,12 @@ function ClientView({data, loading, err}) {
 }
 
 function ArAgingView({data, loading, err}) {
+  const agingRows = useMemo(
+    () => (data?.top_clients || []).map((row, i) => ({...row, rank:i + 1})),
+    [data]
+  );
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(agingRows, "overdue_rub", "desc");
+
   if (loading) {
     return (
       <div className="loading">
@@ -1671,7 +1841,7 @@ function ArAgingView({data, loading, err}) {
   }
 
   const totals = data.totals || {};
-  const rows = data.top_clients || [];
+  const rows = sortedRows;
 
   const agingStatus = (days) => {
     if ((days || 0) > 90) return "risk";
@@ -1738,17 +1908,17 @@ function ArAgingView({data, loading, err}) {
         <table className="dept-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Клиент</th>
-              <Th className="num" tip={COL_TIPS.ar}>ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.overdueAr}>Просрочка</Th>
-              <Th className="num" tip={COL_TIPS.overdueShare}>Доля проср.</Th>
-              <Th className="num" tip={COL_TIPS.agingBucket}>1–30</Th>
-              <Th className="num" tip={COL_TIPS.agingBucket}>31–60</Th>
-              <Th className="num" tip={COL_TIPS.agingBucket}>61–90</Th>
-              <Th className="num" tip={COL_TIPS.agingBucket}>90+</Th>
-              <Th className="num" tip={COL_TIPS.docs}>Док.</Th>
-              <Th tip={COL_TIPS.maxOverdue}>Макс. срок</Th>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "client_name")}>Клиент</Th>
+              <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_rub")}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(sortState, requestSort, "overdue_share_pct")}>Доля проср.</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket} {...sortable(sortState, requestSort, "d_1_30_rub")}>1–30</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket} {...sortable(sortState, requestSort, "d_31_60_rub")}>31–60</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket} {...sortable(sortState, requestSort, "d_61_90_rub")}>61–90</Th>
+              <Th className="num" tip={COL_TIPS.agingBucket} {...sortable(sortState, requestSort, "d_90_plus_rub")}>90+</Th>
+              <Th className="num" tip={COL_TIPS.docs} {...sortable(sortState, requestSort, "open_docs_count")}>Док.</Th>
+              <Th tip={COL_TIPS.maxOverdue} {...sortable(sortState, requestSort, "max_overdue_days")}>Макс. срок</Th>
             </tr>
           </thead>
           <tbody>
@@ -1873,6 +2043,12 @@ function CycleView({data, loading, err}) {
 }
 
 function InventoryView({data, loading, err}) {
+  const inventoryRows = useMemo(
+    () => (data?.top_sku || []).map((row, i) => ({...row, rank:i + 1})),
+    [data]
+  );
+  const {rows: sortedTopSku, sortState, requestSort} = useSortedRows(inventoryRows, "value_rub", "desc");
+
   if (loading) {
     return (
       <div className="loading">
@@ -1895,7 +2071,7 @@ function InventoryView({data, loading, err}) {
   }
 
   const totals = data.totals || {};
-  const topSku = data.top_sku || [];
+  const topSku = sortedTopSku;
 
   return (
     <>
@@ -1981,17 +2157,17 @@ function InventoryView({data, loading, err}) {
         <table className="dept-table stock-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>SKU</th>
-              <th>Бакет</th>
-              <th>Группа</th>
-              <Th className="num" tip={COL_TIPS.stockValue}>Остаток, руб</Th>
-              <Th className="num" tip={COL_TIPS.stockShare}>Доля</Th>
-              <Th className="num" tip={COL_TIPS.qty}>Кол-во</Th>
-              <Th className="num" tip={COL_TIPS.warehouses}>Складов</Th>
-              <Th className="num" tip={COL_TIPS.out90}>Расход 90д</Th>
-              <Th tip={COL_TIPS.lastOut}>Последний расход</Th>
-              <Th tip={COL_TIPS.stockStatus}>Статус</Th>
+              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th {...sortable(sortState, requestSort, "tov_name")}>SKU</Th>
+              <Th {...sortable(sortState, requestSort, "bucket")}>Бакет</Th>
+              <Th {...sortable(sortState, requestSort, "parent_group_name")}>Группа</Th>
+              <Th className="num" tip={COL_TIPS.stockValue} {...sortable(sortState, requestSort, "value_rub")}>Остаток, руб</Th>
+              <Th className="num" tip={COL_TIPS.stockShare} {...sortable(sortState, requestSort, "share_pct")}>Доля</Th>
+              <Th className="num" tip={COL_TIPS.qty} {...sortable(sortState, requestSort, "qty_end")}>Кол-во</Th>
+              <Th className="num" tip={COL_TIPS.warehouses} {...sortable(sortState, requestSort, "bunk_count")}>Складов</Th>
+              <Th className="num" tip={COL_TIPS.out90} {...sortable(sortState, requestSort, "out_qty_90")}>Расход 90д</Th>
+              <Th tip={COL_TIPS.lastOut} {...sortable(sortState, requestSort, "last_out_date")}>Последний расход</Th>
+              <Th tip={COL_TIPS.stockStatus} {...sortable(sortState, requestSort, "stock_status")}>Статус</Th>
             </tr>
           </thead>
           <tbody>
@@ -2063,19 +2239,15 @@ function App() {
   const clientSeqRef = useRef(0);
   const inventorySeqRef = useRef(0);
   const arAgingSeqRef = useRef(0);
+  const defaultFiltersRef = useRef(makeEmptyFilters());
+  const [defaultFiltersLoading, setDefaultFiltersLoading] = useState(false);
 
   // Состояние фильтров: {mol_ids:[], dept_ids:[], parole_ids:[], pred_ids:[]}
-  const [filters, setFilters] = useState(() => {
-    const o = {};
-    FILTER_DEFS.forEach(f => { o[f.key] = []; });
-    return o;
-  });
+  const [filters, setFilters] = useState(() => makeEmptyFilters());
 
   const setFilter = (key, val) => setFilters(f => ({...f, [key]: val}));
   const resetFilters = () => {
-    const o = {};
-    FILTER_DEFS.forEach(f => { o[f.key] = []; });
-    setFilters(o);
+    setFilters({...makeEmptyFilters(), ...defaultFiltersRef.current});
   };
   const filtersActive = useMemo(
     () => FILTER_DEFS.some(f => (filters[f.key] || []).length > 0),
@@ -2139,6 +2311,61 @@ function App() {
     return () => window.removeEventListener("kpi-snapshot-ready", onSnapshotReady);
   }, []);
 
+  useEffect(() => {
+    if (window.KPI_GITHUB_SNAPSHOT && !window.KPI_SNAPSHOT_STORE?.ready) return;
+
+    let cancelled = false;
+    const sameIds = (a=[], b=[]) => {
+      if (a.length !== b.length) return false;
+      const aa = [...a].map(Number).sort((x,y) => x-y);
+      const bb = [...b].map(Number).sort((x,y) => x-y);
+      return aa.every((v, i) => v === bb[i]);
+    };
+
+    const loadDefaultFilters = async () => {
+      setDefaultFiltersLoading(true);
+      const nextDefaults = makeEmptyFilters();
+      for (const def of FILTER_DEFS) {
+        const rule = DEFAULT_FILTER_RULES[def.key];
+        if (!rule) continue;
+        try {
+          const params = new URLSearchParams(dictQuery || "");
+          params.set("limit", "5000");
+          const url = API + def.endpoint + "?" + params.toString();
+          const r = await fetch(url);
+          const j = await r.json();
+          if (!j.ok) continue;
+          nextDefaults[def.key] = (j.items || [])
+            .filter(item => !rule.exclude(item))
+            .map(item => item.id);
+        } catch (e) {
+          console.warn("[KPI default filters]", def.key, e);
+        }
+      }
+      if (cancelled) return;
+      const prevDefaults = defaultFiltersRef.current || makeEmptyFilters();
+      defaultFiltersRef.current = nextDefaults;
+      setFilters(prev => {
+        const next = {...prev};
+        Object.keys(DEFAULT_FILTER_RULES).forEach(key => {
+          const cur = prev[key] || [];
+          const oldDefault = prevDefaults[key] || [];
+          if (cur.length === 0 || sameIds(cur, oldDefault)) {
+            next[key] = nextDefaults[key] || [];
+          }
+        });
+        return next;
+      });
+      setDefaultFiltersLoading(false);
+    };
+
+    loadDefaultFilters();
+    return () => {
+      cancelled = true;
+      setDefaultFiltersLoading(false);
+    };
+  }, [dictQuery]);
+
   const loadBranches = useCallback(async () => {
     if (customPeriodInvalid) {
       setBranchErr(customPeriodError);
@@ -2201,7 +2428,7 @@ function App() {
     const seq = ++clientSeqRef.current;
     setClientLoading(true);
     setClientErr(null);
-    const url = `${API}/kpi/clients?${requestKey}&limit=100`;
+    const url = `${API}/kpi/clients?${requestKey}`;
     console.log("[KPI clients] fetch:", url);
     try {
       const r = await fetch(url);
@@ -2228,7 +2455,7 @@ function App() {
     const seq = ++inventorySeqRef.current;
     setInventoryLoading(true);
     setInventoryErr(null);
-    const url = `${API}/kpi/inventory?${requestKey}&limit=20`;
+    const url = `${API}/kpi/inventory?${requestKey}`;
     console.log("[KPI inventory] fetch:", url);
     try {
       const r = await fetch(url);
@@ -2255,7 +2482,7 @@ function App() {
     const seq = ++arAgingSeqRef.current;
     setArAgingLoading(true);
     setArAgingErr(null);
-    const url = `${API}/kpi/ar-aging?${requestKey}&limit=20`;
+    const url = `${API}/kpi/ar-aging?${requestKey}`;
     console.log("[KPI AR aging] fetch:", url);
     try {
       const r = await fetch(url);
@@ -2311,7 +2538,7 @@ function App() {
   }, [requestKey, customPeriodInvalid]);
 
   useEffect(() => {
-    if (!autoReloadEnabled && !filtersActive) return;
+    if (!autoReloadEnabled) return;
     if (customPeriodInvalid) return;
     if (lastLoadedKeyRef.current === requestKey) return;
     const t = setTimeout(() => load(), 450);
@@ -2423,8 +2650,8 @@ function App() {
               <input type="number" min="0" max="100" step="0.5" value={rate}
                      onChange={e=>setRate(Math.max(0, parseFloat(e.target.value)||0))}/>
             </div>
-            <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid}>
-              {loading ? "Считаю…" : "Рассчитать"}
+            <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid || defaultFiltersLoading}>
+              {loading ? "Считаю…" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
             </button>
             <button className="btn-secondary" onClick={downloadHtml} disabled={customPeriodInvalid}>
               Скачать HTML
