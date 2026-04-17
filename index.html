@@ -230,7 +230,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .dept-summary-label{font-size:10px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
 .dept-summary-value{font-family:var(--mn);font-size:18px;font-weight:700;color:var(--t1)}
 .dept-table-wrap{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);overflow:auto}
-.dept-table{width:100%;min-width:1480px;border-collapse:separate;border-spacing:0;font-size:12px}
+.dept-table{width:100%;min-width:2200px;border-collapse:separate;border-spacing:0;font-size:12px}
+.dept-table.compact-deltas{min-width:1880px}
 .dept-table th{position:sticky;top:0;background:var(--sf);z-index:2;text-align:left;color:var(--t3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.55px;padding:12px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
 .dept-table td{padding:11px 10px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--t1);white-space:nowrap}
 .dept-table tr:last-child td{border-bottom:none}
@@ -239,7 +240,27 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .dept-table .rank{width:44px;color:var(--t3);font-family:var(--mn);font-weight:700}
 .dept-table .dept-name{font-weight:700;min-width:230px;white-space:normal;line-height:1.3}
 .dept-table .muted{display:block;color:var(--t3);font-size:10px;font-weight:600;margin-top:2px}
+.dept-table .counterparty-cell,.dept-detail-table .counterparty-cell{white-space:normal;min-width:240px;max-width:420px;line-height:1.35}
+.counterparty-list{display:flex;flex-direction:column;gap:6px}
+.counterparty-item{display:block}
+.counterparty-name{display:block;font-weight:800;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:560px}
+.counterparty-metrics{display:flex;flex-wrap:wrap;gap:2px 9px;color:var(--t3);font-size:9.5px;font-weight:600}
+.counterparty-metric{white-space:nowrap}
+.counterparty-metrics .risk{color:var(--red)}
+.counterparty-metrics .good{color:var(--grn)}
+.counterparty-empty{color:var(--t3);font-size:10px;font-weight:600}
+.counterparty-more{color:var(--t3);font-size:10px;font-weight:700}
+.cisp-link{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(79,70,229,.45)}
+.cisp-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
 .dept-table .risk{color:var(--red)}
+.dept-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 16px;flex-wrap:wrap}
+.dept-note{font-size:11px;color:var(--t3);line-height:1.5}
+.dept-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.table-toggle{border:1px solid var(--bd);background:var(--sf);color:var(--t2);border-radius:6px;padding:7px 11px;font-family:var(--sn);font-size:11px;font-weight:800;cursor:pointer;transition:border-color .15s,color .15s,background .15s;white-space:nowrap}
+.table-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.table-toggle.active{background:#f5f6ff;border-color:var(--accent);color:var(--accent)}
+.state-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:10.5px;color:var(--t3)}
+.state-legend b{color:var(--t2);font-weight:800}
 .dept-table th.has-tip,.dept-detail-table th.has-tip{cursor:help}
 .dept-table th.sortable,.dept-detail-table th.sortable{cursor:pointer;user-select:none}
 .dept-table th.sortable:hover,.dept-detail-table th.sortable:hover{color:var(--accent);background:#f8fafc}
@@ -248,23 +269,30 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .th-info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;margin-left:5px;background:var(--bg2);border:1px solid var(--bd);color:var(--t3);font-size:10px;font-weight:900;line-height:1;font-family:var(--sn);text-transform:none;letter-spacing:0;vertical-align:middle}
 .dept-table th.has-tip:hover .th-info,.dept-detail-table th.has-tip:hover .th-info{background:var(--accent);border-color:var(--accent);color:#fff}
 .branch-table{min-width:1900px}
-.dept-note{font-size:11px;color:var(--t3);margin:10px 0 16px;line-height:1.5}
 .dept-main-row{cursor:pointer}
 .dept-main-row:hover td{background:#f8fafc}
 .dept-expander{font-family:var(--mn);font-weight:900;color:var(--accent);margin-right:6px}
-.dept-detail-cell{background:#f8fafc!important;padding:14px 18px!important}
+.dept-detail-cell{background:#f8fafc!important;padding:10px 12px!important}
 .dept-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .dept-detail-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px}
 .dept-detail-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
-.dept-detail-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden}
-.dept-detail-table th{background:var(--sf);color:var(--t3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.55px;padding:10px 9px;border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
-.dept-detail-table td{padding:9px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.dept-detail-table{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);overflow:hidden}
+.dept-detail-table th{background:var(--sf);color:var(--t3);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.35px;padding:8px 6px;border-bottom:1px solid var(--bd);white-space:nowrap;text-align:left}
+.dept-detail-table td{padding:7px 6px;border-bottom:1px solid var(--bd);white-space:nowrap}
 .dept-detail-table tr:last-child td{border-bottom:none}
-.dept-detail-scroll{overflow:auto}
+.dept-detail-table .dept-name{min-width:170px}
+.dept-detail-scroll{overflow:auto;max-width:calc(100vw - 92px)}
 .status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:800;white-space:nowrap}
 .status-badge.ok{background:var(--gbg);color:var(--grn)}
 .status-badge.warn{background:var(--abg);color:var(--amb)}
 .status-badge.risk{background:var(--rbg);color:var(--red)}
+.status-badge.neutral{background:var(--bg2);color:var(--t3)}
+.health-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;border-radius:6px;padding:4px 8px;font-family:var(--mn);font-size:12px;font-weight:900}
+.health-pill.na{background:var(--bg2);color:var(--t3)}
+.health-pill.good{background:var(--gbg);color:var(--grn)}
+.health-pill.warn{background:var(--abg);color:var(--amb)}
+.health-pill.mid{background:#fff7ed;color:#ea580c}
+.health-pill.risk{background:var(--rbg);color:var(--red)}
 
 /* ─── Benchmark highlighting ─────────────── */
 .bench-good{background:rgba(5,150,105,.07)}
@@ -287,6 +315,18 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .conc-card-value.conc-mid{color:var(--amb)}
 .conc-card-sub{font-size:10px;color:var(--t3);font-weight:500;margin-top:3px}
 .conc-clients{font-size:10px;color:var(--t2);margin-top:6px;line-height:1.4;font-weight:500;border-top:1px solid var(--bd);padding-top:6px}
+.savings-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh1)}
+.savings-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.savings-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)}
+.savings-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:3px;line-height:1.4}
+.savings-control{display:flex;align-items:center;gap:8px;color:var(--t3);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px}
+.savings-control input[type=number]{width:82px;border:1px solid var(--bd);border-radius:6px;padding:8px 10px;font-family:var(--mn);font-weight:700;color:var(--t1);background:var(--sf)}
+.savings-control input[type=range]{width:150px;accent-color:var(--accent)}
+.savings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.savings-metric{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r3);padding:12px 14px;min-width:0}
+.savings-label{font-size:10px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.savings-value{font-family:var(--mn);font-size:18px;font-weight:800;color:var(--t1)}
+.savings-note{font-size:10px;color:var(--t3);font-weight:500;margin-top:3px}
 
 /* ─── Inventory tab ─────────────────────── */
 .stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
@@ -330,6 +370,9 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .preset-chips{width:100%;overflow-x:auto}
   .chip{flex:0 0 auto}
   .tabs{width:100%}
+  .savings-head{flex-direction:column}
+  .savings-grid{grid-template-columns:1fr}
+  .savings-control{flex-wrap:wrap}
   .stock-grid{grid-template-columns:1fr}
   .wf-row{grid-template-columns:1fr;gap:6px}
   .wf-value{text-align:left}
@@ -781,12 +824,19 @@ const fmtRub = (n) => {
   if (abs >= 1e3) return (n/1e3).toLocaleString("ru-RU",{maximumFractionDigits:1}) + " тыс";
   return n.toLocaleString("ru-RU",{maximumFractionDigits:0});
 };
+const fmtEffectRub = (n) => (n==null||isNaN(n)) ? "—" : (Number(n) > 0 ? "+ " : "") + fmtRub(n);
 const fmtDays = (n) => (n==null||isNaN(n)) ? "—" : n.toLocaleString("ru-RU",{maximumFractionDigits:1});
 const fmtVal  = (card) => card.unit === "дни" ? fmtDays(card.value) : card.unit === "%" ? fmtQty(card.value) : fmtRub(card.value);
 const fmtDelta = (p) => (p==null||isNaN(p)) ? "—" : (p>0?"+":"") + p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtPct = (p) => (p==null||isNaN(p)) ? "—" : p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
+const fmtRatio = (ratio, ar, margin) => {
+  if ((ratio == null || isNaN(ratio)) && Number(ar || 0) <= 0 && Number(margin || 0) > 0) return "Без ДЗ";
+  if (ratio == null || isNaN(ratio)) return "—";
+  return Number(ratio).toLocaleString("ru-RU",{maximumFractionDigits:2});
+};
+const fmtScoreDelta = (n) => (n==null||isNaN(n)) ? "—" : (n>0?"+":"") + Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1}) + " п.";
 const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
 const fmtDate = (s) => {
   if (!s) return "—";
@@ -811,6 +861,42 @@ const daysInclusive = (start, end) => {
   if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return NaN;
   return Math.floor((endValue - startValue) / 86400000) + 1;
 };
+const cispPeriod = (period) => {
+  if (!period?.start || !period?.end) return "";
+  return `${fmtDate(period.start)}-${fmtDate(period.end)}`;
+};
+const cispBuyerStatementUrl = (row, period) => {
+  const agentId = Number(row?.counterparty_id);
+  const periodText = cispPeriod(period);
+  if (!agentId || !periodText) return "";
+  return `https://cisp.ssnab.ru/fin/dbt#/dbtagent?PERIOD=${periodText}&AGENT_ID=${agentId}&SHOW_TOVS_WAITING=true&GROUP_EXPANDED=true&SHOWDATA=true&IS_RECALC=false`;
+};
+
+const effectTitle = (row, period, valueOverride) => {
+  const effect = valueOverride ?? row?.ar_fin_cost_rub;
+  if (effect == null || isNaN(effect)) return COL_TIPS.arFinCost;
+  const avgAr = row?.avg_ar_rub;
+  const avgAdvance = row?.avg_advance_rub ?? row?.avg_ar_advance_rub;
+  const rate = Number(period?.rate);
+  const days = Number(period?.days);
+  const lines = [`Финэффект денег: ${fmtEffectRub(effect)}`];
+  if (avgAr != null && !isNaN(avgAr) && avgAdvance != null && !isNaN(avgAdvance)) {
+    lines.push(`Ср. аванс покупателей: ${fmtRub(avgAdvance)}`);
+    lines.push(`Ср. ДЗ: ${fmtRub(avgAr)}`);
+    lines.push("Средние остатки: простое среднее между остатком на начало и конец периода.");
+    if (Number.isFinite(rate) && Number.isFinite(days) && days > 0) {
+      lines.push(`Расчет: (${fmtRub(avgAdvance)} - ${fmtRub(avgAr)}) × ${fmtPct(rate * 100)} × ${fmtInt(days)} дн. / 365`);
+    }
+  } else {
+    lines.push(COL_TIPS.arFinCost);
+  }
+  return lines.join("\n");
+};
+
+function EffectValue({row, period, value}) {
+  const effect = value ?? row?.ar_fin_cost_rub;
+  return <span title={effectTitle(row, period, effect)}>{fmtEffectRub(effect)}</span>;
+}
 
 const deltaClass = (card) => {
   const p = card.delta_pct;
@@ -830,18 +916,25 @@ const COL_TIPS = {
   revenue: "Выручка за выбранный период: сколько отгрузили/продали по строкам SDOC_TOV. Это не поступление денег.",
   revenueShare: "Доля строки в выручке текущей вкладки. Например, доля клиента в выручке отдела или БЕ.",
   revenueDelta: "Как изменилась выручка относительно предыдущего такого же периода.",
+  healthScore: "Health Score — базовая модель 0–100: маржинальность 25%, динамика выручки 15%, DSO 20%, CEI 15%, доля просрочки 15%, Cash.% 10%. Далее применяются штрафы за рост и уровень просрочки, DSO выше 30, концентрацию TOP-3, бонус/штраф за финэффект денег и потолок для микроклиентов. Наведите на Score в строке, чтобы увидеть входные компоненты. Для строк только с авансом Score не считается.",
+  healthScoreDelta: "Δ Score — изменение Health Score к предыдущему такому же периоду в пунктах. Показывает тренд качества работы отдела.",
   margin: "Маржа = выручка − себестоимость (COGS). Это прибыль до учета стоимости отсрочек, ДЗ и запасов.",
+  marginDelta: "Как изменилась маржа относительно предыдущего такого же периода. Рост маржи лучше, падение — сигнал проверить цены, скидки или себестоимость.",
   marginPct: "Марж.% = маржа / выручка × 100%. Показывает, какая часть продаж остается маржей.",
-  cashAdj: "Cash-adj — денежная маржа. Это маржа минус расчетная стоимость денег, замороженных в ДЗ и запасах. Если показатель около нуля или в минусе, бумажная маржа почти съедена отсрочками/запасами.",
+  marginAr: "Маржа / ДЗ = маржа выбранного периода / ДЗ покупателей на конец периода. Это не годовой коэффициент и не средняя ДЗ; сравнивайте строки с учетом периода и DSO. Если ДЗ нет при положительной марже, показываем «Без ДЗ».",
+  cashAdj: "Cash-adj — денежная маржа после эффекта денег. Для клиентов и КА: маржа + финэффект денег; плюс от авансов улучшает показатель, минус от ДЗ снижает его.",
   cashPct: "Cash.% = Cash-adj / выручка × 100%. Денежная рентабельность после стоимости замороженных денег.",
   ar: "ДЗ — открытый долг покупателей по FIFO на дату окончания периода. Это остаток долга на дату, а не продажи за период.",
   avgAr: "Сред. ДЗ — среднее между ДЗ на начало и конец периода. Используется для стоимости отсрочки и финансирования оборотного капитала.",
   arAdvance: "Авансы покупателей — деньги, полученные вперед. Это наша обязанность отгрузить товар или зачесть оплату, а не обычная ДЗ.",
   overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
   overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
+  overdueDelta: "Как изменилась сумма просроченной ДЗ относительно предыдущего такого же периода. Здесь снижение лучше роста.",
+  counterparties: "Контрагент клиента: конкретное юрлицо (PREDS), по которому строка показывает выручку, текущую ДЗ, просрочку, финэффект денег и денежную маржу.",
+  top3Share: "Концентрация TOP-3, % — доля трех крупнейших клиентов отдела по выручке. Список под процентом показывает этих клиентов.",
   dso: "DSO — сколько дней продаж заморожено в текущей ДЗ: ДЗ на конец периода / выручка периода × дни. Не суммируется по строкам: для отдела, менеджера или БЕ пересчитывается от их общей ДЗ и общей выручки. Средняя ДЗ используется отдельно для стоимости отсрочки.",
-  cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. Чем ближе к 100%, тем лучше сбор.",
-  arFinCost: "Стоимость отсрочки — расчетная цена денег, замороженных в ДЗ за период: средняя ДЗ × ставка × дни периода / 365. Это не бухгалтерский убыток, а оценка стоимости капитала.",
+  cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. У клиентов без проблем CEI часто равен 100%, поэтому для скорости денег смотрите также DSO и финэффект.",
+  arFinCost: "Финэффект денег — (средний аванс покупателей − средняя ДЗ) × ставка × дни периода / 365. Средние остатки считаются как простое среднее между остатком на начало и конец периода. Плюс означает экономию/доход от денег клиента, минус — стоимость финансирования ДЗ.",
   inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
   dio: "DIO — сколько дней деньги в среднем лежат в запасах до продажи/расхода. Чем выше DIO, тем медленнее оборачивается склад.",
   ap: "КЗ сырье — наш открытый долг активным сырьевым поставщикам по FIFO на дату окончания периода.",
@@ -849,7 +942,7 @@ const COL_TIPS = {
   overdueAp: "Просроченная КЗ — часть текущего долга поставщикам, где срок оплаты уже прошел.",
   dpo: "DPO — сколько дней в среднем мы оплачиваем поставщиков. Чем выше DPO, тем дольше поставщики финансируют наш оборот, но слишком высокий DPO может быть риском отношений.",
   ccc: "CCC = DIO + DSO − DPO. Показывает, сколько дней бизнесу нужно финансировать оборот своими деньгами.",
-  status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. Риск означает, что клиент давит на cash flow.",
+  status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. «Только аванс» означает предоплату без продаж и ДЗ в выбранном периоде.",
   agingBucket: "Aging — текущая открытая ДЗ по FIFO, разложенная по срокам просрочки на дату окончания периода.",
   bucketValue: "Сумма текущего открытого остатка в выбранном бакете.",
   docs: "Количество открытых документов, из которых сложилась текущая ДЗ/просрочка.",
@@ -904,6 +997,158 @@ function benchCls(value, avg, lowerIsBetter) {
   if (Math.abs(diff) < 0.05) return "";
   if (lowerIsBetter) return diff < 0 ? "bench-good" : "bench-bad";
   return diff > 0 ? "bench-good" : "bench-bad";
+}
+
+const healthClass = (value) => {
+  if (value == null || isNaN(value)) return "na";
+  if (value >= 75) return "good";
+  if (value >= 55) return "warn";
+  if (value >= 40) return "mid";
+  return "risk";
+};
+
+function HealthPill({value}) {
+  return <span className={"health-pill " + healthClass(value)}>{value == null || isNaN(value) ? "—" : Math.round(value)}</span>;
+}
+
+function CounterpartyList({row}) {
+  const items = row?.counterparties || [];
+  if (!items.length) {
+    return <span className="counterparty-empty">Нет расшифровки</span>;
+  }
+  return (
+    <div className="counterparty-list">
+      {items.map((x, i) => (
+        <div className="counterparty-item" key={`${x.counterparty_id || 0}-${i}`}>
+          <span className="counterparty-name" title={x.counterparty || ""}>{x.counterparty || "Без контрагента"}</span>
+          <span className="counterparty-metrics">
+            <span className="counterparty-metric">выр. {fmtRub(x.revenue_rub)}</span>
+            <span className="counterparty-metric">маржа {fmtRub(x.margin_rub)}</span>
+            <span className="counterparty-metric">{fmtPct(x.margin_pct)}</span>
+            <span className="counterparty-metric">ДЗ {fmtRub(x.ar_rub)}</span>
+            <span className={"counterparty-metric " + ((x.overdue_ar_rub || 0) > 0.01 ? "risk" : "")}>проср. {fmtRub(x.overdue_ar_rub)} · {fmtPct(x.overdue_share_pct)}</span>
+            <span className="counterparty-metric">DSO {fmtDays(x.dso_days)}</span>
+            <span className="counterparty-metric">эфф. <EffectValue row={x}/></span>
+            <span className={"counterparty-metric " + ((x.cash_adj_margin_rub || 0) < 0 ? "risk" : "good")}>cash {fmtRub(x.cash_adj_margin_rub)}</span>
+            {x.status && <span className={"status-badge " + (x.status_code || "ok")}>{x.status}</span>}
+            {Math.abs(x.advances_rub || 0) > 0.01 && <span className="counterparty-metric">аванс {fmtRub(x.advances_rub)}</span>}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function clientCounterpartyRows(rows) {
+  const out = [];
+  (rows || []).forEach((row) => {
+    const items = row?.counterparties || [];
+    if (!items.length) {
+      return;
+    }
+    items.forEach((x, i) => {
+      out.push({
+        ...row,
+        ...x,
+        client_id: row.client_id,
+        client: row.client,
+        manager: row.manager,
+        department: row.department,
+        counterparty_id: x.counterparty_id,
+        counterparty: x.counterparty || "Без контрагента",
+        counterparty_count: items.length,
+        counterparty_row_key: `${row.client_id || "client"}-${x.counterparty_id || i}`,
+        ar_advance_rub: x.advances_rub || 0,
+      });
+    });
+  });
+  return out;
+}
+
+function DsoSavingsSimulator({totals, period}) {
+  const [days, setDays] = useState(5);
+  const periodDays = Math.max(1, Number(period?.days) || 30);
+  const rate = Number(period?.rate) || 0;
+  const ar = Number(totals?.ar_rub) || 0;
+  const revenue = Number(totals?.revenue_rub) || 0;
+  const currentDso = totals?.dso_days == null ? null : Number(totals.dso_days);
+  const reductionDays = Math.max(0, Math.min(365, Number(days) || 0));
+  const dailyRevenue = revenue > 0 ? revenue / periodDays : 0;
+  const releasedAr = Math.min(ar, dailyRevenue * reductionDays);
+  const periodSaving = releasedAr * rate * periodDays / 365;
+  const annualSaving = releasedAr * rate;
+  const targetDso = currentDso == null ? null : Math.max(0, currentDso - reductionDays);
+  const active = ar > 0 && revenue > 0 && reductionDays > 0;
+
+  return (
+    <div className="savings-panel">
+      <div className="savings-head">
+        <div>
+          <div className="savings-title">Потенциал экономии</div>
+          <div className="savings-sub">Снижение DSO высвобождает ДЗ: выручка в день × дни снижения, но не больше текущей ДЗ.</div>
+        </div>
+        <label className="savings-control">
+          Снизить DSO на
+          <input
+            type="number"
+            min="0"
+            max="365"
+            step="1"
+            value={days}
+            onChange={(e) => setDays(e.target.value)}
+          />
+          дн.
+          <input
+            type="range"
+            min="0"
+            max="90"
+            step="1"
+            value={Math.min(reductionDays, 90)}
+            onChange={(e) => setDays(e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="savings-grid">
+        <div className="savings-metric">
+          <div className="savings-label">Высвободится ДЗ</div>
+          <div className="savings-value">{active ? fmtRub(releasedAr) : "—"}</div>
+          <div className="savings-note">прямой cash release</div>
+        </div>
+        <div className="savings-metric">
+          <div className="savings-label">Экономия за период</div>
+          <div className="savings-value">{active ? fmtRub(periodSaving) : "—"}</div>
+          <div className="savings-note">по текущей ставке</div>
+        </div>
+        <div className="savings-metric">
+          <div className="savings-label">Годовой эффект</div>
+          <div className="savings-value">{active ? fmtRub(annualSaving) : "—"}</div>
+          <div className="savings-note">{fmtPct(rate * 100)} годовых</div>
+        </div>
+        <div className="savings-metric">
+          <div className="savings-label">DSO после</div>
+          <div className="savings-value">{targetDso == null ? "—" : fmtDays(targetDso)}</div>
+          <div className="savings-note">сейчас {fmtDays(currentDso)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CispMetricLink({row, period, children}) {
+  const href = cispBuyerStatementUrl(row, period);
+  if (!href) return <>{children}</>;
+  return (
+    <a
+      className="cisp-link"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title="Открыть выписку покупателя в КИСП"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </a>
+  );
 }
 
 function Th({children, className="", tip, sortKey, sortState, onSort}) {
@@ -1191,6 +1436,50 @@ function DeltaBadge({value, lowerBetter=false}) {
   );
 }
 
+function ScoreDeltaBadge({value}) {
+  return (
+    <span className={"delta " + deltaClassRaw(value, false)}>
+      {value == null || isNaN(value) ? "" : value > 0.05 ? "↑" : value < -0.05 ? "↓" : "→"} {fmtScoreDelta(value)}
+    </span>
+  );
+}
+
+const scoreTitle = (row) => {
+  if (!row) return COL_TIPS.healthScore;
+  return [
+    `Score: ${row.health_score == null || isNaN(row.health_score) ? "—" : Number(row.health_score).toLocaleString("ru-RU",{maximumFractionDigits:1})}`,
+    `Марж.%: ${fmtPct(row.margin_pct)}`,
+    `Δ выручки: ${fmtDelta(row.revenue_delta_pct)}`,
+    `DSO: ${fmtDays(row.dso_days)} дн.`,
+    `CEI: ${fmtPct(row.cei_pct)}`,
+    `Проср.%: ${fmtPct(row.overdue_share_pct)}`,
+    `Δ просрочки: ${fmtDelta(row.overdue_ar_delta_pct)}`,
+    `Cash.%: ${fmtPct(row.cash_adj_margin_pct)}`,
+    `Финэффект: ${fmtEffectRub(row.ar_fin_cost_rub)}`,
+    row.top3_client_share_pct == null ? null : `Концентрация TOP-3: ${fmtPct(row.top3_client_share_pct)}`,
+  ].filter(Boolean).join("\n");
+};
+
+function ScoreCell({row}) {
+  return <span title={scoreTitle(row)}><HealthPill value={row?.health_score}/></span>;
+}
+
+const deltaTitle = (label, value, lowerBetter=false) => {
+  const direction = value == null || isNaN(value)
+    ? "нет данных"
+    : lowerBetter
+      ? (value > 0.05 ? "хуже" : value < -0.05 ? "лучше" : "без изменений")
+      : (value > 0.05 ? "лучше" : value < -0.05 ? "хуже" : "без изменений");
+  return `${label}\nΔ к предыдущему периоду: ${fmtDelta(value)} (${direction})`;
+};
+
+const isProblemDepartment = (row) => (
+  (row.health_score_delta != null && row.health_score_delta < -5)
+  || (row.overdue_share_pct != null && row.overdue_share_pct > 5)
+  || (row.overdue_ar_delta_pct != null && row.overdue_ar_delta_pct > 20)
+  || (row.ar_fin_cost_rub != null && row.ar_fin_cost_rub < 0)
+);
+
 function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel="SKU"}) {
   const safeRows = rows || [];
   const maxValue = Math.max(1, ...safeRows.map(r => Math.abs(r.value_rub || 0)));
@@ -1240,23 +1529,41 @@ function DepartmentView({data, loading, err, requestKey}) {
   const [detailByDept, setDetailByDept] = useState({});
   const [detailLoadingDept, setDetailLoadingDept] = useState(null);
   const [detailErr, setDetailErr] = useState(null);
+  const [showDeltas, setShowDeltas] = useState(false);
+  const [problemOnly, setProblemOnly] = useState(false);
   const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
   const requestDetailSort = useCallback((key) => setDetailSortState(prev => nextSortState(prev, key)), []);
   const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
-  const rows = sortedRows;
+  const sourceRows = sortedRows;
+  const problemCount = useMemo(() => sourceRows.filter(isProblemDepartment).length, [sourceRows]);
+  const rows = useMemo(
+    () => problemOnly ? sourceRows.filter(isProblemDepartment) : sourceRows,
+    [sourceRows, problemOnly]
+  );
   const totals = data?.totals || {};
+  const deptColSpan = showDeltas ? 22 : 19;
   const avg = useMemo(() => {
-    if (!rows.length) return null;
-    const n = rows.length;
-    const sum = (k) => rows.reduce((s, r) => s + (r[k] || 0), 0);
+    if (!sourceRows.length) return null;
+    const n = sourceRows.length;
+    const sum = (k) => sourceRows.reduce((s, r) => s + (r[k] || 0), 0);
+    const weightedTop3 = totals.revenue_rub
+      ? sourceRows.reduce((s, r) => s + (r.revenue_rub || 0) * (r.top3_client_share_pct || 0), 0) / totals.revenue_rub
+      : sum("top3_client_share_pct") / n;
     return {
+      health_score: totals.health_score ?? (sum("health_score") / n),
+      health_score_delta: totals.health_score_delta ?? (sum("health_score_delta") / n),
       margin_pct: totals.revenue_rub ? (totals.margin_rub / totals.revenue_rub * 100) : sum("margin_pct") / n,
-      revenue_delta_pct: sum("revenue_delta_pct") / n,
-      dso_days: sum("dso_days") / n,
+      margin_delta_pct: totals.margin_delta_pct ?? (sum("margin_delta_pct") / n),
+      margin_ar_ratio: totals.ar_rub ? (totals.margin_rub / totals.ar_rub) : sum("margin_ar_ratio") / n,
+      cash_adj_margin_pct: totals.revenue_rub ? ((totals.cash_adj_margin_rub || 0) / totals.revenue_rub * 100) : sum("cash_adj_margin_pct") / n,
+      revenue_delta_pct: totals.revenue_delta_pct ?? (sum("revenue_delta_pct") / n),
+      dso_days: totals.dso_days ?? (sum("dso_days") / n),
       cei_pct: totals.cei_pct,
       overdue_share_pct: totals.ar_rub ? (totals.overdue_ar_rub / totals.ar_rub * 100) : sum("overdue_share_pct") / n,
+      overdue_ar_delta_pct: totals.overdue_ar_delta_pct ?? (sum("overdue_ar_delta_pct") / n),
+      top3_client_share_pct: weightedTop3,
     };
-  }, [rows, totals]);
+  }, [sourceRows, totals]);
 
   useEffect(() => {
     setExpandedDeptId(null);
@@ -1342,6 +1649,10 @@ function DepartmentView({data, loading, err, requestKey}) {
           <div className="dept-summary-value">{totals.departments || rows.length}</div>
         </div>
         <div className="dept-summary-item">
+          <div className="dept-summary-label">Health Score</div>
+          <div className="dept-summary-value"><ScoreCell row={totals}/> <ScoreDeltaBadge value={totals.health_score_delta}/></div>
+        </div>
+        <div className="dept-summary-item">
           <div className="dept-summary-label">Выручка</div>
           <div className="dept-summary-value">{fmtRub(totals.revenue_rub)}</div>
         </div>
@@ -1354,8 +1665,16 @@ function DepartmentView({data, loading, err, requestKey}) {
           <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
         </div>
         <div className="dept-summary-item">
+          <div className="dept-summary-label">Финэффект</div>
+          <div className="dept-summary-value"><EffectValue row={totals} period={data.period}/></div>
+        </div>
+        <div className="dept-summary-item">
           <div className="dept-summary-label">Просрочка</div>
           <div className="dept-summary-value">{fmtRub(totals.overdue_ar_rub)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">Проср.%</div>
+          <div className="dept-summary-value">{fmtPct(totals.overdue_share_pct)}</div>
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">CEI</div>
@@ -1363,42 +1682,66 @@ function DepartmentView({data, loading, err, requestKey}) {
         </div>
       </div>
 
-      <div className="dept-note">
-        Кликните на отдел, чтобы раскрыть клиентов внутри него. По заголовкам можно сортировать таблицу.
+      <div className="dept-controls">
+        <div className="dept-note">
+          Кликните на отдел, чтобы раскрыть клиентов внутри него. Бенчмарк и строка итога считаются по агрегату/весу выручки, не простым средним.
+          <div className="state-legend">
+            <span><b>Без ДЗ</b> — маржа есть, ДЗ на конец периода нет</span>
+            <span><b>0</b> — показатель равен нулю</span>
+            <span><b>—</b> — показатель не применим или нет данных</span>
+          </div>
+        </div>
+        <div className="dept-actions">
+          <button type="button" className={"table-toggle " + (problemOnly ? "active" : "")} onClick={() => setProblemOnly(v => !v)}>
+            Только проблемные {problemCount ? `(${problemCount})` : ""}
+          </button>
+          <button type="button" className={"table-toggle " + (showDeltas ? "active" : "")} onClick={() => setShowDeltas(v => !v)}>
+            {showDeltas ? "Скрыть Δ" : "Показать Δ"}
+          </button>
+        </div>
         <span className="bench-legend">
-          <span><span className="bench-legend-dot good"></span>лучше среднего</span>
-          <span><span className="bench-legend-dot bad"></span>хуже среднего</span>
+          <span><span className="bench-legend-dot good"></span>лучше бенчмарка</span>
+          <span><span className="bench-legend-dot bad"></span>хуже бенчмарка</span>
         </span>
       </div>
 
       <div className="dept-table-wrap">
-        <table className="dept-table">
+        <table className={"dept-table " + (showDeltas ? "" : "compact-deltas")}>
           <thead>
             <tr>
               <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
               <Th {...sortable(sortState, requestSort, "department")}>Отдел</Th>
+              <Th className="num" tip={COL_TIPS.healthScore} {...sortable(sortState, requestSort, "health_score")}>Score</Th>
+              <Th className="num" tip={COL_TIPS.healthScoreDelta} {...sortable(sortState, requestSort, "health_score_delta")}>Δ Score</Th>
               <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
               <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(sortState, requestSort, "revenue_share_pct")}>Доля</Th>
-              <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
+              {showDeltas && <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>}
               <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
+              {showDeltas && <Th className="num" tip={COL_TIPS.marginDelta} {...sortable(sortState, requestSort, "margin_delta_pct")}>Δ маржи</Th>}
               <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
               <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.cashPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.marginAr} {...sortable(sortState, requestSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
               <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
+              <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(sortState, requestSort, "overdue_share_pct")}>Проср.%</Th>
+              {showDeltas && <Th className="num" tip={COL_TIPS.overdueDelta} {...sortable(sortState, requestSort, "overdue_ar_delta_pct")}>Δ проср.</Th>}
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
               <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
-              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Ст-ть ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Финэффект</Th>
+              <Th className="num" tip={COL_TIPS.top3Share} {...sortable(sortState, requestSort, "top3_client_share_pct")}>Конц. TOP-3</Th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="14" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет отделов с продажами за выбранный период</td></tr>
+              <tr><td colSpan={deptColSpan} style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>{problemOnly ? "Нет проблемных отделов по выбранным правилам" : "Нет отделов с продажами за выбранный период"}</td></tr>
             )}
             {rows.map((r, idx) => {
               const open = expandedDeptId === r.department_id;
               const detail = detailByDept[String(r.department_id)];
-              const detailRows = sortRows(detail?.rows || [], detailSortState);
+              const detailRows = sortRows(clientCounterpartyRows(detail?.rows || []), detailSortState);
+              const top3Names = (r.top3_clients || []).map(x => x.client).join(", ");
               return (
                 <React.Fragment key={r.department_id}>
                   <tr className="dept-main-row" onClick={() => toggleDepartment(r)}>
@@ -1408,31 +1751,41 @@ function DepartmentView({data, loading, err, requestKey}) {
                       {r.department}
                       <span className="muted">Нажмите для детализации по клиентам</span>
                     </td>
-                    <td className="num">{fmtRub(r.revenue_rub)}</td>
+                    <td className={"num " + benchCls(r.health_score, avg?.health_score, false)}><ScoreCell row={r}/></td>
+                    <td className={"num " + benchCls(r.health_score_delta, avg?.health_score_delta, false)}><ScoreDeltaBadge value={r.health_score_delta}/></td>
+                    <td className="num" title={deltaTitle("Выручка", r.revenue_delta_pct)}>{fmtRub(r.revenue_rub)}</td>
                     <td className="num">{fmtPct(r.revenue_share_pct)}</td>
-                    <td className={"num " + benchCls(r.revenue_delta_pct, avg?.revenue_delta_pct, false)}><DeltaBadge value={r.revenue_delta_pct}/></td>
-                    <td className="num">{fmtRub(r.margin_rub)}</td>
+                    {showDeltas && <td className={"num " + benchCls(r.revenue_delta_pct, avg?.revenue_delta_pct, false)}><DeltaBadge value={r.revenue_delta_pct}/></td>}
+                    <td className="num" title={deltaTitle("Маржа", r.margin_delta_pct)}>{fmtRub(r.margin_rub)}</td>
+                    {showDeltas && <td className={"num " + benchCls(r.margin_delta_pct, avg?.margin_delta_pct, false)}><DeltaBadge value={r.margin_delta_pct}/></td>}
                     <td className={"num " + benchCls(r.margin_pct, avg?.margin_pct, false)}>{fmtPct(r.margin_pct)}</td>
                     <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                    <td className={"num " + benchCls(r.cash_adj_margin_pct, avg?.cash_adj_margin_pct, false)}>{fmtPct(r.cash_adj_margin_pct)}</td>
                     <td className="num">{fmtRub(r.ar_rub)}</td>
+                    <td className={"num " + benchCls(r.margin_ar_ratio, avg?.margin_ar_ratio, false)}>{fmtRatio(r.margin_ar_ratio, r.ar_rub, r.margin_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
                     <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>
                       {fmtRub(r.overdue_ar_rub)}
-                      <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
                     </td>
+                    <td className={"num " + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>{fmtPct(r.overdue_share_pct)}</td>
+                    {showDeltas && <td className={"num " + benchCls(r.overdue_ar_delta_pct, avg?.overdue_ar_delta_pct, true)}><DeltaBadge value={r.overdue_ar_delta_pct} lowerBetter={true}/></td>}
                     <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
                     <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)}>{fmtPct(r.cei_pct)}</td>
-                    <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                    <td className="num"><EffectValue row={r} period={data.period}/></td>
+                    <td className={"num " + benchCls(r.top3_client_share_pct, avg?.top3_client_share_pct, true)}>
+                      {fmtPct(r.top3_client_share_pct)}
+                      {top3Names && <span className="muted">{top3Names}</span>}
+                    </td>
                   </tr>
                   {open && (
                     <tr>
-                      <td className="dept-detail-cell" colSpan="14">
+                      <td className="dept-detail-cell" colSpan={deptColSpan}>
                         <div className="dept-detail-head">
                           <div>
-                            <div className="dept-detail-title">Клиенты отдела</div>
-                            <div className="dept-detail-sub">Сортировка по выручке за выбранный период</div>
+                            <div className="dept-detail-title">Клиенты и контрагенты отдела</div>
+                            <div className="dept-detail-sub">Одна строка = один контрагент клиента</div>
                           </div>
-                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detail.rows?.length || 0)}</div>}
+                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detailRows.length)} строк КА</div>}
                         </div>
                         {detailLoadingDept === r.department_id && (
                           <div className="loading" style={{padding:"24px"}}>
@@ -1444,7 +1797,7 @@ function DepartmentView({data, loading, err, requestKey}) {
                           <div className="err-panel"><b>Ошибка детализации:</b> {detailErr}</div>
                         )}
                         {detail && detailRows.length === 0 && (
-                          <div className="ms-empty">Нет клиентов в выбранном отделе за период</div>
+                          <div className="ms-empty">Нет активных контрагентов в выбранном отделе за период</div>
                         )}
                         {detailRows.length > 0 && (
                           <div className="dept-detail-scroll">
@@ -1453,31 +1806,45 @@ function DepartmentView({data, loading, err, requestKey}) {
                                 <tr>
                                   <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
                                   <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                  <Th tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
+                                  <Th className="num" tip={COL_TIPS.healthScore} {...sortable(detailSortState, requestDetailSort, "health_score")}>Score</Th>
                                   <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
                                   <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля отд.</Th>
                                   <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
                                   <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
+                                  <Th className="num" tip={COL_TIPS.marginAr} {...sortable(detailSortState, requestDetailSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
                                   <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы</Th>
                                   <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
+                                  <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(detailSortState, requestDetailSort, "overdue_share_pct")}>Проср.%</Th>
                                   <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
                                   <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
+                                  <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(detailSortState, requestDetailSort, "ar_fin_cost_rub")}>Финэффект</Th>
                                   <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
                                   <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {detailRows.map((c, idx) => (
-                                  <tr key={c.client_id || idx}>
+                                  <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${idx}`}>
                                     <td className="rank">{idx + 1}</td>
                                     <td className="dept-name">{c.client}</td>
-                                    <td className="num">{fmtRub(c.revenue_rub)}</td>
+                                    <td className="counterparty-cell">
+                                      <span className="counterparty-name" title={c.counterparty || ""}>{c.counterparty || "—"}</span>
+                                    </td>
+                                    <td className="num"><ScoreCell row={c}/></td>
+                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
                                     <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
                                     <td className="num">{fmtRub(c.margin_rub)}</td>
                                     <td className="num">{fmtPct(c.margin_pct)}</td>
-                                    <td className="num">{fmtRub(c.ar_rub)}</td>
+                                    <td className="num">{fmtRatio(c.margin_ar_ratio, c.ar_rub, c.margin_rub)}</td>
+                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.ar_rub)}</CispMetricLink></td>
+                                    <td className="num">{fmtRub(c.ar_advance_rub)}</td>
                                     <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
+                                    <td className="num">{fmtPct(c.overdue_share_pct)}</td>
                                     <td className="num">{fmtDays(c.dso_days)}</td>
                                     <td className="num">{fmtPct(c.cei_pct)}</td>
+                                    <td className="num"><EffectValue row={c} period={detail?.period || data.period}/></td>
                                     <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
                                     <td>
                                       <span className={"status-badge " + c.status_code}>{c.status}</span>
@@ -1500,22 +1867,29 @@ function DepartmentView({data, loading, err, requestKey}) {
             <tfoot>
               <tr>
                 <td></td>
-                <td className="avg-label">Среднее</td>
-                <td className="num">{fmtRub(totals.revenue_rub / rows.length)}</td>
-                <td className="num">—</td>
-                <td className="num">{fmtPct(avg.revenue_delta_pct)}</td>
-                <td className="num">{fmtRub(totals.margin_rub / rows.length)}</td>
+                <td className="avg-label">Итого / взвеш.</td>
+                <td className="num"><ScoreCell row={{...totals, top3_client_share_pct: avg.top3_client_share_pct}}/></td>
+                <td className="num"><ScoreDeltaBadge value={totals.health_score_delta}/></td>
+                <td className="num">{fmtRub(totals.revenue_rub)}</td>
+                <td className="num">100%</td>
+                {showDeltas && <td className="num">{fmtPct(totals.revenue_delta_pct)}</td>}
+                <td className="num">{fmtRub(totals.margin_rub)}</td>
+                {showDeltas && <td className="num">{fmtPct(totals.margin_delta_pct)}</td>}
                 <td className="num">{fmtPct(avg.margin_pct)}</td>
-                <td className="num">{fmtRub((totals.cash_adj_margin_rub || 0) / rows.length)}</td>
-                <td className="num">{fmtRub(totals.ar_rub / rows.length)}</td>
-                <td className="num">{fmtRub((totals.ar_advance_rub || 0) / rows.length)}</td>
+                <td className="num">{fmtRub(totals.cash_adj_margin_rub)}</td>
+                <td className="num">{fmtPct(avg.cash_adj_margin_pct)}</td>
+                <td className="num">{fmtRub(totals.ar_rub)}</td>
+                <td className="num">{fmtRatio(avg.margin_ar_ratio, totals.ar_rub, totals.margin_rub)}</td>
+                <td className="num">{fmtRub(totals.ar_advance_rub)}</td>
                 <td className="num">
-                  {fmtRub(totals.overdue_ar_rub / rows.length)}
-                  <span className="muted">{fmtPct(avg.overdue_share_pct)} от ДЗ</span>
+                  {fmtRub(totals.overdue_ar_rub)}
                 </td>
+                <td className="num">{fmtPct(avg.overdue_share_pct)}</td>
+                {showDeltas && <td className="num">{fmtPct(totals.overdue_ar_delta_pct)}</td>}
                 <td className="num">{fmtDays(avg.dso_days)}</td>
                 <td className="num">{fmtPct(avg.cei_pct)}</td>
-                <td className="num">{fmtRub((totals.ar_fin_cost_rub || 0) / rows.length)}</td>
+                <td className="num"><EffectValue row={totals} period={data.period}/></td>
+                <td className="num">{fmtPct(avg.top3_client_share_pct)}</td>
               </tr>
             </tfoot>
           )}
@@ -1679,7 +2053,7 @@ function ManagerView({data, loading, err, requestKey}) {
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
               <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
-              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Ст-ть ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Финэффект</Th>
             </tr>
           </thead>
           <tbody>
@@ -1689,7 +2063,7 @@ function ManagerView({data, loading, err, requestKey}) {
             {rows.map((r, idx) => {
               const open = expandedManagerId === r.manager_id;
               const detail = detailByManager[String(r.manager_id)];
-              const detailRows = sortRows(detail?.rows || [], detailSortState);
+              const detailRows = sortRows(clientCounterpartyRows(detail?.rows || []), detailSortState);
               return (
                 <React.Fragment key={r.manager_id}>
                   <tr className="dept-main-row" onClick={() => toggleManager(r)}>
@@ -1714,17 +2088,17 @@ function ManagerView({data, loading, err, requestKey}) {
                     </td>
                     <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
                     <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)}>{fmtPct(r.cei_pct)}</td>
-                    <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                    <td className="num"><EffectValue row={r} period={data.period}/></td>
                   </tr>
                   {open && (
                     <tr>
                       <td className="dept-detail-cell" colSpan="15">
                         <div className="dept-detail-head">
                           <div>
-                            <div className="dept-detail-title">Клиенты менеджера</div>
-                            <div className="dept-detail-sub">Сортировка по выручке за выбранный период</div>
+                            <div className="dept-detail-title">Клиенты и контрагенты менеджера</div>
+                            <div className="dept-detail-sub">Одна строка = один контрагент клиента</div>
                           </div>
-                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detail.rows?.length || 0)}</div>}
+                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detailRows.length)} строк КА</div>}
                         </div>
                         {detailLoadingManager === r.manager_id && (
                           <div className="loading" style={{padding:"24px"}}>
@@ -1736,7 +2110,7 @@ function ManagerView({data, loading, err, requestKey}) {
                           <div className="err-panel"><b>Ошибка детализации:</b> {detailErr}</div>
                         )}
                         {detail && detailRows.length === 0 && (
-                          <div className="ms-empty">Нет клиентов у выбранного менеджера за период</div>
+                          <div className="ms-empty">Нет активных контрагентов у выбранного менеджера за период</div>
                         )}
                         {detailRows.length > 0 && (
                           <div className="dept-detail-scroll">
@@ -1745,31 +2119,39 @@ function ManagerView({data, loading, err, requestKey}) {
                                 <tr>
                                   <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
                                   <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                  <Th tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
                                   <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
                                   <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля мен.</Th>
                                   <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
                                   <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
                                   <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                  <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы</Th>
                                   <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
                                   <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
                                   <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
+                                  <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(detailSortState, requestDetailSort, "ar_fin_cost_rub")}>Финэффект</Th>
                                   <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
                                   <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {detailRows.map((c, idx) => (
-                                  <tr key={c.client_id || idx}>
+                                  <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${idx}`}>
                                     <td className="rank">{idx + 1}</td>
                                     <td className="dept-name">{c.client}</td>
-                                    <td className="num">{fmtRub(c.revenue_rub)}</td>
+                                    <td className="counterparty-cell">
+                                      <span className="counterparty-name" title={c.counterparty || ""}>{c.counterparty || "—"}</span>
+                                    </td>
+                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
                                     <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
                                     <td className="num">{fmtRub(c.margin_rub)}</td>
                                     <td className="num">{fmtPct(c.margin_pct)}</td>
-                                    <td className="num">{fmtRub(c.ar_rub)}</td>
+                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.ar_rub)}</CispMetricLink></td>
+                                    <td className="num">{fmtRub(c.ar_advance_rub)}</td>
                                     <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
                                     <td className="num">{fmtDays(c.dso_days)}</td>
                                     <td className="num">{fmtPct(c.cei_pct)}</td>
+                                    <td className="num"><EffectValue row={c} period={detail?.period || data.period}/></td>
                                     <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
                                     <td>
                                       <span className={"status-badge " + c.status_code}>{c.status}</span>
@@ -1808,7 +2190,7 @@ function ManagerView({data, loading, err, requestKey}) {
                 </td>
                 <td className="num">{fmtDays(avg.dso_days)}</td>
                 <td className="num">{fmtPct(avg.cei_pct)}</td>
-                <td className="num">{fmtRub((totals.ar_fin_cost_rub || 0) / rows.length)}</td>
+                <td className="num"><EffectValue row={{avg_ar_rub: (totals.avg_ar_rub || 0) / rows.length, avg_advance_rub: (totals.avg_advance_rub || 0) / rows.length}} period={data.period} value={(totals.ar_fin_cost_rub || 0) / rows.length}/></td>
               </tr>
             </tfoot>
           )}
@@ -2082,7 +2464,8 @@ function BranchView({data, loading, err, requestKey}) {
 }
 
 function ClientView({data, loading, err}) {
-  const {rows: sortedRows, sortState, requestSort} = useSortedRows(data?.rows || [], "revenue_rub", "desc");
+  const clientRows = useMemo(() => clientCounterpartyRows(data?.rows || []), [data?.rows]);
+  const {rows: sortedRows, sortState, requestSort} = useSortedRows(clientRows, "revenue_rub", "desc");
 
   if (loading) {
     return (
@@ -2107,6 +2490,7 @@ function ClientView({data, loading, err}) {
 
   const rows = sortedRows;
   const totals = data.totals || {};
+  const visibleClientCount = new Set(rows.map(r => r.client_id)).size;
 
   return (
     <>
@@ -2129,8 +2513,8 @@ function ClientView({data, loading, err}) {
 
       <div className="dept-summary">
         <div className="dept-summary-item">
-          <div className="dept-summary-label">Клиентов в таблице</div>
-          <div className="dept-summary-value">{totals.clients || rows.length}</div>
+          <div className="dept-summary-label">Клиентов / строк КА</div>
+          <div className="dept-summary-value">{fmtInt(visibleClientCount)} / {fmtInt(rows.length)}</div>
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">Риск</div>
@@ -2153,6 +2537,8 @@ function ClientView({data, loading, err}) {
           <div className="dept-summary-value">{fmtRub(totals.cash_adj_margin_rub)}</div>
         </div>
       </div>
+
+      <DsoSavingsSimulator totals={totals} period={data.period}/>
 
       {(totals.top5_ar_share_pct != null || totals.top5_overdue_share_pct != null) && (
         <div className="conc-panel">
@@ -2193,7 +2579,7 @@ function ClientView({data, loading, err}) {
       )}
 
       <div className="dept-note">
-        Статус подсвечивает клиентов, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ. По заголовкам можно сортировать таблицу.
+        Одна строка = один контрагент клиента. Статус подсвечивает строки, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ.
       </div>
 
       <div className="dept-table-wrap">
@@ -2202,16 +2588,18 @@ function ClientView({data, loading, err}) {
             <tr>
               <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
               <Th {...sortable(sortState, requestSort, "client")}>Клиент</Th>
+              <Th tip={COL_TIPS.counterparties} {...sortable(sortState, requestSort, "counterparty")}>Контрагент</Th>
               <Th {...sortable(sortState, requestSort, "manager")}>Менеджер</Th>
               <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
               <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>
               <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
               <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.dso} {...sortable(sortState, requestSort, "dso_days")}>DSO</Th>
               <Th className="num" tip={COL_TIPS.cei} {...sortable(sortState, requestSort, "cei_pct")}>CEI</Th>
-              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Стоимость отсрочки</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(sortState, requestSort, "ar_fin_cost_rub")}>Финэффект</Th>
               <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
               <Th className="num" tip={COL_TIPS.cashPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
               <Th tip={COL_TIPS.status} {...sortable(sortState, requestSort, "status")}>Статус</Th>
@@ -2219,28 +2607,32 @@ function ClientView({data, loading, err}) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов за выбранный период</td></tr>
+              <tr><td colSpan="17" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет активных контрагентов за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => (
-              <tr key={r.client_id}>
+              <tr key={r.counterparty_row_key || `${r.client_id || "client"}-${idx}`}>
                 <td className="rank">{idx + 1}</td>
                 <td className="dept-name">
                   {r.client}
                   {r.department && <span className="muted">{r.department}</span>}
                 </td>
+                <td className="counterparty-cell">
+                  <span className="counterparty-name" title={r.counterparty || ""}>{r.counterparty || "—"}</span>
+                </td>
                 <td>{r.manager || "—"}</td>
-                <td className="num">{fmtRub(r.revenue_rub)}</td>
+                <td className="num"><CispMetricLink row={r} period={data.period}>{fmtRub(r.revenue_rub)}</CispMetricLink></td>
                 <td className="num"><DeltaBadge value={r.revenue_delta_pct}/></td>
                 <td className="num">{fmtRub(r.margin_rub)}</td>
                 <td className="num">{fmtPct(r.margin_pct)}</td>
-                <td className="num">{fmtRub(r.ar_rub)}</td>
+                <td className="num"><CispMetricLink row={r} period={data.period}>{fmtRub(r.ar_rub)}</CispMetricLink></td>
+                <td className="num">{fmtRub(r.ar_advance_rub)}</td>
                 <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
                   {fmtRub(r.overdue_ar_rub)}
                   <span className="muted">{fmtPct(r.overdue_share_pct)} от ДЗ</span>
                 </td>
                 <td className="num">{fmtDays(r.dso_days)}</td>
                 <td className="num">{fmtPct(r.cei_pct)}</td>
-                <td className="num">{fmtRub(r.ar_fin_cost_rub)}</td>
+                <td className="num"><EffectValue row={r} period={data.period}/></td>
                 <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
                 <td className="num">{fmtPct(r.cash_adj_margin_pct)}</td>
                 <td>
@@ -3104,7 +3496,7 @@ function App() {
             <div className="brand-logo">KPI</div>
             <div className="brand-text">
               <div className="brand-title">Cash Flow Dashboard</div>
-              <div className="brand-sub">Этап 1 · Верхняя панель</div>
+              <div className="brand-sub">Денежная панель</div>
             </div>
           </div>
           <div className="filters">
