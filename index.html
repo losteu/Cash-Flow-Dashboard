@@ -1058,9 +1058,9 @@ const fmtRowcValue = (value, workingCapital) => {
 };
 const rowcTitle = (workingCapital) => {
   if (workingCapital == null || isNaN(workingCapital)) return undefined;
-  const base = `Средний ОК: ${fmtRub(workingCapital)}`;
+  const base = `Оборотный капитал = ${fmtRub(workingCapital)}`;
   return Number(workingCapital) <= 0
-    ? `${base}. При ОК ≤ 0 классический ROWC не считается.`
+    ? `${base}. Бизнес финансируется внешними источниками, ROWC неприменим.`
     : base;
 };
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
@@ -1774,17 +1774,18 @@ const targetLine = (card) => {
 };
 
 // ─── Тултип с описанием и целью ───────────────────
-function CardTooltip({card, tip}) {
+function CardTooltip({card, tip, extraTip}) {
   const tline = targetLine(card);
   return (
     <span className="card-tooltip">
       <b>{card.label}.</b> {tip}
+      {extraTip && <span className="tt-target"><b>●</b> {extraTip}</span>}
       {tline && <span className="tt-target"><b>●</b> {tline}</span>}
     </span>
   );
 }
 
-function CardInfo({card, tip}) {
+function CardInfo({card, tip, extraTip}) {
   const ref = useRef(null);
   const [edge, setEdge] = useState("center");
   const alignTooltip = () => {
@@ -1806,7 +1807,7 @@ function CardInfo({card, tip}) {
       onFocus={alignTooltip}
     >
       ?
-      <CardTooltip card={card} tip={tip}/>
+      <CardTooltip card={card} tip={tip} extraTip={extraTip}/>
     </span>
   );
 }
@@ -1925,18 +1926,19 @@ function Card({card, sub, tip, compareLabel="Предыдущий период",
     + (COMPACT_TITLE_CARD_IDS.has(card?.id) ? " compact-label" : "");
   const displayValue = extra?.valueLabel ?? fmtVal(card);
   const hideUnit = Boolean(extra?.hideUnit);
+  const valueTitle = extra?.valueTitle;
   return (
     <div className={cls}>
       <div className="card-head">
         <div className="card-label-wrap">
           <div className="card-label">{card.label}</div>
-          {tip && <CardInfo card={card} tip={tip}/>}
+          {tip && <CardInfo card={card} tip={tip} extraTip={extra?.tooltipText}/>}
         </div>
         {card.score != null && (
           <span className={"card-score s"+card.score}>● {card.score}/5</span>
         )}
       </div>
-      <div className="card-value">
+      <div className="card-value" title={valueTitle || undefined}>
         {displayValue}{hideUnit ? null : <span className="card-unit">{card.unit}</span>}
       </div>
       {sub && <div className="card-sub">{sub}</div>}
@@ -4432,11 +4434,14 @@ function App() {
       ? null
       : Number(revenueCard.value) * Number(wciCard.value) / 100;
     if ((rowcCard?.value == null || isNaN(rowcCard?.value)) && Number.isFinite(workingCapital) && workingCapital <= 0) {
+      const rowcExplain = rowcTitle(workingCapital);
       extras.rowc_pct = {
         tone: workingCapital < 0 ? "info" : "warn",
         valueLabel: "ОК≤0",
         hideUnit: true,
-        content: <>Средний ОК: <strong>{fmtRub(workingCapital)}</strong>. При ОК ≤ 0 классический ROWC не применяем.</>,
+        valueTitle: rowcExplain,
+        tooltipText: rowcExplain,
+        content: <>Оборотный капитал: <strong>{fmtRub(workingCapital)}</strong>. Бизнес финансируется внешними источниками; ROWC неприменим.</>,
       };
     }
     return extras;
