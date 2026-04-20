@@ -1049,6 +1049,20 @@ const fmtDays = (n) => (n==null||isNaN(n)) ? "—" : n.toLocaleString("ru-RU",{m
 const fmtVal  = (card) => card.unit === "дни" ? fmtDays(card.value) : card.unit === "%" ? fmtQty(card.value) : fmtRub(card.value);
 const fmtDelta = (p) => (p==null||isNaN(p)) ? "—" : (p>0?"+":"") + p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtPct = (p) => (p==null||isNaN(p)) ? "—" : p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
+const fmtRowcValue = (value, workingCapital) => {
+  if (value == null || isNaN(value)) {
+    if (workingCapital != null && !isNaN(workingCapital) && Number(workingCapital) <= 0) return "ОК≤0";
+    return "—";
+  }
+  return fmtPct(value);
+};
+const rowcTitle = (workingCapital) => {
+  if (workingCapital == null || isNaN(workingCapital)) return undefined;
+  const base = `Средний ОК: ${fmtRub(workingCapital)}`;
+  return Number(workingCapital) <= 0
+    ? `${base}. При ОК ≤ 0 классический ROWC не считается.`
+    : base;
+};
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
 const fmtSignedUnitDelta = (n, unit) => {
@@ -1909,6 +1923,8 @@ function Card({card, sub, tip, compareLabel="Предыдущий период",
   const cls = "card"
     + (card.score ? " s"+card.score : "")
     + (COMPACT_TITLE_CARD_IDS.has(card?.id) ? " compact-label" : "");
+  const displayValue = extra?.valueLabel ?? fmtVal(card);
+  const hideUnit = Boolean(extra?.hideUnit);
   return (
     <div className={cls}>
       <div className="card-head">
@@ -1921,7 +1937,7 @@ function Card({card, sub, tip, compareLabel="Предыдущий период",
         )}
       </div>
       <div className="card-value">
-        {fmtVal(card)}<span className="card-unit">{card.unit}</span>
+        {displayValue}{hideUnit ? null : <span className="card-unit">{card.unit}</span>}
       </div>
       {sub && <div className="card-sub">{sub}</div>}
       {extra?.content && <div className={"card-insight " + (extra.tone || "info")}>{extra.content}</div>}
@@ -3086,7 +3102,7 @@ function BranchView({data, loading, err, requestKey}) {
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">ROWC</div>
-          <div className="dept-summary-value">{fmtPct(totals.rowc_pct)}</div>
+          <div className="dept-summary-value" title={rowcTitle(totals.working_capital_rub)}>{fmtRowcValue(totals.rowc_pct, totals.working_capital_rub)}</div>
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">WCI</div>
@@ -3147,7 +3163,7 @@ function BranchView({data, loading, err, requestKey}) {
                     <td className="num">{fmtRub(r.margin_rub)}</td>
                     <td className="num">{fmtPct(r.margin_pct)}</td>
                     <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
-                    <td className="num" title={`Средний ОК: ${fmtRub(r.working_capital_rub)}`}>{fmtPct(r.rowc_pct)}</td>
+                    <td className="num" title={rowcTitle(r.working_capital_rub)}>{fmtRowcValue(r.rowc_pct, r.working_capital_rub)}</td>
                     <td className="num" title={`Средний ОК: ${fmtRub(r.working_capital_rub)}`}>{fmtPct(r.wci_pct)}</td>
                     <td className="num">{fmtRub(r.ar_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
@@ -3581,6 +3597,9 @@ function CycleView({data, loading, err}) {
   const ccc = byId.ccc_days?.value || 0;
   const rowc = byId.rowc_pct?.value;
   const wci = byId.wci_pct?.value;
+  const rowcWorkingCapital = byId.revenue_rub?.value == null || wci == null || isNaN(wci)
+    ? null
+    : Number(byId.revenue_rub.value) * Number(wci) / 100;
   const rows = [
     {label:"DIO", sub:"запасы", value:dio, signed:dio},
     {label:"DSO", sub:"клиенты", value:dso, signed:dso},
@@ -3613,7 +3632,7 @@ function CycleView({data, loading, err}) {
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">ROWC</div>
-          <div className="dept-summary-value">{fmtPct(rowc)}</div>
+          <div className="dept-summary-value" title={rowcTitle(rowcWorkingCapital)}>{fmtRowcValue(rowc, rowcWorkingCapital)}</div>
         </div>
         <div className="dept-summary-item">
           <div className="dept-summary-label">WCI</div>
@@ -4404,6 +4423,20 @@ function App() {
       extras.cei_pct = {
         tone: "info",
         content: <>Уровень CEI остаётся сильным; умеренное ухудшение динамики показано нейтрально, пока метрика выше <strong>95%</strong>.</>,
+      };
+    }
+    const rowcCard = cardMap.rowc_pct;
+    const wciCard = cardMap.wci_pct;
+    const revenueCard = cardMap.revenue_rub;
+    const workingCapital = revenueCard?.value == null || wciCard?.value == null
+      ? null
+      : Number(revenueCard.value) * Number(wciCard.value) / 100;
+    if ((rowcCard?.value == null || isNaN(rowcCard?.value)) && Number.isFinite(workingCapital) && workingCapital <= 0) {
+      extras.rowc_pct = {
+        tone: workingCapital < 0 ? "info" : "warn",
+        valueLabel: "ОК≤0",
+        hideUnit: true,
+        content: <>Средний ОК: <strong>{fmtRub(workingCapital)}</strong>. При ОК ≤ 0 классический ROWC не применяем.</>,
       };
     }
     return extras;
