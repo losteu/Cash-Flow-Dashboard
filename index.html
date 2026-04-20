@@ -45,7 +45,11 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .brand-logo{width:38px;height:38px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;box-shadow:0 4px 12px rgba(99,102,241,.3)}
 .brand-text{display:flex;flex-direction:column;line-height:1.1}
 .brand-title{font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
-.brand-sub{font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.brand-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px}
+.brand-sub{font-size:11px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.6px}
+.mode-badge{display:inline-flex;align-items:center;justify-content:center;min-height:20px;padding:3px 8px;border-radius:999px;border:1px solid var(--bd);background:var(--bg2);font-size:10px;font-weight:800;letter-spacing:.45px;text-transform:uppercase;line-height:1;color:var(--t2)}
+.mode-badge.sql{background:var(--bbg);border-color:var(--bbd);color:var(--blu)}
+.mode-badge.snapshot{background:var(--abg);border-color:var(--abd);color:#92400e}
 
 /* ─── Filters ────────────────────────────── */
 .filters{display:flex;gap:18px;align-items:flex-end;flex:1;justify-content:flex-end;flex-wrap:wrap}
@@ -73,6 +77,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .btn-secondary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
 .app-shell{min-height:100vh;background:var(--bg)}
 .header-actions{display:flex;align-items:flex-end;gap:10px;flex-wrap:nowrap}
+.header-actions-note{width:100%;font-size:11px;color:var(--t3);font-weight:500;line-height:1.4;text-align:right}
+.header-actions-note strong{color:var(--t2);font-weight:700}
 
 /* ─── Container ──────────────────────────── */
 .container{max-width:1640px;margin:0 auto;padding:28px 32px 56px}
@@ -252,6 +258,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .empty-state-ico{font-size:48px;margin-bottom:14px;opacity:.5}
 .empty-state-title{font-size:16px;font-weight:700;color:var(--t2);margin-bottom:6px}
 .empty-state-sub{font-size:13px;color:var(--t3)}
+.empty-state-action{margin-top:16px}
 
 .loading{padding:60px;text-align:center;color:var(--t3)}
 .spinner{display:inline-block;width:32px;height:32px;border:3px solid rgba(99,102,241,.18);border-radius:50%;border-top-color:var(--accent);animation:spin .9s linear infinite;margin-bottom:14px}
@@ -462,6 +469,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .container{padding:20px}
   .filters{justify-content:flex-start;width:100%}
   .header-actions{width:100%;flex-wrap:wrap;justify-content:flex-start}
+  .header-actions-note{text-align:left}
   .preset-group{width:100%;min-width:0}
   .preset-label{width:auto}
   .preset-chips{width:100%;overflow-x:auto}
@@ -1581,6 +1589,21 @@ function NoticePanel({title, items, icon="!", defaultOpen=false}) {
   );
 }
 
+function DashboardEmptyState({icon, title, sub, actionLabel=null, onAction=null}) {
+  return (
+    <div className="empty-state">
+      <div className="empty-state-ico">{icon}</div>
+      <div className="empty-state-title">{title}</div>
+      <div className="empty-state-sub">{sub}</div>
+      {actionLabel && onAction && (
+        <div className="empty-state-action">
+          <button className="btn-primary" type="button" onClick={onAction}>{actionLabel}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AdvanceOnlyTable({rows, period, title="Авансы без отгрузок"}) {
   const safeRows = rows || [];
   if (!safeRows.length) return null;
@@ -2403,7 +2426,7 @@ function inventoryQuickFilterMatch(row, filterKey) {
   return true;
 }
 
-function DepartmentView({data, loading, err, requestKey}) {
+function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const [expandedDeptId, setExpandedDeptId] = useState(null);
   const [detailByDept, setDetailByDept] = useState({});
   const [detailLoadingDept, setDetailLoadingDept] = useState(null);
@@ -2497,11 +2520,13 @@ function DepartmentView({data, loading, err, requestKey}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▦</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть сравнение отделов</div>
-        <div className="empty-state-sub">Раскладка строится по тем же датам и фильтрам</div>
-      </div>
+      <DashboardEmptyState
+        icon="▦"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть сравнение отделов"}
+        sub={emptyStateSub || "Раскладка строится по тем же датам и фильтрам"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -2818,7 +2843,7 @@ function DepartmentView({data, loading, err, requestKey}) {
   );
 }
 
-function ManagerView({data, loading, err, requestKey}) {
+function ManagerView({data, loading, err, requestKey, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const [expandedManagerId, setExpandedManagerId] = useState(null);
   const [detailByManager, setDetailByManager] = useState({});
   const [detailLoadingManager, setDetailLoadingManager] = useState(null);
@@ -2892,11 +2917,13 @@ function ManagerView({data, loading, err, requestKey}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▧</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть сравнение менеджеров</div>
-        <div className="empty-state-sub">Менеджера можно раскрыть до клиентов</div>
-      </div>
+      <DashboardEmptyState
+        icon="▧"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть сравнение менеджеров"}
+        sub={emptyStateSub || "Менеджера можно раскрыть до клиентов"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -3111,7 +3138,7 @@ function ManagerView({data, loading, err, requestKey}) {
   );
 }
 
-function BranchView({data, loading, err, requestKey}) {
+function BranchView({data, loading, err, requestKey, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const [expandedBranchId, setExpandedBranchId] = useState(null);
   const [detailByBranch, setDetailByBranch] = useState({});
   const [detailLoadingBranch, setDetailLoadingBranch] = useState(null);
@@ -3170,11 +3197,13 @@ function BranchView({data, loading, err, requestKey}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▥</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть бизнес-единицы</div>
-        <div className="empty-state-sub">БЕ можно раскрыть до отделов продаж</div>
-      </div>
+      <DashboardEmptyState
+        icon="▥"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть бизнес-единицы"}
+        sub={emptyStateSub || "БЕ можно раскрыть до отделов продаж"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -3378,7 +3407,7 @@ function BranchView({data, loading, err, requestKey}) {
   );
 }
 
-function ClientView({data, loading, err}) {
+function ClientView({data, loading, err, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const clientRows = useMemo(() => clientCounterpartyRows(data?.rows || []), [data?.rows]);
   const {rows: sortedRows, sortState, requestSort} = useSortedRows(clientRows, "revenue_rub", "desc");
 
@@ -3395,11 +3424,13 @@ function ClientView({data, loading, err}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▤</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть клиентов</div>
-        <div className="empty-state-sub">Таблица покажет, где продажи создают кассовое давление</div>
-      </div>
+      <DashboardEmptyState
+        icon="▤"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть клиентов"}
+        sub={emptyStateSub || "Таблица покажет, где продажи создают кассовое давление"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -3557,7 +3588,7 @@ function ClientView({data, loading, err}) {
   );
 }
 
-function ArAgingView({data, loading, err}) {
+function ArAgingView({data, loading, err, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const agingRows = useMemo(
     () => (data?.top_clients || []).map((row, i) => ({...row, rank:i + 1})),
     [data]
@@ -3577,11 +3608,13 @@ function ArAgingView({data, loading, err}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▧</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть aging дебиторки</div>
-        <div className="empty-state-sub">Суммы строятся по открытым FIFO-остаткам ДЗ</div>
-      </div>
+      <DashboardEmptyState
+        icon="▧"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть aging дебиторки"}
+        sub={emptyStateSub || "Суммы строятся по открытым FIFO-остаткам ДЗ"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -3688,7 +3721,7 @@ function ArAgingView({data, loading, err}) {
   );
 }
 
-function CycleView({data, loading, err}) {
+function CycleView({data, loading, err, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   if (loading) {
     return (
       <div className="loading">
@@ -3702,11 +3735,13 @@ function CycleView({data, loading, err}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">↔</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть денежный цикл</div>
-        <div className="empty-state-sub">Waterfall покажет вклад запасов, клиентов и поставщиков</div>
-      </div>
+      <DashboardEmptyState
+        icon="↔"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть денежный цикл"}
+        sub={emptyStateSub || "Waterfall покажет вклад запасов, клиентов и поставщиков"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -3792,7 +3827,7 @@ function CycleView({data, loading, err}) {
   );
 }
 
-function InventoryView({data, loading, err}) {
+function InventoryView({data, loading, err, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
   const [quickFilter, setQuickFilter] = useState("all");
   const inventoryRows = useMemo(
     () => (data?.top_sku || []).map((row, i) => ({...row, rank:i + 1})),
@@ -3826,11 +3861,13 @@ function InventoryView({data, loading, err}) {
   }
   if (!data) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-ico">▥</div>
-        <div className="empty-state-title">Нажмите «Рассчитать», чтобы увидеть структуру запасов</div>
-        <div className="empty-state-sub">Разбивка покажет, где именно заморожены деньги</div>
-      </div>
+      <DashboardEmptyState
+        icon="▥"
+        title={emptyStateTitle || "Нажмите «Рассчитать», чтобы увидеть структуру запасов"}
+        sub={emptyStateSub || "Разбивка покажет, где именно заморожены деньги"}
+        actionLabel={emptyStateActionLabel}
+        onAction={onEmptyStateAction}
+      />
     );
   }
 
@@ -4065,6 +4102,23 @@ function App() {
   const effectiveEnd = preset === "cst" && !customPeriodInvalid ? customEnd : null;
   const compareModeDisabled = snapshotClientMode || Boolean(data?.snapshot_mode);
   const snapshotLoadBlocked = snapshotClientMode && !snapshotReady;
+  const runtimeSnapshotMode = snapshotClientMode || Boolean(data?.snapshot_mode);
+  const modeBadgeLabel = runtimeSnapshotMode ? "Snapshot" : "SQL";
+  const modeBadgeClass = runtimeSnapshotMode ? "snapshot" : "sql";
+  const primaryActionLabel = loading
+    ? "Считаю…"
+    : snapshotLoadBlocked
+      ? "Выбрать snapshot"
+      : snapshotClientMode
+        ? "Обновить snapshot"
+        : defaultFiltersLoading
+          ? "Фильтры…"
+          : "Рассчитать";
+  const snapshotHtmlHint = snapshotClientMode
+    ? "HTML-экспорт работает в локальном сервере. На GitHub Pages доступны snapshot и PNG."
+    : null;
+  const blockedEmptyTitle = "Выберите snapshot-папку, чтобы открыть дашборд";
+  const blockedEmptySub = "GitHub Pages показывает заранее выгруженный срез. После выбора папки можно переключать вкладки и смотреть подготовленные данные.";
   const compareLabel = data?.period?.compare_label || (compareMode === "yoy" ? "YoY" : "Предыдущий период");
   const periodSummary = useMemo(() => {
     const period = data?.period;
@@ -4098,6 +4152,12 @@ function App() {
     if (effectiveEnd) parts.push(`end=${effectiveEnd}`);
     return parts.join("&");
   }, [effectiveDays, effectiveEnd]);
+
+  const openSnapshotPicker = useCallback(() => {
+    if (!snapshotClientMode) return;
+    const input = document.getElementById("snapshotFolderInput");
+    if (input && typeof input.click === "function") input.click();
+  }, [snapshotClientMode]);
 
   useEffect(() => {
     const syncSnapshotReady = (event) => {
@@ -4691,7 +4751,10 @@ function App() {
             <div className="brand-logo">KPI</div>
             <div className="brand-text">
               <div className="brand-title">Cash Flow Dashboard</div>
-              <div className="brand-sub">Денежная панель</div>
+              <div className="brand-meta">
+                <div className="brand-sub">Денежная панель</div>
+                <span className={"mode-badge " + modeBadgeClass}>{modeBadgeLabel}</span>
+              </div>
             </div>
           </div>
           <div className="filters">
@@ -4748,11 +4811,11 @@ function App() {
             <div className="header-actions">
               <button
                 className="btn-primary"
-                onClick={load}
-                disabled={loading || customPeriodInvalid || defaultFiltersLoading || snapshotLoadBlocked}
-                title={snapshotLoadBlocked ? "Сначала выберите snapshot-папку" : undefined}
+                onClick={snapshotLoadBlocked ? openSnapshotPicker : load}
+                disabled={loading || customPeriodInvalid || defaultFiltersLoading}
+                title={snapshotLoadBlocked ? "Открою выбор snapshot-папки" : undefined}
               >
-                {loading ? "Считаю…" : snapshotLoadBlocked ? "Выбрать snapshot" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
+                {primaryActionLabel}
               </button>
               <button
                 className="btn-secondary"
@@ -4767,6 +4830,11 @@ function App() {
                       disabled={customPeriodInvalid || loading || !data || pngExporting}>
                 Скрин PNG
               </button>
+              {snapshotHtmlHint && (
+                <div className="header-actions-note">
+                  <strong>HTML:</strong> {snapshotHtmlHint}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -4877,11 +4945,13 @@ function App() {
         )}
 
         {activeTab === "overview" && !loading && !data && !err && (
-          <div className="empty-state">
-            <div className="empty-state-ico">📊</div>
-            <div className="empty-state-title">Выберите период и нажмите «Рассчитать»</div>
-            <div className="empty-state-sub">Можно выбрать один из пресетов или задать свой диапазон дат</div>
-          </div>
+          <DashboardEmptyState
+            icon={snapshotLoadBlocked ? "🗂" : "📊"}
+            title={snapshotLoadBlocked ? blockedEmptyTitle : "Выберите период и нажмите «Рассчитать»"}
+            sub={snapshotLoadBlocked ? blockedEmptySub : "Можно выбрать один из пресетов или задать свой диапазон дат"}
+            actionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onAction={snapshotLoadBlocked ? openSnapshotPicker : null}
+          />
         )}
 
         {activeTab === "overview" && !loading && data && BLOCKS.map(block => (
@@ -4932,6 +5002,10 @@ function App() {
             loading={loading || branchLoading}
             err={branchErr || (!data && err ? err : null)}
             requestKey={requestKey}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4941,6 +5015,10 @@ function App() {
             loading={loading || managerLoading}
             err={managerErr || (!data && err ? err : null)}
             requestKey={requestKey}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4950,6 +5028,10 @@ function App() {
             loading={loading || deptLoading}
             err={deptErr || (!data && err ? err : null)}
             requestKey={requestKey}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4958,6 +5040,10 @@ function App() {
             data={visibleClientData}
             loading={loading || clientLoading}
             err={clientErr || (!data && err ? err : null)}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4966,6 +5052,10 @@ function App() {
             data={visibleArAgingData}
             loading={loading || arAgingLoading}
             err={arAgingErr || (!data && err ? err : null)}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4974,6 +5064,10 @@ function App() {
             data={visibleInventoryData}
             loading={loading || inventoryLoading}
             err={inventoryErr || (!data && err ? err : null)}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
 
@@ -4982,6 +5076,10 @@ function App() {
             data={data}
             loading={loading}
             err={err}
+            emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
+            emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
+            emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
+            onEmptyStateAction={snapshotLoadBlocked ? openSnapshotPicker : null}
           />
         )}
       </div>
