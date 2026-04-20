@@ -174,6 +174,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .block-ico.b3{background:#fef3c7;color:#d97706}
 .block-ico.b4{background:#fce7f3;color:#db2777}
 .block-ico.b5{background:#ede9fe;color:#7c3aed}
+.block-ico.b6{background:#ecfeff;color:#0f766e}
 .block-title{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.1px}
 .block-desc{font-size:11px;color:var(--t3);font-weight:500;margin-left:4px}
 
@@ -475,6 +476,25 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .overview-change-list{margin:0;padding-left:18px;color:var(--t2)}
 .overview-change-list li{margin:5px 0;line-height:1.5;font-size:12px}
 .overview-change-list strong{font-weight:800;color:var(--t1)}
+.overview-signal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:22px}
+.overview-signal{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:16px 18px;box-shadow:var(--sh1);display:flex;flex-direction:column;gap:10px}
+.overview-signal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.overview-signal-label-wrap{display:flex;align-items:flex-start;gap:6px;flex:1;min-width:0}
+.overview-signal-label{font-size:11px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.overview-signal-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;line-height:1;white-space:nowrap}
+.overview-signal-badge.info{background:#ecfdf5;color:#047857}
+.overview-signal-badge.warn{background:#fef3c7;color:#b45309}
+.overview-signal-badge.risk{background:#fee2e2;color:#dc2626}
+.overview-signal-value{font-family:var(--mn);font-size:26px;font-weight:700;color:var(--t1);line-height:1}
+.overview-signal-secondary{font-size:11px;color:var(--t3);line-height:1.4}
+.overview-signal-secondary strong{color:var(--t1);font-weight:800}
+.overview-signal-sub{font-size:12px;color:var(--t2);line-height:1.5}
+.overview-signal-meta{font-size:11px;color:var(--t3);line-height:1.5}
+.overview-signal-spark{margin-top:2px}
+.overview-signal-spark-svg{display:block;width:100%;height:30px;overflow:visible}
+.overview-signal-spark-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:9px;color:var(--t3);font-family:var(--mn);text-transform:uppercase;letter-spacing:.4px}
+.overview-signal-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--t3)}
+.overview-signal-foot .delta{font-size:11px}
 
 /* ─── Cash cycle / AR aging ─────────────── */
 .cycle-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:16px;margin-bottom:14px}
@@ -1145,6 +1165,8 @@ const rowcTitle = (workingCapital, options={}) => {
   return `${base}. Бизнес финансируется внешними источниками, ROWC неприменим.${extras.length ? " Смотрите: " + extras.join(" · ") + "." : ""}`;
 };
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
+const fmtHhi = (n) => (n==null||isNaN(n)) ? "—" : Math.round(Number(n)).toLocaleString("ru-RU",{maximumFractionDigits:0});
+const fmtHhiDelta = (n) => (n==null||isNaN(n)) ? "—" : `${Number(n) > 0 ? "+" : ""}${Math.round(Number(n)).toLocaleString("ru-RU",{maximumFractionDigits:0})}`;
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
 const fmtMultiple = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
 const fmtMultipleDelta = (n) => (n==null||isNaN(n)) ? "—" : `${n>0?"+":""}${Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1})}x`;
@@ -1197,6 +1219,19 @@ const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
 const cleanEntityLabel = (value, fallback="Без названия") => {
   const text = String(value || "").replace(/^\+\s*/, "").trim();
   return text || fallback;
+};
+const concentrationBand = (hhi) => {
+  if (hhi == null || isNaN(hhi)) return {tone:"info", label:"Нет данных"};
+  if (Number(hhi) >= 2500) return {tone:"risk", label:"Высокая"};
+  if (Number(hhi) >= 1500) return {tone:"warn", label:"Средняя"};
+  return {tone:"info", label:"Низкая"};
+};
+const slowMoverBand = (sharePct, deltaPctPt) => {
+  const share = Number(sharePct || 0);
+  const delta = Number(deltaPctPt || 0);
+  if (share >= 12 || delta >= 1.5) return {tone:"risk", label:"Рост риска"};
+  if (share >= 7 || delta >= 0.5) return {tone:"warn", label:"Под контролем"};
+  return {tone:"info", label:"Стабильно"};
 };
 const fmtDate = (s) => {
   if (!s) return "—";
@@ -2032,6 +2067,74 @@ const Sparkline = React.memo(function Sparkline({card, period}) {
   );
 });
 
+const OverviewSignalSparkline = React.memo(function OverviewSignalSparkline({values, lowerBetter=false, title="Тренд 12M rolling"}) {
+  const spark = useMemo(() => {
+    const raw = Array.isArray(values) ? values : [];
+    const normalized = raw.map(v => (v == null || isNaN(v) ? null : Number(v)));
+    const numeric = normalized.filter(v => v != null);
+    if (numeric.length < 2 || normalized.length < 2) return null;
+
+    const width = 240;
+    const height = 30;
+    const padX = 2;
+    const padY = 3;
+    let min = Math.min(...numeric);
+    let max = Math.max(...numeric);
+    if (min === max) {
+      const delta = Math.max(Math.abs(min || 1) * 0.08, 1);
+      min -= delta;
+      max += delta;
+    }
+
+    const first = numeric[0];
+    const last = numeric[numeric.length - 1];
+    const diff = last - first;
+    const tone = Math.abs(diff) < 1e-9 ? "neutral" : ((lowerBetter ? diff < 0 : diff > 0) ? "good" : "bad");
+    const scaleX = (idx, len) => (len <= 1 ? width / 2 : padX + (idx * (width - padX * 2)) / (len - 1));
+    const scaleY = (value) => {
+      const ratio = (value - min) / (max - min);
+      return height - padY - ratio * (height - padY * 2);
+    };
+    const points = normalized.map((value, idx) => value == null ? null : {
+      x: scaleX(idx, normalized.length),
+      y: scaleY(value),
+      value,
+    });
+    const validPoints = points.filter(Boolean);
+    if (validPoints.length < 2) return null;
+
+    return {
+      tone,
+      line: validPoints.map((pt, idx) => `${idx === 0 ? "M" : "L"} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(" "),
+      area: `${validPoints.map((pt, idx) => `${idx === 0 ? "M" : "L"} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(" ")} L ${validPoints[validPoints.length - 1].x.toFixed(2)} ${(height - 2).toFixed(2)} L ${validPoints[0].x.toFixed(2)} ${(height - 2).toFixed(2)} Z`,
+      first: validPoints[0],
+      last: validPoints[validPoints.length - 1],
+      midY: ((height - padY * 2) / 2 + padY).toFixed(2),
+      pointsCount: normalized.length,
+    };
+  }, [values, lowerBetter]);
+
+  if (!spark) return null;
+  const lineCls = "card-spark-line" + (spark.tone === "good" ? " good" : spark.tone === "bad" ? " bad" : "");
+  const dotCls = "card-spark-dot last" + (spark.tone === "good" ? " good" : spark.tone === "bad" ? " bad" : "");
+
+  return (
+    <div className="overview-signal-spark" title={title}>
+      <svg className="overview-signal-spark-svg" viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
+        <line className="card-spark-grid" x1="0" y1={spark.midY} x2="240" y2={spark.midY}/>
+        <path className="card-spark-area" d={spark.area}/>
+        <path className={lineCls} d={spark.line}/>
+        <circle className="card-spark-dot first" cx={spark.first.x} cy={spark.first.y} r="2.8"/>
+        <circle className={dotCls} cx={spark.last.x} cy={spark.last.y} r="3.2"/>
+      </svg>
+      <div className="overview-signal-spark-meta">
+        <span>12M rolling</span>
+        <span>{spark.pointsCount} точ.</span>
+      </div>
+    </div>
+  );
+});
+
 // ─── Одна карточка ───────────────────────────────
 function Card({card, sub, tip, compareLabel="Предыдущий период", period, extra}) {
   if (card.error) {
@@ -2271,6 +2374,136 @@ function OverviewChangePanel({items}) {
       <ul className="overview-change-list">
         {safeItems.map((item, idx) => <li key={idx}>{item}</li>)}
       </ul>
+    </div>
+  );
+}
+
+function OverviewStructuralSignals({customerConcentration, supplierConcentration, deadStock, compareLabel="Предыдущий период", snapshotMode=false}) {
+  const items = [];
+  const topNames = (rows) => (rows || []).slice(0, 2).map((row) => cleanEntityLabel(row.label, "")).filter(Boolean).join(" · ");
+
+  const customerHhi = customerConcentration?.hhi;
+  const customerHhi12m = customerConcentration?.hhi_12m;
+  if (customerHhi != null || customerHhi12m != null) {
+    const displayHhi = customerHhi != null ? customerHhi : customerHhi12m;
+    const band = concentrationBand(displayHhi);
+    const customerTop5Share = customerConcentration?.top5_share_pct != null
+      ? customerConcentration.top5_share_pct
+      : customerConcentration?.hhi_12m_top5_share_pct;
+    const customerEntityCount = customerConcentration?.entity_count != null
+      ? customerConcentration.entity_count
+      : customerConcentration?.hhi_12m_entity_count;
+    items.push({
+      key: "customer_hhi",
+      label: "HHI клиентов",
+      badge: band.label,
+      tone: band.tone,
+      valueLabel: fmtHhi(displayHhi),
+      secondaryValue: customerHhi != null
+        ? (customerHhi12m == null ? null : <>12M rolling: <strong>{fmtHhi(customerHhi12m)}</strong></>)
+        : <>За период нет выручки после фильтров; показан <strong>12M rolling</strong></>,
+      sub: <>Top-5: <strong>{fmtPct(customerTop5Share)}</strong> выручки · {fmtInt(customerEntityCount)} клиентов</>,
+      meta: <>HHI = индекс Херфиндаля-Хиршмана. Лидеры: {topNames(customerConcentration.top_entities) || "крупнейшие клиенты"}.</>,
+      footer: customerHhi != null
+        ? (customerConcentration.delta_hhi == null ? "—" : <><span className={"delta " + deltaClassRaw(customerConcentration.delta_hhi, true)}>{arrow(customerConcentration.delta_hhi)} {fmtHhiDelta(customerConcentration.delta_hhi)}</span> vs {compareLabel}</>)
+        : "Периодный HHI скрыт: за выбранный период нет положительной выручки после фильтров.",
+      tip: "HHI = Herfindahl-Hirschman Index, или индекс Херфиндаля-Хиршмана. Для клиентов это сумма квадратов долей клиентов в выручке. До 1500 — низкая концентрация, 1500–2500 — средняя, выше 2500 — высокая.",
+      extraTip: "Верхнее число считаем по выручке выбранного периода после фильтров. Строка 12M rolling сглаживает сезонность и показывает концентрацию по последним 365 дням в месячных сдвигах.",
+      sparkline: customerConcentration.hhi_12m_sparkline,
+      sparklineTitle: "Тренд HHI клиентов: 12M rolling по месяцам",
+      sparklineLowerBetter: true,
+    });
+  }
+
+  if (supplierConcentration?.hhi != null) {
+    const band = concentrationBand(supplierConcentration.hhi);
+    items.push({
+      key: "supplier_hhi",
+      label: "HHI поставщиков",
+      badge: band.label,
+      tone: band.tone,
+      valueLabel: fmtHhi(supplierConcentration.hhi),
+      sub: <>Top-5: <strong>{fmtPct(supplierConcentration.top5_share_pct)}</strong> экспозиции · {fmtInt(supplierConcentration.entity_count)} поставщиков</>,
+      meta: <>HHI = индекс Херфиндаля-Хиршмана. Пока считаем по открытой сырьевой экспозиции: КЗ + авансы. Лидеры: {topNames(supplierConcentration.top_entities) || "крупнейшие поставщики"}.</>,
+      footer: supplierConcentration.delta_hhi == null ? "—" : <><span className={"delta " + deltaClassRaw(supplierConcentration.delta_hhi, true)}>{arrow(supplierConcentration.delta_hhi)} {fmtHhiDelta(supplierConcentration.delta_hhi)}</span> vs {compareLabel}</>,
+      tip: "HHI = Herfindahl-Hirschman Index, или индекс Херфиндаля-Хиршмана. Для поставщиков он показывает концентрацию риска на стороне снабжения: чем выше индекс, тем сильнее зависимость от узкого круга поставщиков.",
+      extraTip: "Пока считаем по открытой сырьевой экспозиции на срез: КЗ поставщикам + авансы поставщикам. Это proxy риска концентрации, а не закупочный оборот.",
+    });
+  }
+
+  if (deadStock?.slow_90_share_pct != null) {
+    const band = slowMoverBand(deadStock.slow_90_share_pct, deadStock.slow_90_share_delta_pct_pt);
+    items.push({
+      key: "slow_90_trend",
+      label: "Slow 90+",
+      badge: band.label,
+      tone: band.tone,
+      valueLabel: fmtPct(deadStock.slow_90_share_pct),
+      sub: <><strong>{fmtRub(deadStock.slow_90_rub)}</strong> · {fmtInt(deadStock.slow_90_sku)} SKU без расхода 90+ дней</>,
+      meta: <>Это доля стоимости запаса, которая не имела расхода 90+ дней. Ранний сигнал затоваривания до перехода в неликвид 180+.</>,
+      footer: deadStock.slow_90_share_delta_pct_pt == null ? "—" : <><span className={"delta " + deltaClassRaw(deadStock.slow_90_share_delta_pct_pt, true)}>{arrow(deadStock.slow_90_share_delta_pct_pt)} {fmtSignedUnitDelta(deadStock.slow_90_share_delta_pct_pt, "%")}</span> vs {compareLabel}</>,
+      tip: "Slow 90+ = доля общей стоимости запаса, которая не имела расхода 90+ дней. Рост доли или суммы — опережающий индикатор будущего неликвида и списаний.",
+      extraTip: "Иными словами, текущие 6,1% означают: 6,1% запасов по стоимости лежат без движения уже более 90 дней. Показываем именно slow-mover, а не только dead stock 180+, чтобы видеть затоваривание раньше.",
+    });
+  }
+
+  if (deadStock?.dead_180_share_pct != null) {
+    const band = slowMoverBand(deadStock.dead_180_share_pct, deadStock.dead_180_share_delta_pct_pt);
+    items.push({
+      key: "dead_180_trend",
+      label: "Неликвид 180+",
+      badge: band.label,
+      tone: band.tone,
+      valueLabel: fmtPct(deadStock.dead_180_share_pct),
+      sub: <><strong>{fmtRub(deadStock.dead_180_rub)}</strong> · {fmtInt(deadStock.dead_180_sku)} SKU без расхода 180+ дней</>,
+      meta: <>Это доля стоимости запаса, которая не имела расхода 180+ дней. Это уже неликвид: деньги заморожены, а риск списаний и скидок выше.</>,
+      footer: deadStock.dead_180_share_delta_pct_pt == null ? "—" : <><span className={"delta " + deltaClassRaw(deadStock.dead_180_share_delta_pct_pt, true)}>{arrow(deadStock.dead_180_share_delta_pct_pt)} {fmtSignedUnitDelta(deadStock.dead_180_share_delta_pct_pt, "%")}</span> vs {compareLabel}</>,
+      tip: "Неликвид 180+ = доля общей стоимости запаса, которая не имела расхода 180+ дней. Это самая жёсткая зона медленного стока: товар уже полгода лежит без движения.",
+      extraTip: "Показываем и долю, и сумму, чтобы видеть не только относительный риск, но и сколько денег реально заморожено в неликвиде.",
+    });
+  }
+
+  if (!items.length) {
+    if (!snapshotMode) return null;
+    return (
+      <div className="overview-method-note">
+        В этом snapshot нет блока структурных рисков. Нужен новый snapshot, собранный на текущей версии выгрузки.
+      </div>
+    );
+  }
+
+  return (
+    <div className="block">
+      <div className="block-head">
+        <div className="block-ico b6">🧭</div>
+        <div className="block-title">Структурные Риски</div>
+        <div className="block-desc">· концентрация клиентов и поставщиков, тренд медленного стока</div>
+      </div>
+      <div className="overview-signal-grid">
+        {items.map((item) => (
+          <div key={item.key} className="overview-signal">
+            <div className="overview-signal-head">
+              <div className="overview-signal-label-wrap">
+                <div className="overview-signal-label">{item.label}</div>
+                {(item.tip || item.extraTip) && <CardInfo card={{label:item.label}} tip={item.tip} extraTip={item.extraTip}/>}
+              </div>
+              <div className={"overview-signal-badge " + item.tone}>{item.badge}</div>
+            </div>
+            <div className="overview-signal-value">{item.valueLabel}</div>
+            {item.secondaryValue && <div className="overview-signal-secondary">{item.secondaryValue}</div>}
+            <div className="overview-signal-sub">{item.sub}</div>
+            <div className="overview-signal-meta">{item.meta}</div>
+            {Array.isArray(item.sparkline) && item.sparkline.length > 1 && (
+              <OverviewSignalSparkline
+                values={item.sparkline}
+                lowerBetter={Boolean(item.sparklineLowerBetter)}
+                title={item.sparklineTitle}
+              />
+            )}
+            <div className="overview-signal-foot">{item.footer}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -4576,7 +4809,7 @@ function App() {
     lastLoadedKeyRef.current = requestKey;
     setAutoReloadEnabled(true);
     setLoading(true); setErr(null);
-    const url = `${API}/kpi/top?${requestKey}`;
+    const url = `${API}/kpi/top?${requestKey}&include_sparklines=1&include_structural=1`;
     console.log("[KPI] fetch:", url);
     try {
       const r = await fetch(url);
@@ -5201,6 +5434,16 @@ function App() {
             sub={snapshotLoadBlocked ? blockedEmptySub : "Можно выбрать один из пресетов или задать свой диапазон дат"}
             actionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
             onAction={snapshotLoadBlocked ? openSnapshotPicker : null}
+          />
+        )}
+
+        {activeTab === "overview" && !loading && data && (
+          <OverviewStructuralSignals
+            customerConcentration={data?.insights?.customer_concentration}
+            supplierConcentration={data?.insights?.supplier_concentration}
+            deadStock={data?.insights?.dead_stock}
+            compareLabel={compareLabel}
+            snapshotMode={runtimeSnapshotMode}
           />
         )}
 
