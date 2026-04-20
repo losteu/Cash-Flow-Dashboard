@@ -283,10 +283,33 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .dept-table td{padding:11px 10px;border-bottom:1px solid var(--bd);vertical-align:middle;color:var(--t1);white-space:nowrap}
 .dept-table tr:last-child td{border-bottom:none}
 .dept-table tbody tr:hover td{background:#f8fafc}
+.dept-table .sticky-col,.dept-detail-table .sticky-col{position:sticky;left:var(--sticky-left,0px);background:var(--sf);background-clip:padding-box}
+.dept-table thead .sticky-col,.dept-detail-table thead .sticky-col{z-index:5}
+.dept-table tbody .sticky-col,.dept-detail-table tbody .sticky-col{z-index:1}
+.dept-table tfoot .sticky-col,.dept-detail-table tfoot .sticky-col{z-index:2}
+.dept-table tbody tr:hover .sticky-col,.dept-detail-table tbody tr:hover .sticky-col{background:#f8fafc}
+.dept-table .sticky-divider,.dept-detail-table .sticky-divider{box-shadow:2px 0 0 rgba(148,163,184,.22)}
+.dept-table .sticky-rank{--sticky-left:0px;min-width:54px;width:54px;max-width:54px}
+.dept-table .sticky-dept{--sticky-left:54px;min-width:250px;width:250px}
+.dept-table .sticky-score{--sticky-left:304px;min-width:88px;width:88px}
+.dept-table .sticky-delta{--sticky-left:392px;min-width:154px;width:154px}
+.dept-table .sticky-revenue{--sticky-left:546px;min-width:132px;width:132px}
+.dept-detail-table .sticky-rank{--sticky-left:0px;min-width:46px;width:46px;max-width:46px}
+.dept-detail-table .sticky-client{--sticky-left:46px;min-width:170px;width:170px}
+.dept-detail-table .sticky-counterparty{--sticky-left:216px;min-width:260px;width:260px}
+.dept-detail-table .sticky-score{--sticky-left:476px;min-width:84px;width:84px}
 .dept-table .num{text-align:right;font-family:var(--mn);font-weight:600}
 .dept-table .rank{width:44px;color:var(--t3);font-family:var(--mn);font-weight:700}
 .dept-table .dept-name{font-weight:700;min-width:230px;white-space:normal;line-height:1.3}
 .dept-table .muted{display:block;color:var(--t3);font-size:10px;font-weight:600;margin-top:2px}
+.score-trend{margin-top:6px;width:88px;height:18px}
+.score-trend-svg{display:block;width:100%;height:18px;overflow:visible}
+.score-trend-line{fill:none;stroke:#2563eb;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.score-trend-line.good{stroke:#059669}
+.score-trend-line.bad{stroke:#dc2626}
+.score-trend-dot{stroke:#fff;stroke-width:1.2;fill:#2563eb}
+.score-trend-dot.good{fill:#059669}
+.score-trend-dot.bad{fill:#dc2626}
 .dept-table .counterparty-cell,.dept-detail-table .counterparty-cell{white-space:normal;min-width:240px;max-width:420px;line-height:1.35}
 .counterparty-list{display:flex;flex-direction:column;gap:6px}
 .counterparty-item{display:block}
@@ -1356,7 +1379,7 @@ const COL_TIPS = {
   revenueShare: "Доля строки в выручке текущей вкладки. Например, доля клиента в выручке отдела или БЕ.",
   revenueDelta: "Как изменилась выручка относительно выбранного периода сравнения.",
   healthScore: "Health Score — базовая модель 0–100: маржинальность 25%, динамика выручки 15%, DSO 20%, CEI 15%, доля просрочки 15%, Cash.% 10%. Далее применяются штрафы за рост и уровень просрочки, DSO выше 30, концентрацию TOP-3, бонус/штраф за финэффект денег и потолок для микроклиентов. Наведите на Score в строке, чтобы увидеть входные компоненты. Для строк только с авансом Score не считается.",
-  healthScoreDelta: "Δ Score — изменение Health Score к предыдущему такому же периоду в пунктах. Показывает тренд качества работы отдела.",
+  healthScoreDelta: "Δ Score — изменение Health Score к предыдущему такому же периоду в пунктах. Мини-спарклайн под бейджем показывает 6 месячных срезов этого же Score.",
   margin: "Маржа = выручка − себестоимость (COGS). Это прибыль до учета стоимости отсрочек, ДЗ и запасов.",
   marginDelta: "Как изменилась маржа относительно выбранного периода сравнения. Рост маржи лучше, падение — сигнал проверить цены, скидки или себестоимость.",
   marginPct: "Марж.% = маржа / выручка × 100%. Показывает, какая часть продаж остается маржей.",
@@ -1367,12 +1390,12 @@ const COL_TIPS = {
   avgAr: "Сред. ДЗ — среднее между ДЗ на начало и конец периода. Используется для стоимости отсрочки и финансирования оборотного капитала.",
   arAdvance: "Авансы покупателей — деньги, полученные вперед. Это наша обязанность отгрузить товар или зачесть оплату, а не обычная ДЗ.",
   overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
-  overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
+  overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Это snapshot-метрика на дату окончания периода: она показывает качество хвоста открытой ДЗ именно на срезе.",
   overdueDelta: "Как изменилась сумма просроченной ДЗ относительно выбранного периода сравнения. Здесь снижение лучше роста.",
   counterparties: "Контрагент клиента: конкретное юрлицо (PREDS), по которому строка показывает выручку, текущую ДЗ, просрочку, финэффект денег и денежную маржу.",
   top3Share: "Концентрация TOP-3, % — доля трех крупнейших клиентов отдела по выручке. Список под процентом показывает этих клиентов.",
   dso: "DSO — сколько дней продаж заморожено в текущей ДЗ: ДЗ на конец периода / выручка периода × дни. Авансы покупателей из DSO не вычитаются. Низкий DSO может сочетаться с высокой долей просрочки, если ДЗ маленькая относительно выручки; качество ДЗ смотрите по Проср.%.",
-  cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. У клиентов без проблем CEI часто равен 100%, поэтому для скорости денег смотрите также DSO и финэффект.",
+  cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. Это flow-метрика: она отражает сбор за период, поэтому может быть высокой даже при заметной доле просрочки в хвосте конечной ДЗ. Для скорости денег смотрите также DSO и финэффект.",
   arFinCost: "Финэффект денег — (средний аванс покупателей − средняя ДЗ) × ставка × дни периода / 365. Средние остатки считаются как простое среднее между остатком на начало и конец периода. Плюс означает экономию/доход от денег клиента, минус — стоимость финансирования ДЗ.",
   inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
   dio: "DIO — сколько дней деньги в среднем лежат в запасах до продажи/расхода. Чем выше DIO, тем медленнее оборачивается склад.",
@@ -2098,6 +2121,40 @@ function ScoreDeltaBadge({value}) {
   );
 }
 
+function ScoreTrendSparkline({values}) {
+  const points = Array.isArray(values) ? values.filter(v => v != null && !isNaN(v)).map(Number) : [];
+  if (points.length < 2) return null;
+
+  const width = 88;
+  const height = 18;
+  const padX = 2;
+  const padY = 2;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const span = Math.max(max - min, 1);
+  const scaleX = (idx) => padX + (idx * (width - padX * 2)) / Math.max(points.length - 1, 1);
+  const scaleY = (value) => height - padY - ((value - min) / span) * (height - padY * 2);
+  const path = points.map((value, idx) => `${idx === 0 ? "M" : "L"} ${scaleX(idx).toFixed(2)} ${scaleY(value).toFixed(2)}`).join(" ");
+  const last = points[points.length - 1];
+  const prev = points[0];
+  const tone = last > prev + 1 ? "good" : last < prev - 1 ? "bad" : "";
+  const title = `Тренд Score за 6 месячных срезов: ${points.map(v => Number(v).toLocaleString("ru-RU",{maximumFractionDigits:1})).join(" → ")}`;
+
+  return (
+    <div className="score-trend" title={title}>
+      <svg className="score-trend-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+        <path className={"score-trend-line" + (tone ? ` ${tone}` : "")} d={path}/>
+        <circle
+          className={"score-trend-dot" + (tone ? ` ${tone}` : "")}
+          cx={scaleX(points.length - 1)}
+          cy={scaleY(last)}
+          r="2.8"
+        />
+      </svg>
+    </div>
+  );
+}
+
 const scoreTitle = (row) => {
   if (!row) return COL_TIPS.healthScore;
   return [
@@ -2125,6 +2182,28 @@ const deltaTitle = (label, value, lowerBetter=false) => {
       ? (value > 0.05 ? "хуже" : value < -0.05 ? "лучше" : "без изменений")
       : (value > 0.05 ? "лучше" : value < -0.05 ? "хуже" : "без изменений");
   return `${label}\nΔ к периоду сравнения: ${fmtDelta(value)} (${direction})`;
+};
+
+const overdueShareTitle = (row) => {
+  if (!row) return COL_TIPS.overdueShare;
+  return [
+    `Просрочка = ${fmtRub(row.overdue_ar_rub)}`,
+    `ДЗ на конец = ${fmtRub(row.ar_rub)}`,
+    `Проср.% = ${fmtPct(row.overdue_share_pct)}`,
+    "Это snapshot-метрика на дату окончания периода.",
+  ].join("\n");
+};
+
+const ceiTitle = (row) => {
+  if (!row) return COL_TIPS.cei;
+  return [
+    `CEI = ${fmtPct(row.cei_pct)}`,
+    `ДЗ на начало = ${fmtRub(row.ar_begin_rub)}`,
+    `Выручка периода = ${fmtRub(row.revenue_rub)}`,
+    `ДЗ на конец = ${fmtRub(row.ar_rub)}`,
+    `Просрочка на конец = ${fmtRub(row.overdue_ar_rub)}`,
+    "CEI — flow-метрика сбора за период; она может быть высокой даже при заметной Проср.% в хвосте конечной ДЗ.",
+  ].join("\n");
 };
 
 const isProblemDepartment = (row) => (
@@ -2501,7 +2580,7 @@ function inventoryQuickFilterMatch(row, filterKey) {
   return true;
 }
 
-function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null}) {
+function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyStateSub, emptyStateActionLabel=null, onEmptyStateAction=null, serverExportsAvailable=true}) {
   const [expandedDeptId, setExpandedDeptId] = useState(null);
   const [detailByDept, setDetailByDept] = useState({});
   const [detailLoadingDept, setDetailLoadingDept] = useState(null);
@@ -2571,6 +2650,15 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
       setDetailLoadingDept(null);
     }
   }, [requestKey, detailByDept]);
+
+  const exportDepartmentClients = useCallback((deptRow) => {
+    if (!serverExportsAvailable || !deptRow?.department_id) return;
+    const params = new URLSearchParams(requestKey || "");
+    params.set("dept_ids", String(deptRow.department_id));
+    params.set("sort", "revenue");
+    params.set("limit", "50000");
+    window.location.href = `${API}/export/department_clients.xlsx?${params.toString()}`;
+  }, [requestKey, serverExportsAvailable]);
 
   const toggleDepartment = (row) => {
     const deptId = row.department_id;
@@ -2682,11 +2770,11 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
         <table className={"dept-table " + (showDeltas ? "" : "compact-deltas")}>
           <thead>
             <tr>
-              <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
-              <Th {...sortable(sortState, requestSort, "department")}>Отдел</Th>
-              <Th className="num" tip={COL_TIPS.healthScore} {...sortable(sortState, requestSort, "health_score")}>Score</Th>
-              <Th className="num" tip={COL_TIPS.healthScoreDelta} {...sortable(sortState, requestSort, "health_score_delta")}>Δ Score</Th>
-              <Th className="num" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
+              <Th className="sticky-col sticky-rank" {...sortable(sortState, requestSort, "rank")}>#</Th>
+              <Th className="sticky-col sticky-dept" {...sortable(sortState, requestSort, "department")}>Отдел</Th>
+              <Th className="num sticky-col sticky-score" tip={COL_TIPS.healthScore} {...sortable(sortState, requestSort, "health_score")}>Score</Th>
+              <Th className="num sticky-col sticky-delta" tip={COL_TIPS.healthScoreDelta} {...sortable(sortState, requestSort, "health_score_delta")}>Δ Score</Th>
+              <Th className="num sticky-col sticky-revenue sticky-divider" tip={COL_TIPS.revenue} {...sortable(sortState, requestSort, "revenue_rub")}>Выручка</Th>
               <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(sortState, requestSort, "revenue_share_pct")}>Доля</Th>
               {showDeltas && <Th className="num" tip={COL_TIPS.revenueDelta} {...sortable(sortState, requestSort, "revenue_delta_pct")}>Δ выр.</Th>}
               <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
@@ -2724,17 +2812,20 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
               return (
                 <React.Fragment key={r.department_id}>
                   <tr className="dept-main-row" onClick={() => toggleDepartment(r)}>
-                    <td className="rank">{idx + 1}</td>
-                    <td className="dept-name">
+                    <td className="rank sticky-col sticky-rank">{idx + 1}</td>
+                    <td className="dept-name sticky-col sticky-dept">
                       <span className="dept-expander">{open ? "▾" : "▸"}</span>
                       {r.department}
                       <span className="muted">Нажмите для детализации по клиентам</span>
                     </td>
-                    <td className={"num " + benchCls(r.health_score, avg?.health_score, false)} title={scoreTitle(r)}>
+                    <td className={"num sticky-col sticky-score " + benchCls(r.health_score, avg?.health_score, false)} title={scoreTitle(r)}>
                       <ScoreCell row={r}/>
                     </td>
-                    <td className={"num " + benchCls(r.health_score_delta, avg?.health_score_delta, false)}><ScoreDeltaBadge value={r.health_score_delta}/></td>
-                    <td className="num" title={deltaTitle("Выручка", r.revenue_delta_pct)}>{fmtRub(r.revenue_rub)}</td>
+                    <td className={"num sticky-col sticky-delta " + benchCls(r.health_score_delta, avg?.health_score_delta, false)}>
+                      <ScoreDeltaBadge value={r.health_score_delta}/>
+                      <ScoreTrendSparkline values={r.health_score_sparkline}/>
+                    </td>
+                    <td className="num sticky-col sticky-revenue sticky-divider" title={deltaTitle("Выручка", r.revenue_delta_pct)}>{fmtRub(r.revenue_rub)}</td>
                     <td className="num">{fmtPct(r.revenue_share_pct)}</td>
                     {showDeltas && <td className={"num " + benchCls(r.revenue_delta_pct, avg?.revenue_delta_pct, false)}><DeltaBadge value={r.revenue_delta_pct}/></td>}
                     <td className="num" title={deltaTitle("Маржа", r.margin_delta_pct)}>{fmtRub(r.margin_rub)}</td>
@@ -2746,10 +2837,10 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                     <td className={"num " + benchCls(r.margin_ar_ratio, avg?.margin_ar_ratio, false)}>{fmtRatio(r.margin_ar_ratio, r.ar_rub, r.margin_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
                     <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_ar_rub, avg?.overdue_ar_rub, true)}>{fmtRub(r.overdue_ar_rub)}</td>
-                    <td className={"num " + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>{fmtPct(r.overdue_share_pct)}</td>
+                    <td className={"num " + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)} title={overdueShareTitle(r)}>{fmtPct(r.overdue_share_pct)}</td>
                     {showDeltas && <td className={"num " + benchCls(r.overdue_ar_delta_pct, avg?.overdue_ar_delta_pct, true)}><DeltaBadge value={r.overdue_ar_delta_pct} lowerBetter={true}/></td>}
                     <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
-                    <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)}>{fmtPct(r.cei_pct)}</td>
+                    <td className={"num " + benchCls(r.cei_pct, avg?.cei_pct, false)} title={ceiTitle(r)}>{fmtPct(r.cei_pct)}</td>
                     <td className="num"><EffectValue row={r} period={data.period}/></td>
                     <td className={"num " + benchCls(r.top3_client_share_pct, avg?.top3_client_share_pct, true)}>
                       {fmtPct(r.top3_client_share_pct)}
@@ -2768,6 +2859,15 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                             <div className="detail-actions">
                               <div className="detail-pill">Основные КА: {fmtInt(primaryDetailRows.length)}</div>
                               {advanceOnlyRows.length > 0 && <div className="detail-pill">Только аванс: {fmtInt(advanceOnlyRows.length)}</div>}
+                              {serverExportsAvailable && (
+                                <button
+                                  type="button"
+                                  className="detail-toggle"
+                                  onClick={() => exportDepartmentClients(r)}
+                                >
+                                  Выгрузить XLSX
+                                </button>
+                              )}
                             </div>
                           )}
                         </div>
@@ -2825,10 +2925,10 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                               <table className="dept-detail-table">
                                 <thead>
                                   <tr>
-                                    <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
-                                    <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
-                                    <Th tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
-                                    <Th className="num" tip={COL_TIPS.healthScore} {...sortable(detailSortState, requestDetailSort, "health_score")}>Score</Th>
+                                    <Th className="sticky-col sticky-rank" {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
+                                    <Th className="sticky-col sticky-client" {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                    <Th className="sticky-col sticky-counterparty" tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
+                                    <Th className="num sticky-col sticky-score sticky-divider" tip={COL_TIPS.healthScore} {...sortable(detailSortState, requestDetailSort, "health_score")}>Score</Th>
                                     <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
                                     <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "department_share_pct")}>Доля отд.</Th>
                                     <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
@@ -2848,10 +2948,10 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                                 <tbody>
                                   {visibleDetailRows.map((c, detailIdx) => (
                                     <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${detailIdx}`}>
-                                      <td className="rank">{detailIdx + 1}</td>
-                                      <td className="dept-name">{c.client}</td>
-                                      <td className="counterparty-cell">{c.counterparty || "—"}</td>
-                                      <td className="num"><ScoreCell row={c}/></td>
+                                      <td className="rank sticky-col sticky-rank">{detailIdx + 1}</td>
+                                      <td className="dept-name sticky-col sticky-client">{c.client}</td>
+                                      <td className="counterparty-cell sticky-col sticky-counterparty">{c.counterparty || "—"}</td>
+                                      <td className="num sticky-col sticky-score sticky-divider"><ScoreCell row={c}/></td>
                                       <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
                                       <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
                                       <td className="num">{fmtRub(c.margin_rub)}</td>
@@ -2860,9 +2960,9 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                                       <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.ar_rub)}</CispMetricLink></td>
                                       <td className="num">{fmtRub(c.ar_advance_rub)}</td>
                                       <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
-                                      <td className="num">{fmtPct(c.overdue_share_pct)}</td>
+                                      <td className="num" title={overdueShareTitle(c)}>{fmtPct(c.overdue_share_pct)}</td>
                                       <td className="num">{fmtDays(c.dso_days)}</td>
-                                      <td className="num">{fmtPct(c.cei_pct)}</td>
+                                      <td className="num" title={ceiTitle(c)}>{fmtPct(c.cei_pct)}</td>
                                       <td className="num"><EffectValue row={c} period={detail?.period || data.period}/></td>
                                       <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
                                       <td>
@@ -2887,11 +2987,11 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
           {avg && rows.length > 1 && (
             <tfoot>
               <tr>
-                <td></td>
-                <td className="avg-label">Итого / взвеш.</td>
-                <td className="num"><ScoreCell row={totals}/></td>
-                <td className="num"><ScoreDeltaBadge value={totals.health_score_delta}/></td>
-                <td className="num">{fmtRub(totals.revenue_rub)}</td>
+                <td className="sticky-col sticky-rank"></td>
+                <td className="avg-label sticky-col sticky-dept">Итого / взвеш.</td>
+                <td className="num sticky-col sticky-score"><ScoreCell row={totals}/></td>
+                <td className="num sticky-col sticky-delta"><ScoreDeltaBadge value={totals.health_score_delta}/></td>
+                <td className="num sticky-col sticky-revenue sticky-divider">{fmtRub(totals.revenue_rub)}</td>
                 <td className="num">100%</td>
                 {showDeltas && <td className="num">{fmtPct(totals.revenue_delta_pct)}</td>}
                 <td className="num">{fmtRub(totals.margin_rub)}</td>
@@ -5181,6 +5281,7 @@ function App() {
             loading={loading || deptLoading}
             err={deptErr || (!data && err ? err : null)}
             requestKey={requestKey}
+            serverExportsAvailable={!snapshotClientMode}
             emptyStateTitle={snapshotLoadBlocked ? blockedEmptyTitle : undefined}
             emptyStateSub={snapshotLoadBlocked ? blockedEmptySub : undefined}
             emptyStateActionLabel={snapshotLoadBlocked ? "Выбрать snapshot" : null}
