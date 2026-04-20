@@ -1161,9 +1161,14 @@ const capitalEfficiencyTitle = (options={}) => {
   if (options.rate != null && !isNaN(options.rate)) {
     lines.push(`Ставка = ${fmtPct(Number(options.rate) * 100)}`);
   }
-  lines.push("Формула: маржа / расчётная стоимость денежного цикла.");
+  lines.push("Во сколько раз маржа покрывает расчётную стоимость денежного цикла при текущей ставке.");
+  lines.push("Формула: маржа / стоимость денежного цикла.");
   lines.push("Используем как замену ROWC, когда оборотный капитал нулевой или отрицательный.");
   return lines.join("\n");
+};
+const snapshotCompareText = (period) => {
+  if (!period?.prev_end) return "к предыдущему срезу";
+  return `к срезу на ${fmtDate(period.prev_end)}`;
 };
 const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
 const cleanEntityLabel = (value, fallback="Без названия") => {
@@ -1376,7 +1381,7 @@ const COL_TIPS = {
   overdueAp: "Просроченная КЗ — часть текущего долга поставщикам, где срок оплаты уже прошел.",
   dpo: "DPO — сколько дней в среднем мы оплачиваем поставщиков. Чем выше DPO, тем дольше поставщики финансируют наш оборот, но слишком высокий DPO может быть риском отношений.",
   ccc: "CCC = DIO + DSO − DPO. Показывает, сколько дней бизнесу нужно финансировать оборот своими деньгами.",
-  rowc: "ROWC = маржа / средний оборотный капитал × 365 / дни периода. Показывает годовую доходность на каждый рубль связанного в обороте капитала. Считается только при положительном среднем ОК; при отрицательном ОК смотрите Cash-adjusted margin и марж.%.",
+  rowc: "ROWC = маржа / средний оборотный капитал × 365 / дни периода. Показывает годовую доходность на каждый рубль связанного в обороте капитала. Считается только при положительном среднем ОК; при отрицательном ОК вместо него смотрим, во сколько раз маржа покрывает стоимость денежного цикла при текущей ставке.",
   wci: "WCI = средний оборотный капитал / выручка в годовом эквиваленте × 100%. Для коротких периодов выручка нормируется на 12 месяцев, чтобы показатель не завышался. Ниже — лучше; отрицательное значение означает, что цикл финансируется не собственными деньгами.",
   status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. «Только аванс» означает предоплату без продаж и ДЗ в выбранном периоде.",
   agingBucket: "Aging — текущая открытая ДЗ по FIFO, разложенная по срокам просрочки на дату окончания периода.",
@@ -2294,7 +2299,7 @@ function OverviewRevenueBridge({summary, compareLabel="Предыдущий пе
   );
 }
 
-function OverviewDeadStockCard({summary}) {
+function OverviewDeadStockCard({summary, period}) {
   if (!summary) return null;
 
   const deadRub = summary.dead_180_rub;
@@ -2303,6 +2308,7 @@ function OverviewDeadStockCard({summary}) {
   const slowRub = summary.slow_90_rub;
   const deadDeltaRub = summary.dead_180_delta_rub;
   const deadDeltaPct = summary.dead_180_delta_pct;
+  const compareText = snapshotCompareText(period);
 
   return (
     <div className="card">
@@ -2311,7 +2317,7 @@ function OverviewDeadStockCard({summary}) {
           <div className="card-label">Неликвид 180+</div>
           <CardInfo
             card={{label:"Неликвид 180+"}}
-            tip="Текущий остаток SKU, по которому не было расхода 180+ дней. Считается по тому же складскому breakdown, что и вкладка «Запасы»."
+            tip={`Текущий остаток SKU, по которому не было расхода 180+ дней. Считается по тому же складскому breakdown, что и вкладка «Запасы». Δ считаем ${compareText}.`}
           />
         </div>
       </div>
@@ -2322,7 +2328,7 @@ function OverviewDeadStockCard({summary}) {
       <div className={"card-insight " + ((share || 0) >= 15 ? "risk" : (share || 0) >= 7 ? "warn" : "info")}>
         <strong>{fmtInt(deadSku)}</strong> SKU · {fmtPct(share)} от запаса
         {slowRub == null ? "" : ` · Slow 90+: ${fmtRub(slowRub)}`}
-        {deadDeltaRub == null || Math.abs(Number(deadDeltaRub) || 0) <= 0.01 ? "" : ` · Δ: ${fmtEffectRub(deadDeltaRub)}${deadDeltaPct == null ? "" : ` (${fmtPct(deadDeltaPct)})`}`}
+        {deadDeltaRub == null || Math.abs(Number(deadDeltaRub) || 0) <= 0.01 ? "" : ` · Δ ${compareText}: ${fmtEffectRub(deadDeltaRub)}${deadDeltaPct == null ? "" : ` (${fmtPct(deadDeltaPct)})`}`}
       </div>
       <div className="card-foot">
         <span className="card-foot-label">Складской аудит</span>
@@ -4701,6 +4707,20 @@ function App() {
         content: <>Уровень CEI остаётся сильным; умеренное ухудшение динамики показано нейтрально, пока метрика выше <strong>95%</strong>.</>,
       };
     }
+    const marginRub = Number(cardMap.margin_rub?.value);
+    const cashAdjRub = Number(cardMap.cash_adj_margin_rub?.value);
+    if (Number.isFinite(marginRub) && Math.abs(marginRub) > 0.01 && Number.isFinite(cashAdjRub)) {
+      const marginQualityPct = cashAdjRub / marginRub * 100;
+      const marginGapRub = cashAdjRub - marginRub;
+      extras.cash_adj_margin_rub = {
+        tone: marginQualityPct >= 95 ? "info" : marginQualityPct >= 85 ? "warn" : "risk",
+        content: (
+          <>
+            <strong>Margin Quality</strong>: <strong>{fmtPct(marginQualityPct)}</strong> · денежный разрыв {fmtEffectRub(marginGapRub)}
+          </>
+        ),
+      };
+    }
     const rowcCard = cardMap.rowc_pct;
     const workingCapital = data?.insights?.working_capital_rub;
     const capitalEfficiency = data?.insights?.capital_efficiency || {};
@@ -4722,16 +4742,16 @@ function App() {
         });
         extras.rowc_pct = {
           cardOverrides: {label:"Capital Efficiency", unit:"x", target:null, score:null},
-          tip:"Альтернативная метрика для периодов, где классический ROWC неприменим. Показывает, во сколько раз маржа покрывает расчётную стоимость денежного цикла; для нормировки берём модуль CCC.",
+          tip:"Альтернативная метрика для периодов, где классический ROWC неприменим. Показывает, во сколько раз маржа покрывает стоимость денежного цикла при текущей ставке; для нормировки берём модуль CCC.",
           tone: capitalEfficiencyScore >= 1 ? "info" : "warn",
           valueLabel: fmtMultiple(capitalEfficiency.score),
           unitLabel: "x",
-          sub:"Маржа / стоимость денежного цикла",
+          sub:"Во сколько раз маржа покрывает стоимость цикла",
           valueTitle: efficiencyTitle,
           tooltipText: efficiencyTitle,
           content: (
             <>
-              Соотношение маржи к расчётной стоимости денежного цикла: <strong>{fmtMultiple(capitalEfficiency.score)}x</strong>.
+              Во сколько раз маржа покрывает расчётную стоимость денежного цикла: <strong>{fmtMultiple(capitalEfficiency.score)}x</strong>.
               {capitalEfficiency.cycle_cost_rub == null ? "" : ` Стоимость цикла: ${fmtRub(capitalEfficiency.cycle_cost_rub)}.`}
               {capitalEfficiency.ccc_days == null ? "" : ` Для оценки используем |CCC| = ${fmtDays(Math.abs(Number(capitalEfficiency.ccc_days)))} дн.`}
             </>
@@ -4821,13 +4841,14 @@ function App() {
     }
     const deadStock = data?.insights?.dead_stock;
     if (Number(deadStock?.dead_180_rub) > 0.01) {
+      const deadStockCompare = snapshotCompareText(data?.period);
       items.push(
         <>
           <strong>Неликвид 180+</strong>: {fmtRub(deadStock.dead_180_rub)}
           {deadStock.dead_180_sku == null ? "" : ` · ${fmtInt(deadStock.dead_180_sku)} SKU без расхода 180+ дней`}
           {deadStock.dead_180_delta_rub == null || Math.abs(Number(deadStock.dead_180_delta_rub) || 0) <= 0.01
             ? ""
-            : ` · Δ ${fmtEffectRub(deadStock.dead_180_delta_rub)}${deadStock.dead_180_delta_pct == null ? "" : ` (${fmtPct(deadStock.dead_180_delta_pct)})`}`}
+            : ` · Δ ${deadStockCompare}: ${fmtEffectRub(deadStock.dead_180_delta_rub)}${deadStock.dead_180_delta_pct == null ? "" : ` (${fmtPct(deadStock.dead_180_delta_pct)})`}`}
         </>
       );
     }
@@ -5107,6 +5128,7 @@ function App() {
               {block.id === "stock" && (
                 <OverviewDeadStockCard
                   summary={data?.insights?.dead_stock}
+                  period={data?.period}
                 />
               )}
             </div>
