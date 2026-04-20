@@ -56,6 +56,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .chip{padding:7px 14px;border:none;background:transparent;font-family:var(--sn);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;border-radius:6px;transition:all .15s;white-space:nowrap}
 .chip:hover{color:var(--t1)}
 .chip.active{background:var(--sf);color:var(--accent);box-shadow:var(--sh1)}
+.chip:disabled{opacity:.45;cursor:not-allowed}
 
 .fld{display:flex;flex-direction:column;gap:6px}
 .fld label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
@@ -70,6 +71,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .btn-secondary{padding:10px 16px;background:var(--sf);color:var(--t2);border:1px solid var(--bd);border-radius:var(--r3);font-weight:700;cursor:pointer;font-size:13px;font-family:var(--sn);height:40px;transition:border-color .15s,color .15s,box-shadow .15s}
 .btn-secondary:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 4px 12px rgba(15,23,42,.06)}
 .btn-secondary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.app-shell{min-height:100vh;background:var(--bg)}
+.header-actions{display:flex;align-items:flex-end;gap:10px;flex-wrap:nowrap}
 
 /* ─── Container ──────────────────────────── */
 .container{max-width:1640px;margin:0 auto;padding:28px 32px 56px}
@@ -79,6 +82,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .period-info-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
 .period-info-value{font-family:var(--mn);font-size:12px;color:var(--t1);font-weight:600}
 .period-info-sep{width:1px;height:24px;background:var(--bd)}
+.period-compact{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:16px;box-shadow:var(--sh1);font-family:var(--mn);font-size:12px;font-weight:600;color:var(--t2);line-height:1.45}
+.period-compact-text{min-width:0}
 
 /* ─── Tabs ──────────────────────────────── */
 .tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);padding:4px;margin-bottom:16px;width:max-content;max-width:100%;overflow-x:auto}
@@ -89,8 +94,17 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 /* ─── Multi-select фильтры ────────────── */
 .filter-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:14px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:16px;box-shadow:var(--sh1)}
 .filter-bar-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-right:2px;align-self:center}
-.filter-reset{margin-left:auto;padding:8px 14px;background:var(--bg2);color:var(--t2);border:1px solid var(--bd);border-radius:var(--r3);font-family:var(--sn);font-weight:600;font-size:12px;cursor:pointer;transition:all .15s}
-.filter-reset:hover{background:var(--rbg);color:var(--red);border-color:var(--rbd)}
+.filter-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:12px;box-shadow:var(--sh1)}
+.filter-summary-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;flex:1}
+.filter-summary-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.filter-summary-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid var(--bd);background:var(--bg2);color:var(--t2);font-size:10px;font-weight:700;line-height:1.2;white-space:nowrap}
+.filter-summary-chip.active{background:#f5f6ff;border-color:rgba(99,102,241,.28);color:var(--accent)}
+.filter-summary-chip-label{opacity:.8}
+.filter-summary-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.filter-summary-toggle{padding:8px 14px;background:#f5f6ff;color:var(--accent);border:1px solid rgba(99,102,241,.24);border-radius:var(--r3);font-family:var(--sn);font-weight:700;font-size:12px;cursor:pointer;transition:border-color .15s,color .15s,box-shadow .15s,background .15s}
+.filter-summary-toggle:hover{border-color:var(--accent);background:#eef2ff;box-shadow:0 4px 12px rgba(99,102,241,.12)}
+.filter-reset{margin-left:0;padding:6px 4px;background:transparent;color:var(--t3);border:none;border-radius:var(--r3);font-family:var(--sn);font-weight:600;font-size:12px;cursor:pointer;transition:color .15s,opacity .15s}
+.filter-reset:hover{color:var(--red)}
 .filter-reset:disabled{opacity:.4;cursor:not-allowed}
 
 .ms{position:relative;display:flex;flex-direction:column;gap:6px;min-width:200px;flex:1 1 200px;max-width:280px}
@@ -128,6 +142,10 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .warn-panel b{font-family:var(--sn);font-weight:700;display:block;margin-bottom:4px;font-size:12px;color:#78350f}
 .warn-panel ul{margin:0;padding-left:18px}
 .warn-panel li{margin:2px 0;line-height:1.45}
+.warn-panel-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:none;background:transparent;color:#78350f;font:inherit;padding:0;cursor:pointer;text-align:left}
+.warn-panel-toggle b{margin-bottom:0}
+.warn-panel-meta{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:#92400e;white-space:nowrap}
+.warn-panel.compact{padding:10px 14px}
 
 .legend{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:20px;box-shadow:var(--sh1);flex-wrap:wrap;font-size:11px;color:var(--t2)}
 .legend-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-right:4px}
@@ -155,7 +173,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 
 /* ─── Card ───────────────────────────────── */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px 16px;box-shadow:var(--sh1);position:relative;transition:box-shadow .18s,transform .18s,border-color .18s;animation:fi .35s ease}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:18px 20px 16px;box-shadow:var(--sh1);position:relative;transition:box-shadow .18s,transform .18s,border-color .18s;animation:fi .35s ease;display:flex;flex-direction:column;height:100%}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .card:hover{box-shadow:var(--sh2);transform:translateY(-2px);border-color:var(--bd2);z-index:2}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--bg2);border-radius:var(--r) var(--r) 0 0;pointer-events:none}
@@ -165,9 +183,10 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .card.s2::before{background:linear-gradient(90deg,#f97316,#fdba74)}
 .card.s1::before{background:linear-gradient(90deg,#ef4444,#fca5a5)}
 
-.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
-.card-label-wrap{display:flex;align-items:center;gap:6px;flex:1}
-.card-label{font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;line-height:1.35}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;min-height:30px}
+.card-label-wrap{display:flex;align-items:flex-start;gap:6px;flex:1;min-height:28px}
+.card-label{display:block;font-size:11px;color:var(--t2);font-weight:600;text-transform:uppercase;letter-spacing:.5px;line-height:1.35}
+.card.compact-label .card-label{font-size:10px;line-height:1.2}
 .card-info{width:16px;height:16px;border-radius:50%;background:var(--bg2);color:var(--t3);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:help;flex-shrink:0;transition:background .15s,color .15s;position:relative;font-family:var(--sn);border:1px solid var(--bd)}
 .card-info:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .card-tooltip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);width:min(320px,calc(100vw - 32px));padding:12px 14px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:var(--sn);font-size:12px;font-weight:500;line-height:1.5;letter-spacing:0;text-transform:none;box-shadow:0 12px 32px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:80;text-align:left;white-space:normal}
@@ -194,8 +213,29 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 
 .card-sub{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:12px;font-family:var(--mn)}
 
+.card-insight{margin:2px 0 10px;font-size:10px;font-weight:700;line-height:1.45;color:var(--t3)}
+.card-insight strong{font-weight:800;color:inherit}
+.card-insight.info{color:var(--t3)}
+.card-insight.warn{color:var(--amb)}
+.card-insight.risk{color:var(--red)}
+.card-spark{margin-top:auto;margin-bottom:10px;padding:12px 0 8px;border-bottom:1px solid var(--bd);min-height:62px}
+.card-spark-svg{display:block;width:100%;height:42px;overflow:visible}
+.card-spark-grid{stroke:rgba(148,163,184,.32);stroke-width:1}
+.card-spark-zero{stroke:rgba(15,23,42,.16);stroke-width:1;stroke-dasharray:3 3}
+.card-spark-area{fill:rgba(37,99,235,.08)}
+.card-spark-line{fill:none;stroke:#2563eb;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.card-spark-line.good{stroke:#059669}
+.card-spark-line.bad{stroke:#dc2626}
+.card-spark-dot{stroke:#fff;stroke-width:1.5}
+.card-spark-dot.first{fill:#cbd5e1}
+.card-spark-dot.last{fill:#2563eb}
+.card-spark-dot.last.good{fill:#059669}
+.card-spark-dot.last.bad{fill:#dc2626}
+.card-spark-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;font-size:9px;color:var(--t3);font-family:var(--mn);text-transform:uppercase;letter-spacing:.4px}
+
 .card-foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--bd);gap:8px}
 .card-foot-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.card-foot-note{font-size:11px;color:var(--t3);font-weight:600}
 .delta{font-family:var(--mn);font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
 .delta.up{background:var(--gbg);color:var(--grn)}
 .delta.down{background:var(--rbg);color:var(--red)}
@@ -252,6 +292,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .counterparty-more{color:var(--t3);font-size:10px;font-weight:700}
 .cisp-link{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(79,70,229,.45)}
 .cisp-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.metric-na{color:var(--t3);border-bottom:1px dotted var(--bd2);cursor:help}
 .dept-table .risk{color:var(--red)}
 .dept-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 16px;flex-wrap:wrap}
 .dept-note{font-size:11px;color:var(--t3);line-height:1.5}
@@ -282,6 +323,16 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .dept-detail-table tr:last-child td{border-bottom:none}
 .dept-detail-table .dept-name{min-width:170px}
 .dept-detail-scroll{overflow:auto;max-width:calc(100vw - 92px)}
+.detail-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.detail-toggle{border:1px solid var(--bd);background:var(--sf);color:var(--t2);border-radius:6px;padding:7px 11px;font-family:var(--sn);font-size:11px;font-weight:800;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+.detail-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.detail-toggle.secondary{background:var(--bg2)}
+.detail-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--bd);border-radius:999px;padding:6px 10px;color:var(--t2);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.45px}
+.advance-block{margin-top:12px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:12px 12px 2px;box-shadow:var(--sh1)}
+.advance-block-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.advance-block-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.45px;color:var(--t2)}
+.advance-block-sub{font-size:11px;color:var(--t3);line-height:1.45;margin-top:3px}
+.advance-block .dept-detail-scroll{max-width:100%}
 .status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:800;white-space:nowrap}
 .status-badge.ok{background:var(--gbg);color:var(--grn)}
 .status-badge.warn{background:var(--abg);color:var(--amb)}
@@ -297,7 +348,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 /* ─── Benchmark highlighting ─────────────── */
 .bench-good{background:rgba(5,150,105,.07)}
 .bench-bad{background:rgba(220,38,38,.07)}
-.dept-table tfoot td{background:var(--bg2);font-weight:700;border-top:2px solid var(--bd2);color:var(--t2);font-size:11px;padding:10px 10px}
+.dept-table tfoot td{background:var(--bg2);font-weight:700;border-top:2px solid var(--bd2);color:var(--t2);font-size:11px;padding:10px 10px;position:sticky;bottom:0;z-index:1}
 .dept-table tfoot .avg-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);font-weight:800}
 .bench-legend{display:inline-flex;align-items:center;gap:12px;margin-left:12px;font-size:11px;color:var(--t3);font-weight:500}
 .bench-legend-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
@@ -328,12 +379,18 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .savings-value{font-family:var(--mn);font-size:18px;font-weight:800;color:var(--t1)}
 .savings-note{font-size:10px;color:var(--t3);font-weight:500;margin-top:3px}
 
+.compare-group{display:flex;flex-direction:column;gap:6px}
+.compare-group .preset-chips{padding:3px}
+.compare-group .chip{padding:6px 12px}
+
 /* ─── Inventory tab ─────────────────────── */
 .stock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
 .stock-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:14px 16px;min-width:0}
 .stock-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.stock-panel-title-row{display:flex;align-items:center;gap:6px}
 .stock-panel-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px}
 .stock-panel-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
+.stock-panel-kpi{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 10px;background:var(--bg2);border:1px solid var(--bd);font-family:var(--mn);font-size:10px;font-weight:800;color:var(--t2);white-space:nowrap}
 .stock-bars{display:flex;flex-direction:column;gap:10px}
 .stock-bar-row{display:flex;flex-direction:column;gap:5px}
 .stock-bar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:12px}
@@ -345,6 +402,35 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .stock-table{min-width:1320px}
 .stock-table-wrap{margin-top:14px}
 .stock-status-note{font-size:11px;color:var(--t3);line-height:1.5;margin:8px 0 12px}
+.stock-filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.stock-filter-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.stock-filter-chip{display:inline-flex;align-items:center;gap:8px}
+.stock-filter-chip-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 6px;border-radius:999px;background:var(--bg2);border:1px solid var(--bd);font-family:var(--mn);font-size:10px;font-weight:700;color:var(--t2)}
+.stock-filter-chip.active .stock-filter-chip-count{background:#eef2ff;border-color:#c7d2fe;color:var(--accent)}
+.stock-filter-meta{margin-left:auto;font-size:11px;color:var(--t3);font-family:var(--mn);font-weight:600}
+.overview-overdue-list{display:flex;flex-direction:column;gap:10px}
+.overview-overdue-item{padding:10px 12px;border:1px solid var(--bd);border-radius:var(--r3);background:var(--bg2)}
+.overview-overdue-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.overview-overdue-name{font-size:12px;font-weight:800;color:var(--t1);line-height:1.35}
+.overview-overdue-value{font-family:var(--mn);font-size:12px;font-weight:800;color:var(--red);white-space:nowrap}
+.overview-overdue-meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:6px;font-family:var(--mn);font-size:10px;color:var(--t3)}
+.overview-overdue-meta span + span::before{content:"·";margin-right:10px;color:var(--t4)}
+.overview-overdue-empty{padding:20px 10px;text-align:center;color:var(--t3);font-size:12px}
+.overview-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.overview-panel-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}
+.overview-sortbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.overview-sortbar-title{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+.overview-sortbar .preset-chips{padding:3px}
+.overview-sortbar .chip{padding:6px 12px}
+.overview-method-note{margin-top:12px;font-size:11px;color:var(--t3);line-height:1.5}
+.overview-method-note.warn{color:#92400e}
+.overview-change-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:14px 16px;margin-bottom:16px;box-shadow:var(--sh1)}
+.overview-change-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.overview-change-ico{width:24px;height:24px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;background:#f5f6ff;border:1px solid rgba(99,102,241,.22);color:var(--accent);font-size:12px;font-weight:800;flex-shrink:0}
+.overview-change-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t2)}
+.overview-change-list{margin:0;padding-left:18px;color:var(--t2)}
+.overview-change-list li{margin:5px 0;line-height:1.5;font-size:12px}
+.overview-change-list strong{font-weight:800;color:var(--t1)}
 
 /* ─── Cash cycle / AR aging ─────────────── */
 .cycle-panel{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:16px;margin-bottom:14px}
@@ -365,22 +451,26 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .header-inner{align-items:flex-start}
   .container{padding:20px}
   .filters{justify-content:flex-start;width:100%}
+  .header-actions{width:100%;flex-wrap:wrap;justify-content:flex-start}
   .preset-group{width:100%;min-width:0}
   .preset-label{width:auto}
   .preset-chips{width:100%;overflow-x:auto}
   .chip{flex:0 0 auto}
+  .stock-filter-meta{width:100%;margin-left:0}
   .tabs{width:100%}
   .savings-head{flex-direction:column}
   .savings-grid{grid-template-columns:1fr}
   .savings-control{flex-wrap:wrap}
   .stock-grid{grid-template-columns:1fr}
+  .filter-summary{align-items:flex-start}
+  .filter-summary-actions{width:100%;margin-left:0}
+  .period-compact{align-items:flex-start}
   .wf-row{grid-template-columns:1fr;gap:6px}
   .wf-value{text-align:left}
   .ms-pop{position:fixed;left:16px;right:16px;width:auto;max-height:60vh}
   .card-tooltip,.card-info.tt-left .card-tooltip,.card-info.tt-right .card-tooltip{left:auto;right:0;transform:none;width:min(280px,calc(100vw - 40px))}
   .card-info:hover .card-tooltip,.card-info.tt-left:hover .card-tooltip,.card-info.tt-right:hover .card-tooltip{transform:none}
 }
-
 /* --- GitHub Pages snapshot picker --- */
 .snapshot-bar{max-width:1640px;margin:14px auto 0;padding:12px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--t1)}
 .snapshot-box{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -391,13 +481,14 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .snapshot-status.ok{background:var(--gbg);border-color:var(--gbd);color:var(--grn)}
 .snapshot-status.err{background:var(--rbg);border-color:var(--rbd);color:var(--red)}
 @media(max-width:900px){.snapshot-bar{padding:10px 14px}.snapshot-sub{min-width:100%}.snapshot-status{max-width:100%}}
+
 </style>
 </head>
 <body>
 <div class="snapshot-bar">
   <div class="snapshot-box">
     <div class="snapshot-title">GitHub Pages</div>
-    <div class="snapshot-sub">Откройте snapshot-папку, созданную через export_snapshot.bat. Интерфейс остается как в рабочем React-дашборде, SQL и Flask здесь не используются.</div>
+    <div class="snapshot-sub">Откройте snapshot-папку, созданную через export_snapshot.bat. Интерфейс остается как в рабочем React-дашборде, но данные берутся из заранее выгруженных JSON-файлов.</div>
     <label class="btn-secondary" for="snapshotFolderInput">Выбрать папку snapshot</label>
     <input id="snapshotFolderInput" class="snapshot-file" type="file" webkitdirectory multiple>
     <div id="snapshotStatus" class="snapshot-status">Папка не выбрана</div>
@@ -429,25 +520,44 @@ setTimeout(function() {
   }
 }, 10000);
 </script>
-
-
 <script>
 (function(){
   window.KPI_GITHUB_SNAPSHOT = true;
-  const STORE = {files:new Map(), cache:new Map(), ready:false, manifest:null, folderName:""};
-  window.KPI_SNAPSHOT_STORE = STORE;
-  const REQUIRED = ["manifest.json","kpi/top.json","kpi/branches.json","kpi/departments.json","kpi/clients.json","kpi/ar-aging.json","kpi/inventory.json"];
-  const DICT_MAP = {
-    "/api/dict/branches":"dict/branches.json",
-    "/api/dict/managers":"dict/managers.json",
-    "/api/dict/departments":"dict/departments.json",
-    "/api/dict/clients":"dict/clients.json",
-    "/api/dict/counterparties":"dict/counterparties.json",
-    "/api/dict/sale-types":"dict/sale_types.json",
-    "/api/dict/product-groups":"dict/product_groups.json",
-    "/api/dict/auction":"dict/auction.json"
+
+  const STORE = {
+    files: new Map(),
+    cache: new Map(),
+    ready: false,
+    manifest: null,
+    folderName: "",
   };
-  const FILTER_KEYS = ["bu_ids","mol_ids","dept_ids","parole_ids","pred_ids","sale_type_ids","product_group_ids","auction_flags"];
+  window.KPI_SNAPSHOT_STORE = STORE;
+
+  const REQUIRED = [
+    "manifest.json",
+    "kpi/top.json",
+    "kpi/branches.json",
+    "kpi/managers.json",
+    "kpi/departments.json",
+    "kpi/clients.json",
+    "kpi/ar-aging.json",
+    "kpi/inventory.json",
+  ];
+
+  const DICT_MAP = {
+    "/api/dict/branches": "dict/branches.json",
+    "/api/dict/managers": "dict/managers.json",
+    "/api/dict/departments": "dict/departments.json",
+    "/api/dict/clients": "dict/clients.json",
+    "/api/dict/counterparties": "dict/counterparties.json",
+    "/api/dict/sale-types": "dict/sale_types.json",
+    "/api/dict/product-groups": "dict/product_groups.json",
+    "/api/dict/auction": "dict/auction.json",
+  };
+
+  const FILTER_KEYS = ["bu_ids","mol_ids","dept_ids","parole_ids","pred_ids","sale_type_ids","auction_flags","product_group_ids"];
+  const DEFAULT_FILTER_KEYS = new Set(["parole_ids","sale_type_ids","product_group_ids"]);
+
   const statusEl = () => document.getElementById("snapshotStatus");
   const setStatus = (text, cls) => {
     const el = statusEl();
@@ -455,17 +565,20 @@ setTimeout(function() {
     el.textContent = text;
     el.className = "snapshot-status" + (cls ? " " + cls : "");
   };
+
   const relPath = (file) => {
-    const p = String(file.webkitRelativePath || file.name || "").replace(/\\/g,"/");
-    const parts = p.split("/").filter(Boolean);
-    return parts.length > 1 ? parts.slice(1).join("/") : p;
+    const raw = String(file.webkitRelativePath || file.name || "").replace(/\\/g, "/");
+    const parts = raw.split("/").filter(Boolean);
+    return parts.length > 1 ? parts.slice(1).join("/") : raw;
   };
-  const readFile = (file) => new Promise((resolve,reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = () => reject(r.error || new Error("File read error"));
-    r.readAsText(file, "utf-8");
+
+  const readFile = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error("File read error"));
+    reader.readAsText(file, "utf-8");
   });
+
   const readJson = async (path) => {
     if (STORE.cache.has(path)) return STORE.cache.get(path);
     const file = STORE.files.get(path);
@@ -474,23 +587,33 @@ setTimeout(function() {
     STORE.cache.set(path, payload);
     return payload;
   };
+
   const clone = (payload) => JSON.parse(JSON.stringify(payload || {}));
+
   const jsonResponse = (payload, status) => new Response(JSON.stringify(payload), {
     status: status || 200,
-    headers: {"Content-Type":"application/json; charset=utf-8"}
+    headers: {"Content-Type":"application/json; charset=utf-8"},
   });
-  const fail = (message, status) => jsonResponse({ok:false, snapshot_mode:true, source:"github-pages", error:message}, status || 400);
-  const DEFAULT_FILTER_KEYS = ["parole_ids","sale_type_ids","product_group_ids"];
+
+  const fail = (message, status) => jsonResponse({
+    ok: false,
+    snapshot_mode: true,
+    source: "github-pages",
+    error: message,
+  }, status || 400);
+
   const parseIds = (raw) => String(raw || "")
     .split(",")
-    .map(x => Number(String(x).trim()))
-    .filter(x => Number.isFinite(x));
+    .map((x) => Number(String(x).trim()))
+    .filter((x) => Number.isFinite(x));
+
   const sameIdSet = (a, b) => {
     if (a.length !== b.length) return false;
-    const aa = [...a].sort((x,y) => x-y);
-    const bb = [...b].map(Number).sort((x,y) => x-y);
+    const aa = [...a].sort((x, y) => x - y);
+    const bb = [...b].map(Number).sort((x, y) => x - y);
     return aa.every((v, i) => v === bb[i]);
   };
+
   const matchesDefaultFilter = (params, key) => {
     const raw = String(params.get(key) || "").trim();
     if (!raw) return false;
@@ -498,25 +621,28 @@ setTimeout(function() {
     const expected = defaults[key] || [];
     return expected.length > 0 && sameIdSet(parseIds(raw), expected);
   };
+
   const hasFilters = (params, allow) => {
     const allowed = new Set(allow || []);
-    return FILTER_KEYS.some(k => !allowed.has(k) && String(params.get(k) || "").trim());
+    return FILTER_KEYS.some((key) => !allowed.has(key) && String(params.get(key) || "").trim());
   };
+
   const hasUnsupportedFilters = (params, allow) => {
     const allowed = new Set(allow || []);
-    return FILTER_KEYS.some(k => {
-      const raw = String(params.get(k) || "").trim();
-      if (!raw || allowed.has(k)) return false;
-      return !(DEFAULT_FILTER_KEYS.includes(k) && matchesDefaultFilter(params, k));
+    return FILTER_KEYS.some((key) => {
+      const raw = String(params.get(key) || "").trim();
+      if (!raw || allowed.has(key)) return false;
+      return !(DEFAULT_FILTER_KEYS.has(key) && matchesDefaultFilter(params, key));
     });
   };
+
   const hasOnlyDefaultFilters = (params, allow) => {
     const allowed = new Set(allow || []);
     let found = false;
-    for (const k of FILTER_KEYS) {
-      const raw = String(params.get(k) || "").trim();
-      if (!raw || allowed.has(k)) continue;
-      if (DEFAULT_FILTER_KEYS.includes(k) && matchesDefaultFilter(params, k)) {
+    for (const key of FILTER_KEYS) {
+      const raw = String(params.get(key) || "").trim();
+      if (!raw || allowed.has(key)) continue;
+      if (DEFAULT_FILTER_KEYS.has(key) && matchesDefaultFilter(params, key)) {
         found = true;
         continue;
       }
@@ -524,138 +650,211 @@ setTimeout(function() {
     }
     if (!found) return false;
     const defaults = STORE.manifest?.default_filters || {};
-    return DEFAULT_FILTER_KEYS.every(k => !(defaults[k] || []).length || matchesDefaultFilter(params, k));
+    return Array.from(DEFAULT_FILTER_KEYS).every(
+      (key) => !(defaults[key] || []).length || matchesDefaultFilter(params, key)
+    );
   };
+
   const singleValue = (params, key) => {
     const raw = String(params.get(key) || "").trim();
     if (!raw || raw.includes(",")) return null;
     return raw;
   };
-  const withNotice = (payload) => {
-    const p = clone(payload);
-    p.snapshot_mode = true;
-    p.source = "github-pages";
-    const period = STORE.manifest && STORE.manifest.period;
-    if (period) {
-      const msg = `GitHub Pages: показан заранее выгруженный snapshot ${period.start} - ${period.end}. Новые периоды и произвольные фильтры без SQL не пересчитываются.`;
-      p.warnings = [...(p.warnings || []), msg];
-    }
-    return p;
+
+  const markSnapshot = (payload) => {
+    if (!payload || typeof payload !== "object") return payload;
+    payload.snapshot_mode = true;
+    payload.source = "github-pages";
+    payload.snapshot = {
+      folder: STORE.folderName,
+      exported_at: STORE.manifest?.exported_at || null,
+      period: STORE.manifest?.period || null,
+    };
+    const period = STORE.manifest?.period || {};
+    const warning = period.start && period.end
+      ? `GitHub Pages: показан заранее выгруженный snapshot ${period.start} - ${period.end}. Новые периоды и произвольные фильтры без SQL не пересчитываются.`
+      : "GitHub Pages: показан заранее выгруженный snapshot. Новые периоды и произвольные фильтры без SQL не пересчитываются.";
+    const warnings = Array.isArray(payload.warnings) ? payload.warnings : [];
+    if (!warnings.includes(warning)) warnings.unshift(warning);
+    payload.warnings = warnings;
+    return payload;
   };
-  const unsupported = () => fail("Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и раскрытия БЕ/отделов/менеджеров, которые заранее экспортированы. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.", 422);
-  const payloadForApi = async (url) => {
-    const path = url.pathname;
-    const params = url.searchParams;
-    if (path === "/api/ping") {
-      return {ok:true, db:false, snapshot_mode:true, source:"github-pages", folder:STORE.folderName, manifest:STORE.manifest};
-    }
-    if (DICT_MAP[path]) {
-      try { return withNotice(await readJson(DICT_MAP[path])); }
-      catch (e) { return {ok:true, items:[], count:0, snapshot_mode:true, source:"github-pages", warning:String(e.message || e)}; }
-    }
-    if (path === "/api/kpi/top") {
+
+  const payloadFor = async (path) => markSnapshot(clone(await readJson(path)));
+
+  const unsupported = () => fail(
+    "Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и заранее экспортированные раскрытия. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.",
+    422
+  );
+
+  const dictPayload = async (path, params) => {
+    const data = clone(await readJson(path));
+    let items = Array.isArray(data.items) ? data.items : [];
+    const q = String(params.get("q") || "").trim().toLowerCase();
+    if (q) items = items.filter((item) => String(item?.name || "").toLowerCase().includes(q));
+    const rawLimit = Number(params.get("limit") || 500);
+    const limit = Number.isFinite(rawLimit) ? Math.max(1, Math.min(2000, rawLimit)) : 500;
+    return {
+      ok: true,
+      items: items.slice(0, limit),
+      count: Math.min(items.length, limit),
+      snapshot_mode: true,
+      source: "github-pages",
+      period_days: STORE.manifest?.period?.days,
+      end: STORE.manifest?.period?.end,
+    };
+  };
+
+  const kpiPayload = async (endpoint, params) => {
+    if (endpoint === "top") {
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
-      const rel = defaultOnly ? "kpi/default/top.json" : "kpi/top.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/top.json" : "kpi/top.json");
     }
-    if (path === "/api/kpi/branches") {
+
+    if (endpoint === "branches") {
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
-      const rel = defaultOnly ? "kpi/default/branches.json" : "kpi/branches.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/branches.json" : "kpi/branches.json");
     }
-    if (path === "/api/kpi/departments") {
+
+    if (endpoint === "departments") {
       const buId = singleValue(params, "bu_ids");
-      if (String(params.get("bu_ids") || "").trim() && !buId) return unsupported();
+      if (String(params.get("bu_ids") || "").trim() && buId == null) return unsupported();
       const defaultOnly = hasOnlyDefaultFilters(params, ["bu_ids"]);
       if (hasUnsupportedFilters(params, ["bu_ids"]) || (hasFilters(params, ["bu_ids"]) && !defaultOnly)) return unsupported();
-      if (buId) {
-        const prefix = defaultOnly ? "details/default_branch_" : "details/branch_";
-        return withNotice(await readJson(`${prefix}${buId}_departments.json`));
+      if (buId != null) {
+        return payloadFor((defaultOnly ? "details/default_branch_" : "details/branch_") + buId + "_departments.json");
       }
-      const rel = defaultOnly ? "kpi/default/departments.json" : "kpi/departments.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/departments.json" : "kpi/departments.json");
     }
-    if (path === "/api/kpi/managers") {
+
+    if (endpoint === "managers") {
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
-      const rel = defaultOnly ? "kpi/default/managers.json" : "kpi/managers.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/managers.json" : "kpi/managers.json");
     }
-    if (path === "/api/kpi/clients") {
+
+    if (endpoint === "clients") {
       const deptId = singleValue(params, "dept_ids");
       const managerId = singleValue(params, "mol_ids");
-      if (String(params.get("dept_ids") || "").trim() && !deptId) return unsupported();
-      if (String(params.get("mol_ids") || "").trim() && !managerId) return unsupported();
-      if (deptId && managerId) return unsupported();
+      if (String(params.get("dept_ids") || "").trim() && deptId == null) return unsupported();
+      if (String(params.get("mol_ids") || "").trim() && managerId == null) return unsupported();
+      if (deptId != null && managerId != null) return unsupported();
       const defaultOnly = hasOnlyDefaultFilters(params, ["dept_ids", "mol_ids"]);
       if (hasUnsupportedFilters(params, ["dept_ids", "mol_ids"]) || (hasFilters(params, ["dept_ids", "mol_ids"]) && !defaultOnly)) return unsupported();
-      if (deptId) {
-        const prefix = defaultOnly ? "details/default_department_" : "details/department_";
-        return withNotice(await readJson(`${prefix}${deptId}_clients.json`));
+      if (deptId != null) {
+        return payloadFor((defaultOnly ? "details/default_department_" : "details/department_") + deptId + "_clients.json");
       }
-      if (managerId) {
-        const prefix = defaultOnly ? "details/default_manager_" : "details/manager_";
-        return withNotice(await readJson(`${prefix}${managerId}_clients.json`));
+      if (managerId != null) {
+        return payloadFor((defaultOnly ? "details/default_manager_" : "details/manager_") + managerId + "_clients.json");
       }
-      const rel = defaultOnly ? "kpi/default/clients.json" : "kpi/clients.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/clients.json" : "kpi/clients.json");
     }
-    if (path === "/api/kpi/ar-aging") {
+
+    if (endpoint === "inventory") {
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
-      const rel = defaultOnly ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/inventory.json" : "kpi/inventory.json");
     }
-    if (path === "/api/kpi/inventory") {
+
+    if (endpoint === "ar-aging") {
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
-      const rel = defaultOnly ? "kpi/default/inventory.json" : "kpi/inventory.json";
-      return withNotice(await readJson(rel));
+      return payloadFor(defaultOnly ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json");
     }
+
     return null;
   };
+
+  const handleApi = async (url) => {
+    const path = url.pathname;
+    const params = url.searchParams;
+
+    if (path === "/api/ping") {
+      return {
+        ok: true,
+        db: false,
+        snapshot_mode: true,
+        source: "github-pages",
+        folder: STORE.folderName,
+        manifest: STORE.manifest,
+      };
+    }
+
+    if (DICT_MAP[path]) {
+      return dictPayload(DICT_MAP[path], params);
+    }
+
+    const prefix = "/api/kpi/";
+    if (path.startsWith(prefix)) {
+      return kpiPayload(path.slice(prefix.length), params);
+    }
+
+    return null;
+  };
+
   const nativeFetch = window.fetch.bind(window);
   window.fetch = async function(input, init) {
     const raw = typeof input === "string" ? input : (input && input.url) || "";
     let url;
-    try { url = new URL(raw, window.location.href); } catch(e) { return nativeFetch(input, init); }
-    if (!url.pathname.startsWith("/api/")) return nativeFetch(input, init);
-    if (!STORE.ready) return fail("Сначала нажмите 'Выбрать папку snapshot' и выберите папку с manifest.json.", 428);
     try {
-      const payload = await payloadForApi(url);
-      return payload ? jsonResponse(payload) : fail("Неизвестный API endpoint в snapshot-режиме: " + url.pathname, 404);
-    } catch(e) {
-      return fail(e.message || String(e), 500);
+      url = new URL(raw, window.location.href);
+    } catch (e) {
+      return nativeFetch(input, init);
+    }
+
+    if (!url.pathname.startsWith("/api/")) return nativeFetch(input, init);
+    if (!STORE.ready) {
+      return fail("Сначала нажмите 'Выбрать папку snapshot' и выберите папку с manifest.json.", 428);
+    }
+
+    try {
+      const payload = await handleApi(url);
+      return payload
+        ? jsonResponse(payload)
+        : fail("Неизвестный API endpoint в snapshot-режиме: " + url.pathname, 404);
+    } catch (e) {
+      return fail(e?.message || String(e), 500);
     }
   };
-  const onFolderChange = async (ev) => {
+
+  const loadSnapshotFolder = async (event) => {
+    const files = Array.from(event.target?.files || []);
+    if (!files.length) return;
+
+    STORE.files.clear();
+    STORE.cache.clear();
+    STORE.ready = false;
+    STORE.manifest = null;
+
+    files.forEach((file) => {
+      const path = relPath(file);
+      if (path) STORE.files.set(path, file);
+    });
+
+    STORE.folderName = (files[0].webkitRelativePath || "snapshot").split("/")[0] || "snapshot";
+
+    const missing = REQUIRED.filter((path) => !STORE.files.has(path));
+    if (missing.length) {
+      setStatus("Не хватает файлов snapshot: " + missing.slice(0, 3).join(", ") + (missing.length > 3 ? "..." : ""), "err");
+      return;
+    }
+
     try {
-      STORE.files.clear();
-      STORE.cache.clear();
-      STORE.ready = false;
-      STORE.manifest = null;
-      const files = Array.from(ev.target.files || []);
-      if (!files.length) return;
-      STORE.folderName = (files[0].webkitRelativePath || "snapshot").split("/")[0] || "snapshot";
-      for (const file of files) STORE.files.set(relPath(file), file);
-      const missing = REQUIRED.filter(p => !STORE.files.has(p));
-      if (missing.length) throw new Error("Не хватает файлов: " + missing.join(", "));
       STORE.manifest = await readJson("manifest.json");
       STORE.ready = true;
-      const p = STORE.manifest.period || {};
-      setStatus(`Готово: ${STORE.folderName} · ${p.start || "?"} - ${p.end || "?"}`, "ok");
-      window.dispatchEvent(new CustomEvent("kpi-snapshot-ready", {detail:{manifest:STORE.manifest, period:p}}));
-    } catch(e) {
+      const period = STORE.manifest?.period || {};
+      const periodText = period.start && period.end ? ` · ${period.start}–${period.end}` : "";
+      setStatus(`Подключен snapshot: ${STORE.folderName}${periodText}`, "ok");
+    } catch (e) {
       STORE.ready = false;
-      setStatus(e.message || String(e), "err");
+      setStatus("Ошибка чтения snapshot: " + (e?.message || String(e)), "err");
     }
   };
-  document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("snapshotFolderInput");
-    if (input) input.addEventListener("change", onFolderChange);
-  });
+
+  const input = document.getElementById("snapshotFolderInput");
+  if (input) input.addEventListener("change", loadSnapshotFolder);
 })();
 </script>
 <script type="text/babel">
@@ -674,6 +873,17 @@ const FILTER_DEFS = [
   {key:"product_group_ids", endpoint:"/dict/product-groups", label:"Товарная группа", placeholder:"Все группы без с/х животных"},
   {key:"auction_flags", endpoint:"/dict/auction",     label:"Аукцион",      placeholder:"Все продажи"},
 ];
+
+const FILTER_SHORT_LABELS = {
+  bu_ids: "БЕ",
+  mol_ids: "Менеджеры",
+  dept_ids: "Отделы",
+  parole_ids: "Клиенты",
+  pred_ids: "КА",
+  sale_type_ids: "Тип",
+  product_group_ids: "ТГ",
+  auction_flags: "Аукцион",
+};
 
 const DEFAULT_FILTER_RULES = {
   parole_ids: {
@@ -754,7 +964,7 @@ const BLOCKS = [
       {
         id:"cei_pct",
         sub:"Собрано / доступно к сбору",
-        tip:"Collection Effectiveness Index — насколько эффективно собрали деньги за период. 100% означает, что почти всё доступное к сбору закрыто; низкий CEI показывает, что продажи превращаются в ДЗ."
+        tip:"Collection Effectiveness Index — насколько эффективно собрали деньги за период. 100% означает, что почти всё доступное к сбору закрыто; низкий CEI показывает, что продажи превращаются в ДЗ. На overview, если CEI остаётся в сильной зоне выше 95%, небольшое ухудшение динамики показываем нейтрально, чтобы не конфликтовать с высоким абсолютным уровнем."
       },
     ]
   },
@@ -779,7 +989,7 @@ const BLOCKS = [
       {
         id:"ap_rub",
         sub:"Активные сырьевые поставщики: открытый долг FIFO",
-        tip:"Сколько мы должны активным сырьевым поставщикам прямо сейчас. Архивные и удалённые контрагенты не входят в расчёт."
+        tip:"Сколько мы должны активным сырьевым поставщикам прямо сейчас. Архивные и удалённые контрагенты не входят в расчёт. На overview динамику самой кредиторки красим нейтрально: для CCC важнее смотреть DPO, потому что уменьшение КЗ само по себе может означать и оздоровление, и ускоренный отток денег."
       },
       {
         id:"ap_advance_rub",
@@ -809,7 +1019,17 @@ const BLOCKS = [
       {
         id:"wc_fin_cost_rub",
         sub:"(ДЗ + Запас + авансы пост. − КЗ − авансы пок.) × ставка",
-        tip:"Денежный эффект оборотного капитала за период. Плюс означает стоимость замороженных денег, минус — нас финансируют авансы покупателей и кредиторка поставщиков."
+        tip:"Денежный эффект оборотного капитала за период. Плюс означает стоимость замороженных денег, минус — нас финансируют авансы покупателей и кредиторка поставщиков. Светофор здесь завязан на soft-target 0: 5/5 означает, что эффект не положительный и оборотный капитал не съедает деньги."
+      },
+      {
+        id:"rowc_pct",
+        sub:"Маржа / средний ОК × 365 / дни",
+        tip:"Return on Working Capital — сколько годовой маржи приносит каждый рубль среднего положительного оборотного капитала. Чем выше, тем эффективнее крутится капитал. Если ОК отрицательный или нулевой, показатель не считаем: бизнес в этот период не был связан собственным оборотным капиталом."
+      },
+      {
+        id:"wci_pct",
+        sub:"Средний ОК / выручка периода",
+        tip:"Working Capital Intensity — сколько рублей среднего оборотного капитала нужно на 1 рубль выручки. Чем ниже, тем легче расти без дополнительного финансирования; отрицательное значение означает, что цикл частично финансируют поставщики и авансы покупателей."
       },
     ]
   },
@@ -831,13 +1051,27 @@ const fmtDelta = (p) => (p==null||isNaN(p)) ? "—" : (p>0?"+":"") + p.toLocaleS
 const fmtPct = (p) => (p==null||isNaN(p)) ? "—" : p.toLocaleString("ru-RU",{maximumFractionDigits:1}) + "%";
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
+const fmtSignedUnitDelta = (n, unit) => {
+  if (n == null || isNaN(n)) return "—";
+  const value = Number(n);
+  const sign = value > 0 ? "+" : "";
+  if (unit === "дни") return `${sign}${fmtDays(value)} дн.`;
+  if (unit === "%") return `${sign}${fmtQty(value)} п.п.`;
+  return `${sign}${fmtRub(value)} руб`;
+};
 const fmtRatio = (ratio, ar, margin) => {
-  if ((ratio == null || isNaN(ratio)) && Number(ar || 0) <= 0 && Number(margin || 0) > 0) return "Без ДЗ";
+  if ((ratio == null || isNaN(ratio)) && Number(ar || 0) <= 0 && Number(margin || 0) > 0) {
+    return <span className="metric-na" title="Маржа есть, ДЗ на конец периода нет">—</span>;
+  }
   if (ratio == null || isNaN(ratio)) return "—";
   return Number(ratio).toLocaleString("ru-RU",{maximumFractionDigits:2});
 };
 const fmtScoreDelta = (n) => (n==null||isNaN(n)) ? "—" : (n>0?"+":"") + Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1}) + " п.";
 const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
+const cleanEntityLabel = (value, fallback="Без названия") => {
+  const text = String(value || "").replace(/^\+\s*/, "").trim();
+  return text || fallback;
+};
 const fmtDate = (s) => {
   if (!s) return "—";
   const [y,m,d] = s.split("-");
@@ -855,11 +1089,51 @@ const dateValue = (iso) => {
   return Date.UTC(y, m-1, d);
 };
 const addDaysIso = (iso, days) => new Date(dateValue(iso) + days*86400000).toISOString().slice(0,10);
+const EXPORT_SCRIPT_URLS = [
+  "https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js",
+  "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js",
+];
 const daysInclusive = (start, end) => {
   const startValue = dateValue(start);
   const endValue = dateValue(end);
   if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return NaN;
   return Math.floor((endValue - startValue) / 86400000) + 1;
+};
+const loadHtmlToImage = () => {
+  if (window.htmlToImage) return Promise.resolve(window.htmlToImage);
+  if (window.__KPI_HTML_TO_IMAGE_PROMISE__) return window.__KPI_HTML_TO_IMAGE_PROMISE__;
+  window.__KPI_HTML_TO_IMAGE_PROMISE__ = new Promise((resolve, reject) => {
+    let idx = 0;
+    const tryLoad = () => {
+      if (idx >= EXPORT_SCRIPT_URLS.length) {
+        reject(new Error("Не удалось загрузить библиотеку экспорта PNG"));
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = EXPORT_SCRIPT_URLS[idx];
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.onload = () => {
+        if (window.htmlToImage) resolve(window.htmlToImage);
+        else {
+          script.remove();
+          idx += 1;
+          tryLoad();
+        }
+      };
+      script.onerror = () => {
+        script.remove();
+        idx += 1;
+        tryLoad();
+      };
+      document.head.appendChild(script);
+    };
+    tryLoad();
+  }).catch((error) => {
+    window.__KPI_HTML_TO_IMAGE_PROMISE__ = null;
+    throw error;
+  });
+  return window.__KPI_HTML_TO_IMAGE_PROMISE__;
 };
 const cispPeriod = (period) => {
   if (!period?.start || !period?.end) return "";
@@ -898,11 +1172,73 @@ function EffectValue({row, period, value}) {
   return <span title={effectTitle(row, period, effect)}>{fmtEffectRub(effect)}</span>;
 }
 
-const deltaClass = (card) => {
-  const p = card.delta_pct;
+const LOWER_BETTER_CARD_IDS = new Set([
+  "ar_rub",
+  "overdue_ar_rub",
+  "dso_days",
+  "inventory_rub",
+  "dio_days",
+  "ap_advance_rub",
+  "overdue_ap_rub",
+  "ccc_days",
+  "wc_fin_cost_rub",
+  "wci_pct",
+]);
+const NEUTRAL_TREND_CARD_IDS = new Set(["ap_rub"]);
+const ZERO_LINE_CARD_IDS = new Set(["wc_fin_cost_rub", "wci_pct"]);
+const COMPACT_TITLE_CARD_IDS = new Set(["overdue_ap_rub"]);
+const SIGN_ABSOLUTE_DELTA_CARD_IDS = new Set(["ccc_days", "wc_fin_cost_rub", "wci_pct"]);
+const RISK_DIFF_SEVERE_BUCKETS = new Set(["d_61_90", "d_90_plus"]);
+const RISK_DIFF_MIN_RUB = 500000;
+const RISK_DIFF_SEVERE_BUCKET_MIN_RUB = 250000;
+const OVERVIEW_OVERDUE_SORTS = [
+  {key:"amount", label:"По сумме"},
+  {key:"age", label:"По возрасту"},
+  {key:"term_90", label:"По 90+"},
+];
+
+const metricValue = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
+const metricDeltaValue = (metric) => {
+  const ready = metricValue(metric?.delta_value);
+  if (ready != null) return ready;
+  const cur = metricValue(metric?.value ?? metric?.current_value);
+  const prev = metricValue(metric?.prev_value);
+  if (cur == null || prev == null) return null;
+  return cur - prev;
+};
+const metricUnit = (metric) => {
+  if (metric?.unit) return metric.unit;
+  if (metric?.id === "ccc_days") return "дни";
+  return "руб";
+};
+const shouldUseAbsoluteYoYDelta = (metric, period) => {
+  if (period?.compare_mode !== "yoy") return false;
+  if (!SIGN_ABSOLUTE_DELTA_CARD_IDS.has(metric?.id)) return false;
+  const cur = metricValue(metric?.value ?? metric?.current_value);
+  const prev = metricValue(metric?.prev_value);
+  if (cur == null || prev == null) return false;
+  return cur <= 0 || prev <= 0 || (cur > 0 && prev < 0) || (cur < 0 && prev > 0);
+};
+const metricTrendValue = (metric, period) => shouldUseAbsoluteYoYDelta(metric, period)
+  ? metricDeltaValue(metric)
+  : metricValue(metric?.delta_pct);
+const fmtMetricDelta = (metric, period) => shouldUseAbsoluteYoYDelta(metric, period)
+  ? fmtSignedUnitDelta(metricDeltaValue(metric), metricUnit(metric))
+  : fmtDelta(metric?.delta_pct);
+const isLowerBetterCard = (card) => card?.lower_better === true || LOWER_BETTER_CARD_IDS.has(card?.id);
+const isNeutralTrendCard = (card) => NEUTRAL_TREND_CARD_IDS.has(card?.id);
+const isStableHighCEI = (card) => card?.id === "cei_pct" && Number(card?.value) >= 95;
+
+const deltaClass = (card, period) => {
+  if (isNeutralTrendCard(card)) return "flat";
+  const p = metricTrendValue(card, period);
   if (p == null) return "flat";
   if (Math.abs(p) < 0.01) return "flat";
-  if (card.lower_better) return p < 0 ? "inverse-down" : "inverse-up";
+  if (isStableHighCEI(card) && p < 0) return "flat";
+  if (isLowerBetterCard(card)) return p < 0 ? "inverse-down" : "inverse-up";
   return p > 0 ? "up" : "down";
 };
 const deltaClassRaw = (p, lowerBetter=false) => {
@@ -915,13 +1251,13 @@ const deltaClassRaw = (p, lowerBetter=false) => {
 const COL_TIPS = {
   revenue: "Выручка за выбранный период: сколько отгрузили/продали по строкам SDOC_TOV. Это не поступление денег.",
   revenueShare: "Доля строки в выручке текущей вкладки. Например, доля клиента в выручке отдела или БЕ.",
-  revenueDelta: "Как изменилась выручка относительно предыдущего такого же периода.",
+  revenueDelta: "Как изменилась выручка относительно выбранного периода сравнения.",
   healthScore: "Health Score — базовая модель 0–100: маржинальность 25%, динамика выручки 15%, DSO 20%, CEI 15%, доля просрочки 15%, Cash.% 10%. Далее применяются штрафы за рост и уровень просрочки, DSO выше 30, концентрацию TOP-3, бонус/штраф за финэффект денег и потолок для микроклиентов. Наведите на Score в строке, чтобы увидеть входные компоненты. Для строк только с авансом Score не считается.",
   healthScoreDelta: "Δ Score — изменение Health Score к предыдущему такому же периоду в пунктах. Показывает тренд качества работы отдела.",
   margin: "Маржа = выручка − себестоимость (COGS). Это прибыль до учета стоимости отсрочек, ДЗ и запасов.",
-  marginDelta: "Как изменилась маржа относительно предыдущего такого же периода. Рост маржи лучше, падение — сигнал проверить цены, скидки или себестоимость.",
+  marginDelta: "Как изменилась маржа относительно выбранного периода сравнения. Рост маржи лучше, падение — сигнал проверить цены, скидки или себестоимость.",
   marginPct: "Марж.% = маржа / выручка × 100%. Показывает, какая часть продаж остается маржей.",
-  marginAr: "Маржа / ДЗ = маржа выбранного периода / ДЗ покупателей на конец периода. Это не годовой коэффициент и не средняя ДЗ; сравнивайте строки с учетом периода и DSO. Если ДЗ нет при положительной марже, показываем «Без ДЗ».",
+  marginAr: "Маржа / ДЗ = маржа выбранного периода / ДЗ покупателей на конец периода. Это не годовой коэффициент и не средняя ДЗ; сравнивайте строки с учетом периода и DSO. Если ДЗ нет при положительной марже, показываем прочерк с подсказкой.",
   cashAdj: "Cash-adj — денежная маржа после эффекта денег. Для клиентов и КА: маржа + финэффект денег; плюс от авансов улучшает показатель, минус от ДЗ снижает его.",
   cashPct: "Cash.% = Cash-adj / выручка × 100%. Денежная рентабельность после стоимости замороженных денег.",
   ar: "ДЗ — открытый долг покупателей по FIFO на дату окончания периода. Это остаток долга на дату, а не продажи за период.",
@@ -929,10 +1265,10 @@ const COL_TIPS = {
   arAdvance: "Авансы покупателей — деньги, полученные вперед. Это наша обязанность отгрузить товар или зачесть оплату, а не обычная ДЗ.",
   overdueAr: "Просрочка — часть текущей открытой ДЗ на дату окончания периода, где срок оплаты уже прошел. Это не сумма просрочки за месяц.",
   overdueShare: "Процент от ДЗ = просрочка / текущая ДЗ × 100%. Например 100% означает, что вся открытая ДЗ клиента просрочена.",
-  overdueDelta: "Как изменилась сумма просроченной ДЗ относительно предыдущего такого же периода. Здесь снижение лучше роста.",
+  overdueDelta: "Как изменилась сумма просроченной ДЗ относительно выбранного периода сравнения. Здесь снижение лучше роста.",
   counterparties: "Контрагент клиента: конкретное юрлицо (PREDS), по которому строка показывает выручку, текущую ДЗ, просрочку, финэффект денег и денежную маржу.",
   top3Share: "Концентрация TOP-3, % — доля трех крупнейших клиентов отдела по выручке. Список под процентом показывает этих клиентов.",
-  dso: "DSO — сколько дней продаж заморожено в текущей ДЗ: ДЗ на конец периода / выручка периода × дни. Не суммируется по строкам: для отдела, менеджера или БЕ пересчитывается от их общей ДЗ и общей выручки. Средняя ДЗ используется отдельно для стоимости отсрочки.",
+  dso: "DSO — сколько дней продаж заморожено в текущей ДЗ: ДЗ на конец периода / выручка периода × дни. Авансы покупателей из DSO не вычитаются. Низкий DSO может сочетаться с высокой долей просрочки, если ДЗ маленькая относительно выручки; качество ДЗ смотрите по Проср.%.",
   cei: "CEI — эффективность сбора денег за период. Формула: (ДЗ на начало + выручка − ДЗ на конец) / (ДЗ на начало + выручка − непросроченная ДЗ на конец) × 100%. У клиентов без проблем CEI часто равен 100%, поэтому для скорости денег смотрите также DSO и финэффект.",
   arFinCost: "Финэффект денег — (средний аванс покупателей − средняя ДЗ) × ставка × дни периода / 365. Средние остатки считаются как простое среднее между остатком на начало и конец периода. Плюс означает экономию/доход от денег клиента, минус — стоимость финансирования ДЗ.",
   inventory: "Запасы — деньги, замороженные в коммерческих остатках: товары, сырье и упаковка.",
@@ -942,6 +1278,8 @@ const COL_TIPS = {
   overdueAp: "Просроченная КЗ — часть текущего долга поставщикам, где срок оплаты уже прошел.",
   dpo: "DPO — сколько дней в среднем мы оплачиваем поставщиков. Чем выше DPO, тем дольше поставщики финансируют наш оборот, но слишком высокий DPO может быть риском отношений.",
   ccc: "CCC = DIO + DSO − DPO. Показывает, сколько дней бизнесу нужно финансировать оборот своими деньгами.",
+  rowc: "ROWC = маржа / средний оборотный капитал × 365 / дни периода. Показывает годовую доходность на каждый рубль связанного в обороте капитала. Считается только при положительном среднем ОК.",
+  wci: "WCI = средний оборотный капитал / выручка периода × 100%. Показывает, сколько оборотного капитала требует рубль выручки. Ниже — лучше; отрицательное значение означает, что цикл финансируется не собственными деньгами.",
   status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. «Только аванс» означает предоплату без продаж и ДЗ в выбранном периоде.",
   agingBucket: "Aging — текущая открытая ДЗ по FIFO, разложенная по срокам просрочки на дату окончания периода.",
   bucketValue: "Сумма текущего открытого остатка в выбранном бакете.",
@@ -968,6 +1306,25 @@ const compareSortValues = (a, b) => {
   return av.localeCompare(bv, "ru", {numeric:true, sensitivity:"base"});
 };
 
+const isAdvanceOnlyRow = (row) => (
+  (row?.status_code === "advance_only")
+  || (
+    Number(row?.revenue_rub || 0) <= 0
+    && Number(row?.ar_rub || 0) <= 0
+    && Number(row?.overdue_ar_rub || 0) <= 0
+    && Number(row?.ar_advance_rub ?? row?.advances_rub ?? 0) > 0
+  )
+);
+
+const splitAdvanceOnlyRows = (rows) => {
+  const main = [];
+  const advanceOnly = [];
+  (rows || []).forEach((row) => {
+    (isAdvanceOnlyRow(row) ? advanceOnly : main).push(row);
+  });
+  return {main, advanceOnly};
+};
+
 const sortRows = (rows, sortState) => {
   const list = [...(rows || [])];
   const key = sortState?.key;
@@ -990,11 +1347,12 @@ function useSortedRows(rows, defaultKey="rank", defaultDir="asc") {
 
 const sortable = (sortState, requestSort, key) => ({sortKey:key, sortState, onSort:requestSort});
 
-// Benchmark: подсветка ячеек относительно среднего по компании.
+// Benchmark: подсветка ячеек относительно среднего по компании
+// lowerIsBetter=true для DSO, просрочки; false для маржи, роста
 function benchCls(value, avg, lowerIsBetter) {
   if (value == null || avg == null || avg === 0) return "";
   const diff = (value - avg) / Math.abs(avg);
-  if (Math.abs(diff) < 0.05) return "";
+  if (Math.abs(diff) < 0.05) return ""; // мёртвая зона ±5%
   if (lowerIsBetter) return diff < 0 ? "bench-good" : "bench-bad";
   return diff > 0 ? "bench-good" : "bench-bad";
 }
@@ -1148,6 +1506,77 @@ function CispMetricLink({row, period, children}) {
     >
       {children}
     </a>
+  );
+}
+
+function NoticePanel({title, items, icon="!", defaultOpen=false}) {
+  const safeItems = items || [];
+  const [open, setOpen] = useState(defaultOpen);
+  if (!safeItems.length) return null;
+  return (
+    <div className="warn-panel compact">
+      <span className="warn-panel-ico">{icon}</span>
+      <div style={{flex:1}}>
+        <button className="warn-panel-toggle" type="button" onClick={() => setOpen(v => !v)}>
+          <b>{title}</b>
+          <span className="warn-panel-meta">{open ? "Скрыть" : `${safeItems.length} пункт.`}</span>
+        </button>
+        {open && <ul>{safeItems.map((item, idx) => <li key={idx}>{item}</li>)}</ul>}
+      </div>
+    </div>
+  );
+}
+
+function AdvanceOnlyTable({rows, period, title="Авансы без отгрузок"}) {
+  const safeRows = rows || [];
+  if (!safeRows.length) return null;
+  return (
+    <div className="advance-block">
+      <div className="advance-block-head">
+        <div>
+          <div className="advance-block-title">{title}</div>
+          <div className="advance-block-sub">Предоплата без продаж и без ДЗ на конец периода. Эти строки выделены отдельно, чтобы не смешиваться с рабочими КА.</div>
+        </div>
+        <div className="detail-pill">{fmtInt(safeRows.length)} строк</div>
+      </div>
+      <div className="dept-detail-scroll">
+        <table className="dept-detail-table">
+          <thead>
+            <tr>
+              <Th>#</Th>
+              <Th>Клиент</Th>
+              <Th tip={COL_TIPS.counterparties}>Контрагент</Th>
+              <Th className="num" tip={COL_TIPS.healthScore}>Score</Th>
+              <Th className="num" tip={COL_TIPS.revenue}>Выручка</Th>
+              <Th className="num" tip={COL_TIPS.arAdvance}>Авансы</Th>
+              <Th className="num" tip={COL_TIPS.arFinCost}>Финэффект</Th>
+              <Th className="num" tip={COL_TIPS.cashAdj}>Cash-adj</Th>
+              <Th tip={COL_TIPS.status}>Статус</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {safeRows.map((row, idx) => (
+              <tr key={row.counterparty_row_key || `${row.client_id || "client"}-advance-${idx}`}>
+                <td className="rank">{idx + 1}</td>
+                <td className="dept-name">{row.client || "—"}</td>
+                <td className="counterparty-cell">
+                  <span className="counterparty-name" title={row.counterparty || ""}>{row.counterparty || "—"}</span>
+                </td>
+                <td className="num"><ScoreCell row={row}/></td>
+                <td className="num"><CispMetricLink row={row} period={period}>{fmtRub(row.revenue_rub)}</CispMetricLink></td>
+                <td className="num">{fmtRub(row.ar_advance_rub ?? row.advances_rub)}</td>
+                <td className="num"><EffectValue row={row} period={period}/></td>
+                <td className="num">{fmtRub(row.cash_adj_margin_rub)}</td>
+                <td>
+                  <span className={"status-badge " + (row.status_code || "neutral")}>{row.status || "—"}</span>
+                  <span className="muted">{row.status_reason}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -1326,7 +1755,7 @@ const targetLine = (card) => {
   if (card.target == null) return null;
   const val = fmtTargetVal(card.target, card.unit);
   if (card.target === 0) return "Цель: " + val;
-  const sign = card.lower_better ? "≤" : "≥";
+  const sign = isLowerBetterCard(card) ? "≤" : "≥";
   return "Цель: " + sign + " " + val;
 };
 
@@ -1368,8 +1797,101 @@ function CardInfo({card, tip}) {
   );
 }
 
+const Sparkline = React.memo(function Sparkline({card, period}) {
+  const spark = useMemo(() => {
+    const raw = Array.isArray(card?.sparkline) ? card.sparkline : [];
+    const values = raw.map(v => (v == null || isNaN(v) ? null : Number(v)));
+    const numeric = values.filter(v => v != null);
+    if (numeric.length < 2 || values.length < 2) return null;
+
+    const width = 240;
+    const height = 42;
+    const padX = 2;
+    const padY = 4;
+    let min = Math.min(...numeric);
+    let max = Math.max(...numeric);
+    if (ZERO_LINE_CARD_IDS.has(card?.id)) {
+      min = Math.min(min, 0);
+      max = Math.max(max, 0);
+    }
+    if (min === max) {
+      const delta = Math.max(Math.abs(min || 1) * 0.08, 1);
+      min -= delta;
+      max += delta;
+    }
+
+    const tone = (() => {
+      if (isNeutralTrendCard(card)) return "neutral";
+      const numericValues = values.filter(v => v != null);
+      if (numericValues.length < 2) return "neutral";
+      const first = numericValues[0];
+      const last = numericValues[numericValues.length - 1];
+      const diff = last - first;
+      if (Math.abs(diff) < 1e-9) return "neutral";
+      if (isStableHighCEI(card) && diff < 0) return "neutral";
+      const good = isLowerBetterCard(card) ? diff < 0 : diff > 0;
+      return good ? "good" : "bad";
+    })();
+
+    const scaleX = (idx, len) => (len <= 1 ? width / 2 : padX + (idx * (width - padX * 2)) / (len - 1));
+    const scaleY = (value) => {
+      const ratio = (value - min) / (max - min);
+      return height - padY - ratio * (height - padY * 2);
+    };
+    const zeroY = ZERO_LINE_CARD_IDS.has(card?.id) ? scaleY(0) : null;
+
+    const points = values.map((value, idx) => value == null ? null : {
+      x: scaleX(idx, values.length),
+      y: scaleY(value),
+      value,
+    });
+    const validPoints = points.filter(Boolean);
+    if (validPoints.length < 2) return null;
+
+    const line = validPoints.map((pt, idx) => `${idx === 0 ? "M" : "L"} ${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(" ");
+    const area = `${line} L ${validPoints[validPoints.length - 1].x.toFixed(2)} ${(height - 2).toFixed(2)} L ${validPoints[0].x.toFixed(2)} ${(height - 2).toFixed(2)} Z`;
+    const midY = ((height - padY * 2) / 2 + padY).toFixed(2);
+
+    return {
+      tone,
+      line,
+      area,
+      first: validPoints[0],
+      last: validPoints[validPoints.length - 1],
+      midY,
+      zeroY,
+      pointsCount: values.length,
+    };
+  }, [card]);
+
+  if (!spark) return null;
+
+  const title = period
+    ? `Тренд внутри периода ${fmtDate(period.start)} — ${fmtDate(period.end)}`
+    : "Тренд внутри периода";
+  const lineCls = "card-spark-line" + (spark.tone === "good" ? " good" : spark.tone === "bad" ? " bad" : "");
+  const dotCls = "card-spark-dot last" + (spark.tone === "good" ? " good" : spark.tone === "bad" ? " bad" : "");
+
+  return (
+    <div className="card-spark" title={title}>
+      <svg className="card-spark-svg" viewBox="0 0 240 42" preserveAspectRatio="none" aria-hidden="true">
+        <line className="card-spark-grid" x1="0" y1={spark.midY} x2="240" y2={spark.midY}/>
+        {spark.zeroY == null ? null : <line className="card-spark-zero" x1="0" y1={spark.zeroY} x2="240" y2={spark.zeroY}/>}
+        <path className="card-spark-area" d={spark.area}/>
+        <path className={lineCls} d={spark.line}/>
+        <circle className="card-spark-dot first" cx={spark.first.x} cy={spark.first.y} r="3.2"/>
+        <circle className={dotCls} cx={spark.last.x} cy={spark.last.y} r="3.6"/>
+      </svg>
+      <div className="card-spark-meta">
+        <span>Тренд</span>
+        <span>{spark.pointsCount} точ.</span>
+      </div>
+    </div>
+  );
+});
+
 // ─── Одна карточка ───────────────────────────────
-function Card({card, sub, tip}) {
+function Card({card, sub, tip, compareLabel="Предыдущий период", period, extra}) {
   if (card.error) {
     return (
       <div className="card err">
@@ -1384,7 +1906,9 @@ function Card({card, sub, tip}) {
       </div>
     );
   }
-  const cls = "card" + (card.score ? " s"+card.score : "");
+  const cls = "card"
+    + (card.score ? " s"+card.score : "")
+    + (COMPACT_TITLE_CARD_IDS.has(card?.id) ? " compact-label" : "");
   return (
     <div className={cls}>
       <div className="card-head">
@@ -1400,10 +1924,12 @@ function Card({card, sub, tip}) {
         {fmtVal(card)}<span className="card-unit">{card.unit}</span>
       </div>
       {sub && <div className="card-sub">{sub}</div>}
+      {extra?.content && <div className={"card-insight " + (extra.tone || "info")}>{extra.content}</div>}
+      <Sparkline card={card} period={period}/>
       <div className="card-foot">
-        <span className="card-foot-label">vs прошлый период</span>
-        <span className={"delta "+deltaClass(card)}>
-          {arrow(card.delta_pct)} {fmtDelta(card.delta_pct)}
+        <span className="card-foot-label">vs {compareLabel}</span>
+        <span className={"delta "+deltaClass(card, period)}>
+          {arrow(metricTrendValue(card, period))} {fmtMetricDelta(card, period)}
         </span>
       </div>
     </div>
@@ -1470,7 +1996,7 @@ const deltaTitle = (label, value, lowerBetter=false) => {
     : lowerBetter
       ? (value > 0.05 ? "хуже" : value < -0.05 ? "лучше" : "без изменений")
       : (value > 0.05 ? "лучше" : value < -0.05 ? "хуже" : "без изменений");
-  return `${label}\nΔ к предыдущему периоду: ${fmtDelta(value)} (${direction})`;
+  return `${label}\nΔ к периоду сравнения: ${fmtDelta(value)} (${direction})`;
 };
 
 const isProblemDepartment = (row) => (
@@ -1480,14 +2006,17 @@ const isProblemDepartment = (row) => (
   || (row.ar_fin_cost_rub != null && row.ar_fin_cost_rub < 0)
 );
 
-function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel="SKU"}) {
+function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel="SKU", titleTip}) {
   const safeRows = rows || [];
   const maxValue = Math.max(1, ...safeRows.map(r => Math.abs(r.value_rub || 0)));
   return (
     <div className="stock-panel">
       <div className="stock-panel-head">
         <div>
-          <div className="stock-panel-title">{title}</div>
+          <div className="stock-panel-title-row">
+            <div className="stock-panel-title">{title}</div>
+            {titleTip && <CardInfo card={{label:title}} tip={titleTip}/>}
+          </div>
           {sub && <div className="stock-panel-sub">{sub}</div>}
         </div>
       </div>
@@ -1495,15 +2024,20 @@ function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel
         {safeRows.length === 0 && <div className="ms-empty">Нет данных</div>}
         {safeRows.map((r, i) => {
           const value = r.value_rub || 0;
-          const width = Math.max(1, Math.abs(value) / maxValue * 100);
+          const width = value === 0 ? 0 : Math.min(100, Math.max(2.5, Math.abs(value) / maxValue * 100));
           const name = r[labelKey] || r.bucket || "Без названия";
+          const barTitle = [
+            `${name}: ${fmtRub(value)}`,
+            r.share_pct == null ? null : `${fmtPct(r.share_pct)} от итога`,
+            r[countKey] == null ? null : `${fmtInt(r[countKey])} ${countLabel}`,
+          ].filter(Boolean).join("\n");
           return (
             <div className="stock-bar-row" key={(name || "") + i}>
               <div className="stock-bar-head">
                 <div className="stock-bar-name" title={name}>{name}</div>
                 <div className="stock-bar-meta">{fmtRub(value)}</div>
               </div>
-              <div className="stock-track">
+              <div className="stock-track" title={barTitle}>
                 <div className="stock-fill" style={{width: width + "%"}}/>
               </div>
               <div className="stock-bar-foot">
@@ -1518,17 +2052,226 @@ function StockBars({title, sub, rows, labelKey, countKey="sku_count", countLabel
   );
 }
 
+function OverviewChangePanel({items}) {
+  const safeItems = (items || []).filter(Boolean);
+  if (!safeItems.length) return null;
+  return (
+    <div className="overview-change-panel">
+      <div className="overview-change-head">
+        <div className="overview-change-ico">Δ</div>
+        <div className="overview-change-title">Изменения периода</div>
+      </div>
+      <ul className="overview-change-list">
+        {safeItems.map((item, idx) => <li key={idx}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+function OverviewDeadStockCard({summary}) {
+  if (!summary) return null;
+
+  const deadRub = summary.dead_180_rub;
+  const deadSku = summary.dead_180_sku;
+  const share = summary.dead_180_share_pct;
+  const slowRub = summary.slow_90_rub;
+
+  return (
+    <div className="card">
+      <div className="card-head">
+        <div className="card-label-wrap">
+          <div className="card-label">Неликвид 180+</div>
+          <CardInfo
+            card={{label:"Неликвид 180+"}}
+            tip="Текущий остаток SKU, по которому не было расхода 180+ дней. Считается по тому же складскому breakdown, что и вкладка «Запасы»."
+          />
+        </div>
+      </div>
+      <div className="card-value">
+        {fmtRub(deadRub)}<span className="card-unit">руб</span>
+      </div>
+      <div className="card-sub">SKU без расхода 180+ дней</div>
+      <div className={"card-insight " + ((share || 0) >= 15 ? "risk" : (share || 0) >= 7 ? "warn" : "info")}>
+        <strong>{fmtInt(deadSku)}</strong> SKU · {fmtPct(share)} от запаса
+        {slowRub == null ? "" : ` · Slow 90+: ${fmtRub(slowRub)}`}
+      </div>
+      <div className="card-foot">
+        <span className="card-foot-label">Складской аудит</span>
+        <span className="card-foot-note">См. вкладку «Запасы»</span>
+      </div>
+    </div>
+  );
+}
+
+function OverviewAgingPanel({data, loading, err, overviewArRub=null, salesOnlyFiltersActive=false}) {
+  const [sortMode, setSortMode] = useState("amount");
+  const totals = data?.totals || {};
+  const rows = useMemo(() => {
+    const list = ((data?.top_clients) || []).filter(r => (r.overdue_rub || 0) > 0);
+    list.sort((a, b) => {
+      if (sortMode === "age") {
+        return compareSortValues(b?.max_overdue_days, a?.max_overdue_days)
+          || compareSortValues(b?.overdue_rub, a?.overdue_rub);
+      }
+      if (sortMode === "term_90") {
+        return compareSortValues(b?.d_90_plus_rub, a?.d_90_plus_rub)
+          || compareSortValues(b?.max_overdue_days, a?.max_overdue_days)
+          || compareSortValues(b?.overdue_rub, a?.overdue_rub);
+      }
+      return compareSortValues(b?.overdue_rub, a?.overdue_rub)
+        || compareSortValues(b?.max_overdue_days, a?.max_overdue_days);
+    });
+    return list.slice(0, 5);
+  }, [data, sortMode]);
+  const overviewArGap = useMemo(() => {
+    const topAr = Number(overviewArRub);
+    const agingAr = Number(totals?.ar_rub);
+    if (!Number.isFinite(topAr) || !Number.isFinite(agingAr)) return null;
+    const diff = agingAr - topAr;
+    const absDiff = Math.abs(diff);
+    const threshold = Math.max(1_000_000, Math.abs(topAr) * 0.01);
+    if (absDiff < threshold) return null;
+    return {
+      diff,
+      absDiff,
+      reason: salesOnlyFiltersActive
+        ? "Разница объясняется продажными фильтрами: верхняя карточка ДЗ их учитывает, а FIFO-aging нет, потому что в R_DBT_BOOK нет такого разреза."
+        : "Методика должна совпадать с верхней карточкой ДЗ; если разница сохраняется, расчёт стоит перепроверить."
+    };
+  }, [overviewArRub, totals, salesOnlyFiltersActive]);
+  const agingTitleTip = salesOnlyFiltersActive
+    ? "Aging на overview считается так же, как во вкладке «ДЗ»: по открытым FIFO-остаткам, а не по обороту продаж. Если включены фильтры типа продажи, аукциона или товарной группы, суммы могут отличаться от верхней карточки ДЗ: FIFO-остатки этого разреза не хранят."
+    : "Aging на overview считается так же, как во вкладке «ДЗ»: по открытым FIFO-остаткам, а не по обороту продаж.";
+
+  if (!loading && !data && !err) return null;
+
+  return (
+    <div className="block">
+      <div className="block-head">
+        <div className="block-ico b2">⏱</div>
+        <div className="block-title">Фокус по дебиторке</div>
+        <div className="block-desc">· ageing buckets и top-5 просрочки без перехода во вкладку</div>
+      </div>
+
+      {err && !data && (
+        <div className="err-panel"><b>Ошибка AR ageing:</b> {err}</div>
+      )}
+
+      {loading && !data && (
+        <div className="stock-panel">
+          <div className="loading" style={{padding:"26px 10px"}}>
+            <div className="spinner"></div>
+            <div className="loading-text">Подтягиваю ageing ДЗ для главной панели…</div>
+          </div>
+        </div>
+      )}
+
+      {data && (
+        <>
+          <div className="stock-grid">
+            <StockBars
+              title="Aging ДЗ на дату"
+              sub="Открытая FIFO-дебиторка по срокам оплаты"
+              rows={data.buckets}
+              labelKey="bucket_label"
+              countKey="client_count"
+              countLabel="клиентов"
+              titleTip={agingTitleTip}
+            />
+
+            <div className="stock-panel">
+              <div className="overview-panel-head">
+                <div>
+                  <div className="stock-panel-title">Top-5 в просрочку</div>
+                  <div className="stock-panel-sub">Кто формирует просроченную ДЗ прямо сейчас</div>
+                </div>
+                <div className="overview-panel-tools">
+                  {totals.top5_overdue_share_pct != null && (
+                    <div className="stock-panel-kpi">{fmtPct(totals.top5_overdue_share_pct)} просрочки</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="overview-sortbar">
+                <div className="overview-sortbar-title">Сортировка</div>
+                <div className="preset-chips">
+                  {OVERVIEW_OVERDUE_SORTS.map((opt) => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      className={"chip" + (sortMode === opt.key ? " active" : "")}
+                      onClick={() => setSortMode(opt.key)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {rows.length === 0 && (
+                <div className="overview-overdue-empty">
+                  Просрочки по клиентам нет. Весь открытый остаток пока в сроке.
+                </div>
+              )}
+
+              {rows.length > 0 && (
+                <div className="overview-overdue-list">
+                  {rows.map((row, idx) => (
+                    <div className="overview-overdue-item" key={(row.client_id || row.client_name || "client") + "-" + idx}>
+                      <div className="overview-overdue-head">
+                        <div className="overview-overdue-name">{row.client_name || "Без клиента"}</div>
+                        <div className="overview-overdue-value">{fmtRub(row.overdue_rub)}</div>
+                      </div>
+                      <div className="overview-overdue-meta">
+                        <span>ДЗ {fmtRub(row.ar_rub)}</span>
+                        <span>{fmtPct(row.overdue_share_pct)} от ДЗ</span>
+                        <span>90+: {fmtRub(row.d_90_plus_rub)}</span>
+                        <span>док.: {fmtInt(row.open_docs_count)}</span>
+                        <span>макс.: {fmtInt(row.max_overdue_days)} дн.</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {overviewArGap && (
+            <div className={"overview-method-note" + (salesOnlyFiltersActive ? " warn" : "")}>
+              Aging FIFO: {fmtRub(totals.ar_rub)} · верхняя карточка ДЗ: {fmtRub(overviewArRub)}. {overviewArGap.reason}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 const stockStatusClass = (status) => {
   if ((status || "").includes("Неликвид")) return "risk";
   if ((status || "").includes("Slow")) return "warn";
   return "ok";
 };
 
+const INVENTORY_QUICK_FILTERS = [
+  {key:"all", label:"Все SKU"},
+  {key:"zero_cost", label:"Без цены"},
+  {key:"slow_90", label:"Slow 90+"},
+  {key:"dead_180", label:"Неликвид 180+"},
+];
+
+function inventoryQuickFilterMatch(row, filterKey) {
+  if (filterKey === "zero_cost") return (row?.zero_cost_rows || 0) > 0;
+  if (filterKey === "slow_90") return (row?.stock_status || "") === "Slow 90+";
+  if (filterKey === "dead_180") return (row?.stock_status || "") === "Неликвид 180+";
+  return true;
+}
+
 function DepartmentView({data, loading, err, requestKey}) {
   const [expandedDeptId, setExpandedDeptId] = useState(null);
   const [detailByDept, setDetailByDept] = useState({});
   const [detailLoadingDept, setDetailLoadingDept] = useState(null);
   const [detailErr, setDetailErr] = useState(null);
+  const [detailVisibleCountByDept, setDetailVisibleCountByDept] = useState({});
   const [showDeltas, setShowDeltas] = useState(false);
   const [problemOnly, setProblemOnly] = useState(false);
   const [detailSortState, setDetailSortState] = useState({key:"revenue_rub", dir:"desc"});
@@ -1570,6 +2313,7 @@ function DepartmentView({data, loading, err, requestKey}) {
     setDetailByDept({});
     setDetailLoadingDept(null);
     setDetailErr(null);
+    setDetailVisibleCountByDept({});
   }, [requestKey]);
 
   const loadDepartmentClients = useCallback(async (deptId) => {
@@ -1626,15 +2370,7 @@ function DepartmentView({data, loading, err, requestKey}) {
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Особенности сравнения отделов:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Особенности сравнения отделов" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -1665,7 +2401,7 @@ function DepartmentView({data, loading, err, requestKey}) {
           <div className="dept-summary-value">{fmtRub(totals.ar_rub)}</div>
         </div>
         <div className="dept-summary-item">
-          <div className="dept-summary-label">Финэффект</div>
+        <div className="dept-summary-label">Финэффект</div>
           <div className="dept-summary-value"><EffectValue row={totals} period={data.period}/></div>
         </div>
         <div className="dept-summary-item">
@@ -1686,7 +2422,7 @@ function DepartmentView({data, loading, err, requestKey}) {
         <div className="dept-note">
           Кликните на отдел, чтобы раскрыть клиентов внутри него. Бенчмарк и строка итога считаются по агрегату/весу выручки, не простым средним.
           <div className="state-legend">
-            <span><b>Без ДЗ</b> — маржа есть, ДЗ на конец периода нет</span>
+            <span><b>— с подсказкой</b> — маржа есть, ДЗ на конец периода нет</span>
             <span><b>0</b> — показатель равен нулю</span>
             <span><b>—</b> — показатель не применим или нет данных</span>
           </div>
@@ -1720,9 +2456,9 @@ function DepartmentView({data, loading, err, requestKey}) {
               {showDeltas && <Th className="num" tip={COL_TIPS.marginDelta} {...sortable(sortState, requestSort, "margin_delta_pct")}>Δ маржи</Th>}
               <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
               <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
-              <Th className="num" tip={COL_TIPS.cashPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
+              <Th className="num" tip={COL_TIPS.cashAdjPct} {...sortable(sortState, requestSort, "cash_adj_margin_pct")}>Cash.%</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
-              <Th className="num" tip={COL_TIPS.marginAr} {...sortable(sortState, requestSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
+              <Th className="num" tip={COL_TIPS.marginArRatio} {...sortable(sortState, requestSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
               <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(sortState, requestSort, "overdue_share_pct")}>Проср.%</Th>
@@ -1738,9 +2474,15 @@ function DepartmentView({data, loading, err, requestKey}) {
               <tr><td colSpan={deptColSpan} style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>{problemOnly ? "Нет проблемных отделов по выбранным правилам" : "Нет отделов с продажами за выбранный период"}</td></tr>
             )}
             {rows.map((r, idx) => {
-              const open = expandedDeptId === r.department_id;
               const detail = detailByDept[String(r.department_id)];
               const detailRows = sortRows(clientCounterpartyRows(detail?.rows || []), detailSortState);
+              const {main: primaryDetailRows, advanceOnly: advanceOnlyRows} = splitAdvanceOnlyRows(detailRows);
+              const detailRowKey = String(r.department_id);
+              const visibleLimit = Math.max(20, detailVisibleCountByDept[detailRowKey] || 20);
+              const visibleDetailRows = primaryDetailRows.slice(0, visibleLimit);
+              const remainingDetailRows = Math.max(0, primaryDetailRows.length - visibleDetailRows.length);
+              const showAllDetailRows = primaryDetailRows.length > 0 && remainingDetailRows === 0;
+              const open = expandedDeptId === r.department_id;
               const top3Names = (r.top3_clients || []).map(x => x.client).join(", ");
               return (
                 <React.Fragment key={r.department_id}>
@@ -1751,7 +2493,9 @@ function DepartmentView({data, loading, err, requestKey}) {
                       {r.department}
                       <span className="muted">Нажмите для детализации по клиентам</span>
                     </td>
-                    <td className={"num " + benchCls(r.health_score, avg?.health_score, false)}><ScoreCell row={r}/></td>
+                    <td className={"num " + benchCls(r.health_score, avg?.health_score, false)} title={scoreTitle(r)}>
+                      <ScoreCell row={r}/>
+                    </td>
                     <td className={"num " + benchCls(r.health_score_delta, avg?.health_score_delta, false)}><ScoreDeltaBadge value={r.health_score_delta}/></td>
                     <td className="num" title={deltaTitle("Выручка", r.revenue_delta_pct)}>{fmtRub(r.revenue_rub)}</td>
                     <td className="num">{fmtPct(r.revenue_share_pct)}</td>
@@ -1764,9 +2508,7 @@ function DepartmentView({data, loading, err, requestKey}) {
                     <td className="num">{fmtRub(r.ar_rub)}</td>
                     <td className={"num " + benchCls(r.margin_ar_ratio, avg?.margin_ar_ratio, false)}>{fmtRatio(r.margin_ar_ratio, r.ar_rub, r.margin_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
-                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>
-                      {fmtRub(r.overdue_ar_rub)}
-                    </td>
+                    <td className={"num " + (r.overdue_ar_rub > 0 ? "risk " : "") + benchCls(r.overdue_ar_rub, avg?.overdue_ar_rub, true)}>{fmtRub(r.overdue_ar_rub)}</td>
                     <td className={"num " + benchCls(r.overdue_share_pct, avg?.overdue_share_pct, true)}>{fmtPct(r.overdue_share_pct)}</td>
                     {showDeltas && <td className={"num " + benchCls(r.overdue_ar_delta_pct, avg?.overdue_ar_delta_pct, true)}><DeltaBadge value={r.overdue_ar_delta_pct} lowerBetter={true}/></td>}
                     <td className={"num " + benchCls(r.dso_days, avg?.dso_days, true)}>{fmtDays(r.dso_days)}</td>
@@ -1783,9 +2525,14 @@ function DepartmentView({data, loading, err, requestKey}) {
                         <div className="dept-detail-head">
                           <div>
                             <div className="dept-detail-title">Клиенты и контрагенты отдела</div>
-                            <div className="dept-detail-sub">Одна строка = один контрагент клиента</div>
+                            <div className="dept-detail-sub">Одна строка = один контрагент клиента. По умолчанию показываем top-20 по текущей сортировке.</div>
                           </div>
-                          {detail?.totals && <div className="dept-detail-sub">Показано: {fmtInt(detailRows.length)} строк КА</div>}
+                          {detail?.totals && (
+                            <div className="detail-actions">
+                              <div className="detail-pill">Основные КА: {fmtInt(primaryDetailRows.length)}</div>
+                              {advanceOnlyRows.length > 0 && <div className="detail-pill">Только аванс: {fmtInt(advanceOnlyRows.length)}</div>}
+                            </div>
+                          )}
                         </div>
                         {detailLoadingDept === r.department_id && (
                           <div className="loading" style={{padding:"24px"}}>
@@ -1799,63 +2546,100 @@ function DepartmentView({data, loading, err, requestKey}) {
                         {detail && detailRows.length === 0 && (
                           <div className="ms-empty">Нет активных контрагентов в выбранном отделе за период</div>
                         )}
-                        {detailRows.length > 0 && (
-                          <div className="dept-detail-scroll">
-                            <table className="dept-detail-table">
-                              <thead>
-                                <tr>
-                                  <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
-                                  <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
-                                  <Th tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
-                                  <Th className="num" tip={COL_TIPS.healthScore} {...sortable(detailSortState, requestDetailSort, "health_score")}>Score</Th>
-                                  <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
-                                  <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Доля отд.</Th>
-                                  <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
-                                  <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
-                                  <Th className="num" tip={COL_TIPS.marginAr} {...sortable(detailSortState, requestDetailSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
-                                  <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
-                                  <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы</Th>
-                                  <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
-                                  <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(detailSortState, requestDetailSort, "overdue_share_pct")}>Проср.%</Th>
-                                  <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
-                                  <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
-                                  <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(detailSortState, requestDetailSort, "ar_fin_cost_rub")}>Финэффект</Th>
-                                  <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
-                                  <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {detailRows.map((c, idx) => (
-                                  <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${idx}`}>
-                                    <td className="rank">{idx + 1}</td>
-                                    <td className="dept-name">{c.client}</td>
-                                    <td className="counterparty-cell">
-                                      <span className="counterparty-name" title={c.counterparty || ""}>{c.counterparty || "—"}</span>
-                                    </td>
-                                    <td className="num"><ScoreCell row={c}/></td>
-                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
-                                    <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
-                                    <td className="num">{fmtRub(c.margin_rub)}</td>
-                                    <td className="num">{fmtPct(c.margin_pct)}</td>
-                                    <td className="num">{fmtRatio(c.margin_ar_ratio, c.ar_rub, c.margin_rub)}</td>
-                                    <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.ar_rub)}</CispMetricLink></td>
-                                    <td className="num">{fmtRub(c.ar_advance_rub)}</td>
-                                    <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
-                                    <td className="num">{fmtPct(c.overdue_share_pct)}</td>
-                                    <td className="num">{fmtDays(c.dso_days)}</td>
-                                    <td className="num">{fmtPct(c.cei_pct)}</td>
-                                    <td className="num"><EffectValue row={c} period={detail?.period || data.period}/></td>
-                                    <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
-                                    <td>
-                                      <span className={"status-badge " + c.status_code}>{c.status}</span>
-                                      <span className="muted">{c.status_reason}</span>
-                                    </td>
+                        {primaryDetailRows.length > 0 && (
+                          <>
+                            <div className="dept-detail-head" style={{marginTop:"2px"}}>
+                              <div className="dept-detail-sub">Показано {fmtInt(visibleDetailRows.length)} из {fmtInt(primaryDetailRows.length)} рабочих КА</div>
+                              {primaryDetailRows.length > 20 && (
+                                <div className="detail-actions">
+                                  {!showAllDetailRows && remainingDetailRows > 20 && (
+                                    <button
+                                      type="button"
+                                      className="detail-toggle"
+                                      onClick={() => setDetailVisibleCountByDept(prev => ({
+                                        ...prev,
+                                        [detailRowKey]: Math.min(primaryDetailRows.length, visibleDetailRows.length + 20),
+                                      }))}
+                                    >
+                                      Показать ещё {fmtInt(Math.min(20, remainingDetailRows))}
+                                    </button>
+                                  )}
+                                  {!showAllDetailRows ? (
+                                    <button
+                                      type="button"
+                                      className={"detail-toggle" + (remainingDetailRows > 20 ? " secondary" : "")}
+                                      onClick={() => setDetailVisibleCountByDept(prev => ({...prev, [detailRowKey]: primaryDetailRows.length}))}
+                                    >
+                                      Показать весь список ({fmtInt(primaryDetailRows.length)})
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      className="detail-toggle secondary"
+                                      onClick={() => setDetailVisibleCountByDept(prev => ({...prev, [detailRowKey]: 20}))}
+                                    >
+                                      Свернуть до top-20
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className="dept-detail-scroll">
+                              <table className="dept-detail-table">
+                                <thead>
+                                  <tr>
+                                    <Th {...sortable(detailSortState, requestDetailSort, "rank")}>#</Th>
+                                    <Th {...sortable(detailSortState, requestDetailSort, "client")}>Клиент</Th>
+                                    <Th tip={COL_TIPS.counterparties} {...sortable(detailSortState, requestDetailSort, "counterparty")}>Контрагент</Th>
+                                    <Th className="num" tip={COL_TIPS.healthScore} {...sortable(detailSortState, requestDetailSort, "health_score")}>Score</Th>
+                                    <Th className="num" tip={COL_TIPS.revenue} {...sortable(detailSortState, requestDetailSort, "revenue_rub")}>Выручка</Th>
+                                    <Th className="num" tip={COL_TIPS.revenueShare} {...sortable(detailSortState, requestDetailSort, "department_share_pct")}>Доля отд.</Th>
+                                    <Th className="num" tip={COL_TIPS.margin} {...sortable(detailSortState, requestDetailSort, "margin_rub")}>Маржа</Th>
+                                    <Th className="num" tip={COL_TIPS.marginPct} {...sortable(detailSortState, requestDetailSort, "margin_pct")}>Марж.%</Th>
+                                    <Th className="num" tip={COL_TIPS.marginArRatio} {...sortable(detailSortState, requestDetailSort, "margin_ar_ratio")}>Маржа/ДЗ</Th>
+                                    <Th className="num" tip={COL_TIPS.ar} {...sortable(detailSortState, requestDetailSort, "ar_rub")}>ДЗ</Th>
+                                    <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(detailSortState, requestDetailSort, "ar_advance_rub")}>Авансы</Th>
+                                    <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(detailSortState, requestDetailSort, "overdue_ar_rub")}>Просрочка</Th>
+                                    <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(detailSortState, requestDetailSort, "overdue_share_pct")}>Проср.%</Th>
+                                    <Th className="num" tip={COL_TIPS.dso} {...sortable(detailSortState, requestDetailSort, "dso_days")}>DSO</Th>
+                                    <Th className="num" tip={COL_TIPS.cei} {...sortable(detailSortState, requestDetailSort, "cei_pct")}>CEI</Th>
+                                    <Th className="num" tip={COL_TIPS.arFinCost} {...sortable(detailSortState, requestDetailSort, "ar_fin_cost_rub")}>Финэффект</Th>
+                                    <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(detailSortState, requestDetailSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+                                    <Th tip={COL_TIPS.status} {...sortable(detailSortState, requestDetailSort, "status")}>Статус</Th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
+                                </thead>
+                                <tbody>
+                                  {visibleDetailRows.map((c, detailIdx) => (
+                                    <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${detailIdx}`}>
+                                      <td className="rank">{detailIdx + 1}</td>
+                                      <td className="dept-name">{c.client}</td>
+                                      <td className="counterparty-cell">{c.counterparty || "—"}</td>
+                                      <td className="num"><ScoreCell row={c}/></td>
+                                      <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
+                                      <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
+                                      <td className="num">{fmtRub(c.margin_rub)}</td>
+                                      <td className="num">{fmtPct(c.margin_pct)}</td>
+                                      <td className="num">{fmtRatio(c.margin_ar_ratio, c.ar_rub, c.margin_rub)}</td>
+                                      <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.ar_rub)}</CispMetricLink></td>
+                                      <td className="num">{fmtRub(c.ar_advance_rub)}</td>
+                                      <td className={"num " + (c.overdue_ar_rub > 0 ? "risk" : "")}>{fmtRub(c.overdue_ar_rub)}</td>
+                                      <td className="num">{fmtPct(c.overdue_share_pct)}</td>
+                                      <td className="num">{fmtDays(c.dso_days)}</td>
+                                      <td className="num">{fmtPct(c.cei_pct)}</td>
+                                      <td className="num"><EffectValue row={c} period={detail?.period || data.period}/></td>
+                                      <td className="num">{fmtRub(c.cash_adj_margin_rub)}</td>
+                                      <td>
+                                        <span className={"status-badge " + (c.status_code || "neutral")}>{c.status}</span>
+                                        <span className="muted">{c.status_reason}</span>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
                         )}
+                        <AdvanceOnlyTable rows={advanceOnlyRows} period={detail?.period || data.period} />
                       </td>
                     </tr>
                   )}
@@ -1868,7 +2652,7 @@ function DepartmentView({data, loading, err, requestKey}) {
               <tr>
                 <td></td>
                 <td className="avg-label">Итого / взвеш.</td>
-                <td className="num"><ScoreCell row={{...totals, top3_client_share_pct: avg.top3_client_share_pct}}/></td>
+                <td className="num"><ScoreCell row={totals}/></td>
                 <td className="num"><ScoreDeltaBadge value={totals.health_score_delta}/></td>
                 <td className="num">{fmtRub(totals.revenue_rub)}</td>
                 <td className="num">100%</td>
@@ -1881,9 +2665,7 @@ function DepartmentView({data, loading, err, requestKey}) {
                 <td className="num">{fmtRub(totals.ar_rub)}</td>
                 <td className="num">{fmtRatio(avg.margin_ar_ratio, totals.ar_rub, totals.margin_rub)}</td>
                 <td className="num">{fmtRub(totals.ar_advance_rub)}</td>
-                <td className="num">
-                  {fmtRub(totals.overdue_ar_rub)}
-                </td>
+                <td className="num">{fmtRub(totals.overdue_ar_rub)}</td>
                 <td className="num">{fmtPct(avg.overdue_share_pct)}</td>
                 {showDeltas && <td className="num">{fmtPct(totals.overdue_ar_delta_pct)}</td>}
                 <td className="num">{fmtDays(avg.dso_days)}</td>
@@ -1983,15 +2765,7 @@ function ManagerView({data, loading, err, requestKey}) {
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Особенности сравнения менеджеров:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Особенности сравнения менеджеров" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -2272,15 +3046,7 @@ function BranchView({data, loading, err, requestKey}) {
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Особенности контроля по БЕ:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Особенности контроля по БЕ" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -2318,6 +3084,14 @@ function BranchView({data, loading, err, requestKey}) {
           <div className="dept-summary-label">CCC</div>
           <div className="dept-summary-value">{fmtDays(totals.ccc_days)} дн.</div>
         </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ROWC</div>
+          <div className="dept-summary-value">{fmtPct(totals.rowc_pct)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">WCI</div>
+          <div className="dept-summary-value">{fmtPct(totals.wci_pct)}</div>
+        </div>
       </div>
 
       <div className="dept-note">
@@ -2335,6 +3109,8 @@ function BranchView({data, loading, err, requestKey}) {
               <Th className="num" tip={COL_TIPS.margin} {...sortable(sortState, requestSort, "margin_rub")}>Маржа</Th>
               <Th className="num" tip={COL_TIPS.marginPct} {...sortable(sortState, requestSort, "margin_pct")}>Марж.%</Th>
               <Th className="num" tip={COL_TIPS.cashAdj} {...sortable(sortState, requestSort, "cash_adj_margin_rub")}>Cash-adj</Th>
+              <Th className="num" tip={COL_TIPS.rowc} {...sortable(sortState, requestSort, "rowc_pct")}>ROWC</Th>
+              <Th className="num" tip={COL_TIPS.wci} {...sortable(sortState, requestSort, "wci_pct")}>WCI</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
               <Th className="num" tip={COL_TIPS.arAdvance} {...sortable(sortState, requestSort, "ar_advance_rub")}>Авансы пок.</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_ar_rub")}>Проср. ДЗ</Th>
@@ -2351,7 +3127,7 @@ function BranchView({data, loading, err, requestKey}) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="19" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
+              <tr><td colSpan="21" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет БЕ с данными за выбранный период</td></tr>
             )}
             {rows.map((r, idx) => {
               const open = expandedBranchId === r.branch_id;
@@ -2371,6 +3147,8 @@ function BranchView({data, loading, err, requestKey}) {
                     <td className="num">{fmtRub(r.margin_rub)}</td>
                     <td className="num">{fmtPct(r.margin_pct)}</td>
                     <td className="num">{fmtRub(r.cash_adj_margin_rub)}</td>
+                    <td className="num" title={`Средний ОК: ${fmtRub(r.working_capital_rub)}`}>{fmtPct(r.rowc_pct)}</td>
+                    <td className="num" title={`Средний ОК: ${fmtRub(r.working_capital_rub)}`}>{fmtPct(r.wci_pct)}</td>
                     <td className="num">{fmtRub(r.ar_rub)}</td>
                     <td className="num">{fmtRub(r.ar_advance_rub)}</td>
                     <td className={"num " + (r.overdue_ar_rub > 0 ? "risk" : "")}>
@@ -2392,7 +3170,7 @@ function BranchView({data, loading, err, requestKey}) {
                   </tr>
                   {open && (
                     <tr>
-                      <td className="dept-detail-cell" colSpan="19">
+                      <td className="dept-detail-cell" colSpan="21">
                         <div className="dept-detail-head">
                           <div>
                             <div className="dept-detail-title">Отделы БЕ</div>
@@ -2489,20 +3267,13 @@ function ClientView({data, loading, err}) {
   }
 
   const rows = sortedRows;
+  const {main: activeRows, advanceOnly: advanceOnlyRows} = splitAdvanceOnlyRows(rows);
   const totals = data.totals || {};
   const visibleClientCount = new Set(rows.map(r => r.client_id)).size;
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Особенности клиентской модели:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Особенности клиентской модели" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -2579,7 +3350,7 @@ function ClientView({data, loading, err}) {
       )}
 
       <div className="dept-note">
-        Одна строка = один контрагент клиента. Статус подсвечивает строки, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ.
+        Одна строка = один контрагент клиента. Статус подсвечивает строки, где денежная маржа отрицательная, DSO слишком длинный или просрочка занимает заметную долю ДЗ. Строки только с авансом вынесены отдельно.
       </div>
 
       <div className="dept-table-wrap">
@@ -2606,10 +3377,10 @@ function ClientView({data, loading, err}) {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && (
+            {activeRows.length === 0 && (
               <tr><td colSpan="17" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет активных контрагентов за выбранный период</td></tr>
             )}
-            {rows.map((r, idx) => (
+            {activeRows.map((r, idx) => (
               <tr key={r.counterparty_row_key || `${r.client_id || "client"}-${idx}`}>
                 <td className="rank">{idx + 1}</td>
                 <td className="dept-name">
@@ -2644,6 +3415,7 @@ function ClientView({data, loading, err}) {
           </tbody>
         </table>
       </div>
+      <AdvanceOnlyTable rows={advanceOnlyRows} period={data.period} title="Авансы без отгрузок по клиентам" />
     </>
   );
 }
@@ -2687,15 +3459,7 @@ function ArAgingView({data, loading, err}) {
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Методика aging ДЗ:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Методика aging ДЗ" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -2815,6 +3579,8 @@ function CycleView({data, loading, err}) {
   const dso = byId.dso_days?.value || 0;
   const dpo = byId.dpo_days?.value || 0;
   const ccc = byId.ccc_days?.value || 0;
+  const rowc = byId.rowc_pct?.value;
+  const wci = byId.wci_pct?.value;
   const rows = [
     {label:"DIO", sub:"запасы", value:dio, signed:dio},
     {label:"DSO", sub:"клиенты", value:dso, signed:dso},
@@ -2844,6 +3610,14 @@ function CycleView({data, loading, err}) {
         <div className="dept-summary-item">
           <div className="dept-summary-label">Стоимость ОК</div>
           <div className="dept-summary-value">{fmtRub(byId.wc_fin_cost_rub?.value)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">ROWC</div>
+          <div className="dept-summary-value">{fmtPct(rowc)}</div>
+        </div>
+        <div className="dept-summary-item">
+          <div className="dept-summary-label">WCI</div>
+          <div className="dept-summary-value">{fmtPct(wci)}</div>
         </div>
       </div>
 
@@ -2879,11 +3653,25 @@ function CycleView({data, loading, err}) {
 }
 
 function InventoryView({data, loading, err}) {
+  const [quickFilter, setQuickFilter] = useState("all");
   const inventoryRows = useMemo(
     () => (data?.top_sku || []).map((row, i) => ({...row, rank:i + 1})),
     [data]
   );
-  const {rows: sortedTopSku, sortState, requestSort} = useSortedRows(inventoryRows, "value_rub", "desc");
+  const quickFilterCounts = useMemo(() => {
+    const counts = {all: inventoryRows.length, zero_cost: 0, slow_90: 0, dead_180: 0};
+    inventoryRows.forEach((row) => {
+      if ((row.zero_cost_rows || 0) > 0) counts.zero_cost += 1;
+      if ((row.stock_status || "") === "Slow 90+") counts.slow_90 += 1;
+      if ((row.stock_status || "") === "Неликвид 180+") counts.dead_180 += 1;
+    });
+    return counts;
+  }, [inventoryRows]);
+  const filteredInventoryRows = useMemo(
+    () => inventoryRows.filter((row) => inventoryQuickFilterMatch(row, quickFilter)),
+    [inventoryRows, quickFilter]
+  );
+  const {rows: sortedTopSku, sortState, requestSort} = useSortedRows(filteredInventoryRows, "value_rub", "desc");
 
   if (loading) {
     return (
@@ -2911,15 +3699,7 @@ function InventoryView({data, loading, err}) {
 
   return (
     <>
-      {data.warnings && data.warnings.length > 0 && (
-        <div className="warn-panel">
-          <span className="warn-panel-ico">!</span>
-          <div style={{flex:1}}>
-            <b>Методика запасов:</b>
-            <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-          </div>
-        </div>
-      )}
+      <NoticePanel title="Методика запасов" items={data.warnings} />
 
       {data.errors && data.errors.length > 0 && (
         <div className="err-panel">
@@ -2989,6 +3769,24 @@ function InventoryView({data, loading, err}) {
         ТОП SKU отсортирован по замороженным деньгам. Slow 90+ означает, что за последние 90 дней по текущему остатку не было расхода; неликвид 180+ — не было расхода 180 дней.
       </div>
 
+      <div className="stock-filter-bar">
+        <div className="stock-filter-title">Быстрый фильтр</div>
+        <div className="preset-chips">
+          {INVENTORY_QUICK_FILTERS.map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              className={"chip stock-filter-chip" + (quickFilter === opt.key ? " active" : "")}
+              onClick={() => setQuickFilter(opt.key)}
+            >
+              <span>{opt.label}</span>
+              <span className="stock-filter-chip-count">{fmtInt(quickFilterCounts[opt.key] || 0)}</span>
+            </button>
+          ))}
+        </div>
+        <div className="stock-filter-meta">Показано {fmtInt(sortedTopSku.length)} из {fmtInt(inventoryRows.length)} SKU</div>
+      </div>
+
       <div className="dept-table-wrap stock-table-wrap">
         <table className="dept-table stock-table">
           <thead>
@@ -3008,7 +3806,7 @@ function InventoryView({data, loading, err}) {
           </thead>
           <tbody>
             {topSku.length === 0 && (
-              <tr><td colSpan="11" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет SKU с остатками</td></tr>
+              <tr><td colSpan="11" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>{quickFilter === "all" ? "Нет SKU с остатками" : "По выбранному фильтру SKU не найдено"}</td></tr>
             )}
             {topSku.map((r, i) => (
               <tr key={r.tov_id || i}>
@@ -3043,6 +3841,7 @@ function App() {
   const [customEnd, setCustomEnd] = useState(() => todayIso());
   const [customStart, setCustomStart] = useState(() => addDaysIso(todayIso(), -29));
   const [rate, setRate] = useState(20);         // процентов годовых
+  const [compareMode, setCompareMode] = useState("prev");
   const [activeTab, setActiveTab] = useState("overview");
   const [data, setData] = useState(null);
   const [branchData, setBranchData] = useState(null);
@@ -3065,7 +3864,9 @@ function App() {
   const [clientErr, setClientErr] = useState(null);
   const [inventoryErr, setInventoryErr] = useState(null);
   const [arAgingErr, setArAgingErr] = useState(null);
+  const [pngExporting, setPngExporting] = useState(false);
   const [autoReloadEnabled, setAutoReloadEnabled] = useState(false);
+  const captureRef = useRef(null);
   const lastLoadedKeyRef = useRef(null);
   const branchLoadedKeyRef = useRef(null);
   const managerLoadedKeyRef = useRef(null);
@@ -3082,6 +3883,7 @@ function App() {
   const arAgingSeqRef = useRef(0);
   const defaultFiltersRef = useRef(makeEmptyFilters());
   const [defaultFiltersLoading, setDefaultFiltersLoading] = useState(false);
+  const [filtersCollapsed, setFiltersCollapsed] = useState(true);
 
   // Состояние фильтров: {mol_ids:[], dept_ids:[], parole_ids:[], pred_ids:[]}
   const [filters, setFilters] = useState(() => makeEmptyFilters());
@@ -3092,6 +3894,18 @@ function App() {
   };
   const filtersActive = useMemo(
     () => FILTER_DEFS.some(f => (filters[f.key] || []).length > 0),
+    [filters]
+  );
+  const filterSummaryItems = useMemo(
+    () => FILTER_DEFS.map(def => {
+      const count = (filters[def.key] || []).length;
+      return {
+        key: def.key,
+        label: FILTER_SHORT_LABELS[def.key] || def.label,
+        value: count ? fmtInt(count) : "все",
+        active: count > 0,
+      };
+    }),
     [filters]
   );
 
@@ -3107,50 +3921,40 @@ function App() {
     return PRESETS.find(p => p.id===preset)?.days || 30;
   }, [preset, customPeriodDays, customPeriodInvalid]);
   const effectiveEnd = preset === "cst" && !customPeriodInvalid ? customEnd : null;
+  const compareModeDisabled = Boolean(data?.snapshot_mode);
+  const compareLabel = data?.period?.compare_label || (compareMode === "yoy" ? "YoY" : "Предыдущий период");
+  const periodSummary = useMemo(() => {
+    const period = data?.period;
+    if (!period) return null;
+    const currentRangeText = `${fmtDate(period.start)}-${fmtDate(period.end)} (${fmtInt(period.days)} дн.)`;
+    const compareRangeText = period.prev_start && period.prev_end
+      ? `${fmtDate(period.prev_start)}-${fmtDate(period.prev_end)}`
+      : compareLabel;
+    const compareText = period.compare_mode === "yoy"
+      ? `YoY: ${compareRangeText}`
+      : `сравн.: ${compareRangeText}`;
+    const rateText = `@${(period.rate * 100).toLocaleString("ru-RU", {maximumFractionDigits:1})}% годовых`;
+    return {
+      text: `${currentRangeText} · ${compareText} · ${rateText}`,
+      title: `${fmtDate(period.start)} — ${fmtDate(period.end)} · ${compareLabel}: ${compareRangeText} · ${(period.rate * 100).toLocaleString("ru-RU", {maximumFractionDigits:1})}% годовых`,
+    };
+  }, [data?.period, compareLabel]);
 
   const requestKey = useMemo(() => {
-    const parts = [`period_days=${effectiveDays}`, `rate=${rate/100}`];
+    const parts = [`period_days=${effectiveDays}`, `rate=${rate/100}`, `compare_mode=${compareMode}`];
     if (effectiveEnd) parts.push(`end=${effectiveEnd}`);
     FILTER_DEFS.forEach(f => {
       const ids = filters[f.key];
       if (ids && ids.length) parts.push(`${f.key}=${ids.join(",")}`);
     });
     return parts.join("&");
-  }, [effectiveDays, effectiveEnd, rate, filters]);
+  }, [effectiveDays, effectiveEnd, rate, filters, compareMode]);
 
   const dictQuery = useMemo(() => {
     const parts = [`period_days=${effectiveDays}`];
     if (effectiveEnd) parts.push(`end=${effectiveEnd}`);
     return parts.join("&");
   }, [effectiveDays, effectiveEnd]);
-  useEffect(() => {
-    const onSnapshotReady = (ev) => {
-      const p = ev.detail?.period || {};
-      if (p.start && p.end) {
-        setPreset("cst");
-        setCustomStart(p.start);
-        setCustomEnd(p.end);
-      }
-      if (p.rate != null && !isNaN(Number(p.rate))) {
-        setRate(Math.round(Number(p.rate) * 1000) / 10);
-      }
-      const empty = {};
-      FILTER_DEFS.forEach(f => { empty[f.key] = []; });
-      setFilters(empty);
-      setData(null); setBranchData(null); setDeptData(null); setClientData(null); setInventoryData(null); setArAgingData(null);
-      setErr(null); setBranchErr(null); setDeptErr(null); setClientErr(null); setInventoryErr(null); setArAgingErr(null);
-      lastLoadedKeyRef.current = null;
-      branchLoadedKeyRef.current = null;
-      deptLoadedKeyRef.current = null;
-      clientLoadedKeyRef.current = null;
-      inventoryLoadedKeyRef.current = null;
-      arAgingLoadedKeyRef.current = null;
-      setActiveTab("overview");
-      setAutoReloadEnabled(true);
-    };
-    window.addEventListener("kpi-snapshot-ready", onSnapshotReady);
-    return () => window.removeEventListener("kpi-snapshot-ready", onSnapshotReady);
-  }, []);
 
   useEffect(() => {
     if (window.KPI_GITHUB_SNAPSHOT && !window.KPI_SNAPSHOT_STORE?.ready) return;
@@ -3208,6 +4012,12 @@ function App() {
       setDefaultFiltersLoading(false);
     };
   }, [dictQuery]);
+
+  useEffect(() => {
+    if (data?.snapshot_mode && compareMode !== "prev") {
+      setCompareMode("prev");
+    }
+  }, [data?.snapshot_mode, compareMode]);
 
   const loadBranches = useCallback(async () => {
     if (customPeriodInvalid) {
@@ -3400,12 +4210,59 @@ function App() {
 
   const downloadHtml = useCallback(() => {
     if (customPeriodInvalid) return;
-    if (window.KPI_GITHUB_SNAPSHOT) {
-      alert("В GitHub Pages режиме HTML уже открыт как статическая страница. Для другого периода выберите другую snapshot-папку.");
-      return;
-    }
     window.location.href = `${API}/export/dashboard.html?${requestKey}`;
   }, [requestKey, customPeriodInvalid]);
+
+  const downloadPng = useCallback(async () => {
+    if (customPeriodInvalid || loading || pngExporting || !captureRef.current) return;
+    setPngExporting(true);
+    try {
+      const htmlToImage = await loadHtmlToImage();
+      const node = captureRef.current;
+      const period = data?.period;
+      const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      const scrollX = window.scrollX || window.pageXOffset || 0;
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      const scale = Math.min(1.5, Math.max(1, window.devicePixelRatio || 1));
+      const filename = period?.start && period?.end
+        ? `kpi-screen_${period.start}_${period.end}.png`
+        : `kpi-screen_${todayIso()}.png`;
+      const dataUrl = await htmlToImage.toPng(node, {
+        cacheBust: true,
+        backgroundColor: getComputedStyle(document.body).backgroundColor || "#f4f5f9",
+        pixelRatio: scale,
+        width: viewportWidth,
+        height: viewportHeight,
+        canvasWidth: Math.round(viewportWidth * scale),
+        canvasHeight: Math.round(viewportHeight * scale),
+        style: {
+          transform: `translate(${-scrollX}px, ${-scrollY}px)`,
+          transformOrigin: "top left",
+        },
+      });
+      const link = document.createElement("a");
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      console.error("[KPI PNG] export error:", e);
+      window.alert(`Не удалось сформировать PNG: ${e.message || String(e)}`);
+    } finally {
+      setPngExporting(false);
+    }
+  }, [customPeriodInvalid, loading, pngExporting, data]);
+
+  useEffect(() => {
+    if (!data) return;
+    const warmup = () => loadHtmlToImage().catch(() => {});
+    if (window.requestIdleCallback) {
+      const idleId = window.requestIdleCallback(warmup, {timeout: 1200});
+      return () => window.cancelIdleCallback(idleId);
+    }
+    const timer = window.setTimeout(warmup, 600);
+    return () => window.clearTimeout(timer);
+  }, [data]);
 
   useEffect(() => {
     if (!autoReloadEnabled) return;
@@ -3475,21 +4332,166 @@ function App() {
     return () => clearTimeout(t);
   }, [activeTab, data, customPeriodInvalid, arAgingLoading, requestKey, loadArAging]);
 
+  useEffect(() => {
+    if (activeTab !== "overview") return;
+    if (!data) return;
+    if (customPeriodInvalid) return;
+    if (arAgingLoading) return;
+    if (arAgingLoadedKeyRef.current === requestKey) return;
+    const t = setTimeout(() => loadArAging(), 180);
+    return () => clearTimeout(t);
+  }, [activeTab, data, customPeriodInvalid, arAgingLoading, requestKey, loadArAging]);
+
   // Строим индекс карточек по id (для быстрого доступа по блокам).
   const cardMap = useMemo(() => {
     const m = {};
     (data?.cards || []).forEach(c => { m[c.id] = c; });
     return m;
   }, [data]);
+  const overviewCardExtras = useMemo(() => {
+    const extras = {};
+    const apCard = cardMap.ap_rub;
+    const overdueApCard = cardMap.overdue_ap_rub;
+    if ((apCard?.value || 0) > 0 && overdueApCard?.value != null) {
+      const overdueShare = Number(overdueApCard.value) / Number(apCard.value) * 100;
+      if (Number.isFinite(overdueShare)) {
+        extras.overdue_ap_rub = {
+          tone: overdueShare >= 40 ? "risk" : overdueShare >= 20 ? "warn" : "info",
+          content: <>Доля просрочки в КЗ: <strong>{fmtPct(overdueShare)}</strong></>,
+        };
+      }
+    }
+    const apAdvanceDriver = data?.insights?.ap_advance_driver;
+    if (apAdvanceDriver && Math.abs(Number(apAdvanceDriver.delta_rub) || 0) > 0.01) {
+      extras.ap_advance_rub = {
+        tone: Number(apAdvanceDriver.delta_rub) > 0 ? "warn" : "info",
+        content: (
+          <>
+            Драйвер {Number(apAdvanceDriver.delta_rub) > 0 ? "роста" : "снижения"}: <strong>{apAdvanceDriver.counterparty || "Без контрагента"}</strong> {fmtEffectRub(apAdvanceDriver.delta_rub)}
+            {apAdvanceDriver.share_of_delta_pct == null ? "" : ` · ${fmtPct(apAdvanceDriver.share_of_delta_pct)} прироста`}
+          </>
+        ),
+      };
+    }
+    const overdueArDriver = data?.insights?.overdue_ar_driver;
+    const overdueTop = overdueArDriver?.top_contributors || [];
+    const overdueTopDelta = overdueTop.reduce((sum, row) => sum + Number(row?.delta_rub || 0), 0);
+    const overdueTopShare = overdueTop.reduce((sum, row) => sum + Number(row?.share_of_delta_pct || 0), 0);
+    const overdueTopLabel = overdueTop.map((row) => cleanEntityLabel(row.client, "")).filter(Boolean).join(" + ");
+    if (overdueArDriver && Math.abs(overdueTopDelta) > 0.01) {
+      extras.overdue_ar_rub = {
+        tone: "risk",
+        content: (
+          <>
+            Драйвер: <strong>{overdueTopLabel || "крупнейшие клиенты"}</strong> {fmtEffectRub(overdueTopDelta)}
+            {Number.isFinite(overdueTopShare) && overdueTopShare > 0 ? ` · ${fmtPct(overdueTopShare)} прироста` : ""}
+          </>
+        ),
+      };
+    }
+    const arAdvanceContext = data?.insights?.ar_advance_context;
+    if (arAdvanceContext) {
+      extras.ar_advance_rub = {
+        tone: Number(arAdvanceContext.days_of_revenue || 0) >= 20 ? "warn" : "info",
+        content: (
+          <>
+            Предоплачено отгрузок на <strong>{fmtDays(arAdvanceContext.days_of_revenue)}</strong> дн.
+          </>
+        ),
+      };
+    }
+    if (isStableHighCEI(cardMap.cei_pct) && Number(cardMap.cei_pct?.delta_pct) < 0) {
+      extras.cei_pct = {
+        tone: "info",
+        content: <>Уровень CEI остаётся сильным; умеренное ухудшение динамики показано нейтрально, пока метрика выше <strong>95%</strong>.</>,
+      };
+    }
+    return extras;
+  }, [data, cardMap]);
   const visibleBranchData = branchLoadedKeyRef.current === requestKey ? branchData : null;
   const visibleManagerData = managerLoadedKeyRef.current === requestKey ? managerData : null;
   const visibleDeptData = deptLoadedKeyRef.current === requestKey ? deptData : null;
   const visibleClientData = clientLoadedKeyRef.current === requestKey ? clientData : null;
   const visibleInventoryData = inventoryLoadedKeyRef.current === requestKey ? inventoryData : null;
   const visibleArAgingData = arAgingLoadedKeyRef.current === requestKey ? arAgingData : null;
+  const overviewChangeItems = useMemo(() => {
+    const items = [];
+    const isYoY = data?.period?.compare_mode === "yoy";
+    const changeSuffix = isYoY ? " год к году" : "";
+    const overdueArDriver = data?.insights?.overdue_ar_driver;
+    const overdueTop = overdueArDriver?.top_contributors || [];
+    const overdueTopDelta = overdueTop.reduce((sum, row) => sum + Number(row?.delta_rub || 0), 0);
+    const overdueTopShare = overdueTop.reduce((sum, row) => sum + Number(row?.share_of_delta_pct || 0), 0);
+    const overdueTopLabel = overdueTop.map((row) => cleanEntityLabel(row.client, "")).filter(Boolean).join(" + ");
+    if (overdueArDriver && Math.abs(Number(cardMap.overdue_ar_rub?.delta_pct) || 0) >= 15) {
+      items.push(
+        <>
+          <strong>Просроченная ДЗ</strong> {fmtMetricDelta(cardMap.overdue_ar_rub, data?.period)}{changeSuffix}. Основной вклад: <strong>{overdueTopLabel || "крупнейшие клиенты"}</strong> на {fmtRub(overdueTopDelta)}
+          {Number.isFinite(overdueTopShare) && overdueTopShare > 0 ? ` · ${fmtPct(overdueTopShare)} прироста` : ""}
+        </>
+      );
+    }
+    const apAdvanceDriver = data?.insights?.ap_advance_driver;
+    if (apAdvanceDriver && Math.abs(Number(cardMap.ap_advance_rub?.delta_pct) || 0) >= 15) {
+      items.push(
+        <>
+          <strong>Авансы поставщикам</strong> {fmtMetricDelta(cardMap.ap_advance_rub, data?.period)}{changeSuffix}. Драйвер: <strong>{apAdvanceDriver.counterparty || "Без контрагента"}</strong> {fmtEffectRub(apAdvanceDriver.delta_rub)}
+          {apAdvanceDriver.share_of_delta_pct == null ? "" : ` · ${fmtPct(apAdvanceDriver.share_of_delta_pct)} изменения`}
+        </>
+      );
+    }
+    const arAdvanceContext = data?.insights?.ar_advance_context;
+    if (arAdvanceContext && Math.abs(Number(cardMap.ar_advance_rub?.delta_pct) || 0) >= 15) {
+      items.push(
+        <>
+          <strong>Авансы покупателей</strong> {fmtMetricDelta(cardMap.ar_advance_rub, data?.period)}{changeSuffix}. Покрывают <strong>{fmtDays(arAdvanceContext.days_of_revenue)}</strong> дн. отгрузок
+        </>
+      );
+    }
+    const deadStock = data?.insights?.dead_stock;
+    if (Number(deadStock?.dead_180_rub) > 0.01) {
+      items.push(
+        <>
+          <strong>Неликвид 180+</strong>: {fmtRub(deadStock.dead_180_rub)}
+          {deadStock.dead_180_sku == null ? "" : ` · ${fmtInt(deadStock.dead_180_sku)} SKU без расхода 180+ дней`}
+        </>
+      );
+    }
+    const riskDiff = (data?.insights?.aging_risk_diff?.top_worsened_clients || []).filter((item) => {
+      const amount = Math.max(
+        Math.abs(Number(item?.overdue_delta_rub) || 0),
+        Math.abs(Number(item?.current_bucket_rub) || 0),
+      );
+      if (RISK_DIFF_SEVERE_BUCKETS.has(item?.current_bucket_key)) {
+        return amount >= RISK_DIFF_SEVERE_BUCKET_MIN_RUB;
+      }
+      return amount >= RISK_DIFF_MIN_RUB;
+    });
+    riskDiff.slice(0, 2).forEach((item) => {
+      const clientLabel = cleanEntityLabel(item.client, "Клиент");
+      const currentBucket = item.current_bucket_label || "просрочку";
+      const prevBucket = item.prev_bucket_label;
+      items.push(
+        <>
+          <strong>{clientLabel}</strong> {prevBucket ? <>перешёл из {prevBucket} в {currentBucket}</> : <>появился в {currentBucket}</>}
+          {item.overdue_delta_rub == null ? "" : ` · ${fmtRub(item.overdue_delta_rub)}`}
+        </>
+      );
+    });
+    if (!items.length) {
+      (data?.period_changes || []).slice(0, 3).forEach((item) => {
+        items.push(
+          <>
+            <strong>{item.label}</strong> {fmtMetricDelta(item, data?.period)}{isYoY ? " год к году" : " к периоду сравнения"}
+          </>
+        );
+      });
+    }
+    return items.slice(0, 5);
+  }, [data, cardMap]);
 
   return (
-    <>
+    <div className="app-shell" ref={captureRef}>
       <header className="header">
         <div className="header-inner">
           <div className="brand">
@@ -3512,6 +4514,25 @@ function App() {
                 ))}
               </div>
             </div>
+            <div className="compare-group">
+              <div className="preset-label">Сравнение</div>
+              <div className="preset-chips">
+                <button
+                  className={"chip" + (compareMode === "prev" ? " active" : "")}
+                  onClick={() => setCompareMode("prev")}
+                >
+                  Пред. период
+                </button>
+                <button
+                  className={"chip" + (compareMode === "yoy" ? " active" : "")}
+                  onClick={() => !compareModeDisabled && setCompareMode("yoy")}
+                  disabled={compareModeDisabled}
+                  title={compareModeDisabled ? "В snapshot-режиме YoY недоступен" : "Тот же диапазон прошлого года"}
+                >
+                  YoY
+                </button>
+              </div>
+            </div>
             {preset==="cst" && (
               <>
                 <div className="fld date">
@@ -3531,12 +4552,19 @@ function App() {
               <input type="number" min="0" max="100" step="0.5" value={rate}
                      onChange={e=>setRate(Math.max(0, parseFloat(e.target.value)||0))}/>
             </div>
-            <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid || defaultFiltersLoading}>
-              {loading ? "Считаю…" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
-            </button>
-            <button className="btn-secondary" onClick={downloadHtml} disabled={customPeriodInvalid}>
-              Скачать HTML
-            </button>
+            <div className="header-actions">
+              <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid || defaultFiltersLoading}>
+                {loading ? "Считаю…" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
+              </button>
+              <button className="btn-secondary" onClick={downloadHtml} disabled={customPeriodInvalid}>
+                Скачать HTML
+              </button>
+              <button className="btn-secondary"
+                      onClick={downloadPng}
+                      disabled={customPeriodInvalid || loading || !data || pngExporting}>
+                Скрин PNG
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -3577,55 +4605,59 @@ function App() {
           </button>
         </div>
 
-        <div className="filter-bar">
-          <div className="filter-bar-title">Фильтры</div>
-          {FILTER_DEFS.map(def => (
-            <MultiSelect key={def.key}
-                         def={def}
-                         value={filters[def.key]}
-                         onChange={v => setFilter(def.key, v)}
-                         dictQuery={dictQuery}/>
-          ))}
-          <button className="filter-reset"
-                  onClick={resetFilters}
-                  disabled={!filtersActive}>
-            Сбросить
-          </button>
+        <div className="filter-summary">
+        <div className="filter-summary-head">
+          <div className="filter-summary-title">Фильтры</div>
+          {filterSummaryItems.map(item => (
+            <span key={item.key} className={"filter-summary-chip" + (item.active ? " active" : "")}>
+              <span className="filter-summary-chip-label">{item.label}</span>
+                <span>{item.value}</span>
+              </span>
+            ))}
         </div>
+        <div className="filter-summary-actions">
+          <button className="filter-summary-toggle"
+                  type="button"
+                  onClick={() => setFiltersCollapsed(v => !v)}>
+            {filtersCollapsed ? "Показать фильтры" : "Свернуть фильтры"}
+          </button>
+          {filtersActive && (
+            <button className="filter-reset"
+                    onClick={resetFilters}
+                    disabled={!filtersActive}>
+              Сбросить
+            </button>
+          )}
+        </div>
+      </div>
 
-        {data?.period && (
-          <div className="period-info">
-            <div className="period-info-item">
-              <div className="period-info-label">Период</div>
-              <div className="period-info-value">{fmtDate(data.period.start)} — {fmtDate(data.period.end)} ({data.period.days} дн.)</div>
-            </div>
-            <div className="period-info-sep"/>
-            <div className="period-info-item">
-              <div className="period-info-label">Сравнение с</div>
-              <div className="period-info-value">{fmtDate(data.period.prev_start)} — {fmtDate(data.period.prev_end)}</div>
-            </div>
-            <div className="period-info-sep"/>
-            <div className="period-info-item">
-              <div className="period-info-label">Ставка фин.</div>
-              <div className="period-info-value">{(data.period.rate*100).toFixed(1)}% годовых</div>
-            </div>
+        {!filtersCollapsed && (
+          <div className="filter-bar">
+            <div className="filter-bar-title">Фильтры</div>
+            {FILTER_DEFS.map(def => (
+              <MultiSelect key={def.key}
+                           def={def}
+                           value={filters[def.key]}
+                           onChange={v => setFilter(def.key, v)}
+                           dictQuery={dictQuery}/>
+            ))}
+          </div>
+        )}
+
+        {periodSummary && (
+          <div className="period-compact" title={periodSummary.title}>
+            <span className="period-compact-text">{periodSummary.text}</span>
           </div>
         )}
 
         {activeTab === "overview" && data && <ScoreLegend/>}
 
+        {activeTab === "overview" && <OverviewChangePanel items={overviewChangeItems}/>}
+
         {err && <div className="err-panel"><b>Ошибка запроса:</b> {err}</div>}
         {customPeriodInvalid && <div className="err-panel"><b>Некорректный период:</b> {customPeriodError}</div>}
 
-        {activeTab === "overview" && data?.warnings && data.warnings.length > 0 && (
-          <div className="warn-panel">
-            <span className="warn-panel-ico">⚠</span>
-            <div style={{flex:1}}>
-              <b>Применены фильтры — обратите внимание:</b>
-              <ul>{data.warnings.map((w,i) => <li key={i}>{w}</li>)}</ul>
-            </div>
-          </div>
-        )}
+        {activeTab === "overview" && <NoticePanel title="Применены фильтры — обратите внимание" items={data?.warnings} icon="⚠" />}
 
         {activeTab === "overview" && data?.errors && data.errors.length > 0 && (
           <div className="err-panel">
@@ -3660,11 +4692,30 @@ function App() {
               {block.cards.map(bc => {
                 const c = cardMap[bc.id];
                 if (!c) return null;
-                return <Card key={bc.id} card={c} sub={bc.sub} tip={bc.tip}/>;
+                return <Card key={bc.id} card={c} sub={bc.sub} tip={bc.tip} compareLabel={compareLabel} period={data.period} extra={overviewCardExtras[bc.id]}/>;
               })}
+              {block.id === "stock" && (
+                <OverviewDeadStockCard
+                  summary={data?.insights?.dead_stock}
+                />
+              )}
             </div>
           </div>
         ))}
+
+        {activeTab === "overview" && !loading && data && (
+          <OverviewAgingPanel
+            data={visibleArAgingData}
+            loading={arAgingLoading}
+            err={arAgingErr}
+            overviewArRub={cardMap.ar_rub?.value}
+            salesOnlyFiltersActive={Boolean(
+              (data?.filters?.sale_type_ids || []).length
+              || (data?.filters?.auction_flags || []).length
+              || (data?.filters?.product_group_ids || []).length
+            )}
+          />
+        )}
 
         {activeTab === "branches" && (
           <BranchView
@@ -3725,7 +4776,7 @@ function App() {
           />
         )}
       </div>
-    </>
+    </div>
   );
 }
 
