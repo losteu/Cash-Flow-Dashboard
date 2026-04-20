@@ -1123,6 +1123,8 @@ const rowcTitle = (workingCapital, options={}) => {
 };
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
+const fmtMultiple = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
+const fmtMultipleDelta = (n) => (n==null||isNaN(n)) ? "—" : `${n>0?"+":""}${Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1})}x`;
 const fmtSignedUnitDelta = (n, unit) => {
   if (n == null || isNaN(n)) return "—";
   const value = Number(n);
@@ -1139,6 +1141,30 @@ const fmtRatio = (ratio, ar, margin) => {
   return Number(ratio).toLocaleString("ru-RU",{maximumFractionDigits:2});
 };
 const fmtScoreDelta = (n) => (n==null||isNaN(n)) ? "—" : (n>0?"+":"") + Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1}) + " п.";
+const capitalEfficiencyTitle = (options={}) => {
+  const lines = [];
+  if (options.workingCapital != null && !isNaN(options.workingCapital)) {
+    lines.push(`Оборотный капитал = ${fmtRub(options.workingCapital)}`);
+  }
+  if (options.score != null && !isNaN(options.score)) {
+    lines.push(`Capital Efficiency = ${fmtMultiple(options.score)}x`);
+  }
+  if (options.cycleCostRub != null && !isNaN(options.cycleCostRub)) {
+    lines.push(`Расчётная стоимость денежного цикла = ${fmtRub(options.cycleCostRub)}`);
+  }
+  if (options.cycleRevenueRub != null && !isNaN(options.cycleRevenueRub)) {
+    lines.push(`Выручка внутри цикла = ${fmtRub(options.cycleRevenueRub)}`);
+  }
+  if (options.cccDays != null && !isNaN(options.cccDays)) {
+    lines.push(`Для оценки используем |CCC| = ${fmtDays(Math.abs(options.cccDays))} дн.`);
+  }
+  if (options.rate != null && !isNaN(options.rate)) {
+    lines.push(`Ставка = ${fmtPct(Number(options.rate) * 100)}`);
+  }
+  lines.push("Формула: маржа / расчётная стоимость денежного цикла.");
+  lines.push("Используем как замену ROWC, когда оборотный капитал нулевой или отрицательный.");
+  return lines.join("\n");
+};
 const arrow = (p) => p==null?"":(p>0.05?"↑":p<-0.05?"↓":"→");
 const cleanEntityLabel = (value, fallback="Без названия") => {
   const text = String(value || "").replace(/^\+\s*/, "").trim();
@@ -1994,33 +2020,39 @@ function Card({card, sub, tip, compareLabel="Предыдущий период",
       </div>
     );
   }
+  const displayCard = extra?.cardOverrides ? {...card, ...extra.cardOverrides} : card;
   const cls = "card"
-    + (card.score ? " s"+card.score : "")
-    + (COMPACT_TITLE_CARD_IDS.has(card?.id) ? " compact-label" : "");
+    + (displayCard.score ? " s"+displayCard.score : "")
+    + (COMPACT_TITLE_CARD_IDS.has(displayCard?.id) ? " compact-label" : "");
   const displayValue = extra?.valueLabel ?? fmtVal(card);
   const hideUnit = Boolean(extra?.hideUnit);
+  const displayTip = extra?.tip ?? tip;
+  const displaySub = extra?.sub ?? sub;
+  const unitLabel = extra?.unitLabel ?? displayCard.unit;
+  const footerLabel = extra?.footerLabel ?? `vs ${compareLabel}`;
+  const footerClass = extra?.footerClass ?? deltaClass(card, period);
   const valueTitle = extra?.valueTitle;
   return (
     <div className={cls}>
       <div className="card-head">
         <div className="card-label-wrap">
-          <div className="card-label">{card.label}</div>
-          {tip && <CardInfo card={card} tip={tip} extraTip={extra?.tooltipText}/>}
+          <div className="card-label">{displayCard.label}</div>
+          {displayTip && <CardInfo card={displayCard} tip={displayTip} extraTip={extra?.tooltipText}/>}
         </div>
-        {card.score != null && (
-          <span className={"card-score s"+card.score}>● {card.score}/5</span>
+        {displayCard.score != null && (
+          <span className={"card-score s"+displayCard.score}>● {displayCard.score}/5</span>
         )}
       </div>
       <div className="card-value" title={valueTitle || undefined}>
-        {displayValue}{hideUnit ? null : <span className="card-unit">{card.unit}</span>}
+        {displayValue}{hideUnit ? null : <span className="card-unit">{unitLabel}</span>}
       </div>
-      {sub && <div className="card-sub">{sub}</div>}
+      {displaySub && <div className="card-sub">{displaySub}</div>}
       {extra?.content && <div className={"card-insight " + (extra.tone || "info")}>{extra.content}</div>}
       <Sparkline card={card} period={period}/>
       <div className="card-foot">
-        <span className="card-foot-label">vs {compareLabel}</span>
-        <span className={"delta "+deltaClass(card, period)}>
-          {arrow(metricTrendValue(card, period))} {fmtMetricDelta(card, period)}
+        <span className="card-foot-label">{footerLabel}</span>
+        <span className={"delta "+footerClass}>
+          {extra?.footerValue ?? <>{arrow(metricTrendValue(card, period))} {fmtMetricDelta(card, period)}</>}
         </span>
       </div>
     </div>
@@ -4671,29 +4703,64 @@ function App() {
     }
     const rowcCard = cardMap.rowc_pct;
     const workingCapital = data?.insights?.working_capital_rub;
+    const capitalEfficiency = data?.insights?.capital_efficiency || {};
     const grossMarginPct = Number(cardMap.margin_rub?.value || 0) > 0 && Number(cardMap.revenue_rub?.value || 0) > 0
       ? Number(cardMap.margin_rub.value) / Number(cardMap.revenue_rub.value) * 100
       : null;
     const cashAdjMarginRub = cardMap.cash_adj_margin_rub?.value;
     if ((rowcCard?.value == null || isNaN(rowcCard?.value)) && Number.isFinite(workingCapital) && workingCapital <= 0) {
       const rowcExplain = rowcTitle(workingCapital, {grossMarginPct, cashAdjMarginRub});
-      extras.rowc_pct = {
-        tone: workingCapital < 0 ? "info" : "warn",
-        valueLabel: "ОК≤0",
-        hideUnit: true,
-        valueTitle: rowcExplain,
-        tooltipText: rowcExplain,
-        content: (
-          <>
-            Оборотный капитал: <strong>{fmtRub(workingCapital)}</strong>. Бизнес финансируется внешними источниками; ROWC неприменим.
-            {cashAdjMarginRub == null ? "" : ` Смотрите Cash-adjusted margin: ${fmtRub(cashAdjMarginRub)}.`}
-            {grossMarginPct == null ? "" : ` Gross Margin: ${fmtPct(grossMarginPct)}.`}
-          </>
-        ),
-      };
+      const capitalEfficiencyScore = Number(capitalEfficiency.score);
+      if (Number.isFinite(capitalEfficiencyScore)) {
+        const efficiencyTitle = capitalEfficiencyTitle({
+          workingCapital,
+          score: capitalEfficiency.score,
+          cycleCostRub: capitalEfficiency.cycle_cost_rub,
+          cycleRevenueRub: capitalEfficiency.cycle_revenue_rub,
+          cccDays: capitalEfficiency.ccc_days,
+          rate: capitalEfficiency.rate ?? data?.period?.rate,
+        });
+        extras.rowc_pct = {
+          cardOverrides: {label:"Capital Efficiency", unit:"x", target:null, score:null},
+          tip:"Альтернативная метрика для периодов, где классический ROWC неприменим. Показывает, во сколько раз маржа покрывает расчётную стоимость денежного цикла; для нормировки берём модуль CCC.",
+          tone: capitalEfficiencyScore >= 1 ? "info" : "warn",
+          valueLabel: fmtMultiple(capitalEfficiency.score),
+          unitLabel: "x",
+          sub:"Маржа / стоимость денежного цикла",
+          valueTitle: efficiencyTitle,
+          tooltipText: efficiencyTitle,
+          content: (
+            <>
+              Соотношение маржи к расчётной стоимости денежного цикла: <strong>{fmtMultiple(capitalEfficiency.score)}x</strong>.
+              {capitalEfficiency.cycle_cost_rub == null ? "" : ` Стоимость цикла: ${fmtRub(capitalEfficiency.cycle_cost_rub)}.`}
+              {capitalEfficiency.ccc_days == null ? "" : ` Для оценки используем |CCC| = ${fmtDays(Math.abs(Number(capitalEfficiency.ccc_days)))} дн.`}
+            </>
+          ),
+          footerLabel: `vs ${compareLabel}`,
+          footerClass: deltaClassRaw(capitalEfficiency.delta_score, false),
+          footerValue: capitalEfficiency.delta_score == null || isNaN(capitalEfficiency.delta_score)
+            ? "—"
+            : <>{arrow(capitalEfficiency.delta_score)} {fmtMultipleDelta(capitalEfficiency.delta_score)}</>,
+        };
+      } else {
+        extras.rowc_pct = {
+          tone: workingCapital < 0 ? "info" : "warn",
+          valueLabel: "ОК≤0",
+          hideUnit: true,
+          valueTitle: rowcExplain,
+          tooltipText: rowcExplain,
+          content: (
+            <>
+              Оборотный капитал: <strong>{fmtRub(workingCapital)}</strong>. Бизнес финансируется внешними источниками; ROWC неприменим.
+              {cashAdjMarginRub == null ? "" : ` Смотрите Cash-adjusted margin: ${fmtRub(cashAdjMarginRub)}.`}
+              {grossMarginPct == null ? "" : ` Gross Margin: ${fmtPct(grossMarginPct)}.`}
+            </>
+          ),
+        };
+      }
     }
     return extras;
-  }, [data, cardMap]);
+  }, [data, cardMap, compareLabel]);
   const visibleBranchData = branchLoadedKeyRef.current === requestKey ? branchData : null;
   const visibleManagerData = managerLoadedKeyRef.current === requestKey ? managerData : null;
   const visibleDeptData = deptLoadedKeyRef.current === requestKey ? deptData : null;
