@@ -391,6 +391,16 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .stock-panel-title{font-size:12px;font-weight:800;color:var(--t1);text-transform:uppercase;letter-spacing:.45px}
 .stock-panel-sub{font-size:11px;color:var(--t3);font-weight:500;margin-top:2px}
 .stock-panel-kpi{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 10px;background:var(--bg2);border:1px solid var(--bd);font-family:var(--mn);font-size:10px;font-weight:800;color:var(--t2);white-space:nowrap}
+.bridge-panel{grid-column:1 / -1;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:14px 16px;min-width:0}
+.bridge-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.bridge-stat{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:0}
+.bridge-stat-label{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.45px;margin-bottom:6px}
+.bridge-stat-value{font-family:var(--mn);font-size:14px;font-weight:700;color:var(--t1);line-height:1.2}
+.bridge-drivers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.bridge-driver{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:0}
+.bridge-driver-label{font-size:11px;font-weight:800;color:var(--t1);line-height:1.35}
+.bridge-driver-value{font-family:var(--mn);font-size:12px;font-weight:700;color:var(--t1);margin-top:6px}
+.bridge-driver-meta{font-size:10px;font-weight:600;line-height:1.45;color:var(--t3);margin-top:6px}
 .stock-bars{display:flex;flex-direction:column;gap:10px}
 .stock-bar-row{display:flex;flex-direction:column;gap:5px}
 .stock-bar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:12px}
@@ -462,6 +472,7 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .savings-grid{grid-template-columns:1fr}
   .savings-control{flex-wrap:wrap}
   .stock-grid{grid-template-columns:1fr}
+  .bridge-strip,.bridge-drivers{grid-template-columns:1fr}
   .filter-summary{align-items:flex-start}
   .filter-summary-actions{width:100%;margin-left:0}
   .period-compact{align-items:flex-start}
@@ -2082,6 +2093,85 @@ function OverviewChangePanel({items}) {
       <ul className="overview-change-list">
         {safeItems.map((item, idx) => <li key={idx}>{item}</li>)}
       </ul>
+    </div>
+  );
+}
+
+function OverviewRevenueBridge({summary, compareLabel="Предыдущий период"}) {
+  if (!summary) return null;
+  const components = Array.isArray(summary.components) ? summary.components : [];
+  if (!components.length) return null;
+  const maxValue = Math.max(1, ...components.map((item) => Math.abs(Number(item?.value_rub || 0))));
+  const topGroups = Array.isArray(summary.groups) ? summary.groups.slice(0, 3) : [];
+  return (
+    <div className="bridge-panel">
+      <div className="stock-panel-head">
+        <div>
+          <div className="stock-panel-title-row">
+            <div className="stock-panel-title">Price / Mix / Volume</div>
+            <CardInfo
+              card={{label:"Price / Mix / Volume"}}
+              tip="Разложение изменения выручки относительно периода сравнения. Price и Volume считаются на уровне SKU, затем агрегируются в parent-группы; Mix — остаточный структурный эффект."
+              extraTip={summary.methodology}
+            />
+          </div>
+          <div className="stock-panel-sub">Почему изменилась выручка vs {compareLabel}: цена, объём и структурный микс.</div>
+        </div>
+        <div className="stock-panel-kpi">Δ {fmtEffectRub(summary.delta_rub)}</div>
+      </div>
+
+      <div className="bridge-strip">
+        <div className="bridge-stat">
+          <div className="bridge-stat-label">{compareLabel}</div>
+          <div className="bridge-stat-value">{fmtRub(summary.prev_revenue_rub)}</div>
+        </div>
+        <div className="bridge-stat">
+          <div className="bridge-stat-label">Цена</div>
+          <div className="bridge-stat-value">{fmtEffectRub(summary.price_effect_rub)}</div>
+        </div>
+        <div className="bridge-stat">
+          <div className="bridge-stat-label">Объём</div>
+          <div className="bridge-stat-value">{fmtEffectRub(summary.volume_effect_rub)}</div>
+        </div>
+        <div className="bridge-stat">
+          <div className="bridge-stat-label">Микс</div>
+          <div className="bridge-stat-value">{fmtEffectRub(summary.mix_effect_rub)}</div>
+        </div>
+        <div className="bridge-stat">
+          <div className="bridge-stat-label">Текущий период</div>
+          <div className="bridge-stat-value">{fmtRub(summary.current_revenue_rub)}</div>
+        </div>
+      </div>
+
+      <div className="wf">
+        {components.map((item) => {
+          const value = Number(item?.value_rub || 0);
+          const width = value === 0 ? 0 : Math.min(100, Math.max(3, Math.abs(value) / maxValue * 100));
+          return (
+            <div className="wf-row" key={item.id || item.label}>
+              <div className="wf-label">{item.label}</div>
+              <div className="wf-track">
+                <div className={"wf-fill" + (value < 0 ? " neg" : "")} style={{width: width + "%"}}/>
+              </div>
+              <div className="wf-value">{fmtEffectRub(value)}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {topGroups.length > 0 && (
+        <div className="bridge-drivers">
+          {topGroups.map((group) => (
+            <div className="bridge-driver" key={group.parent_group_id || group.parent_group_name}>
+              <div className="bridge-driver-label">{group.parent_group_name || "Без группы"}</div>
+              <div className="bridge-driver-value">{fmtEffectRub(group.delta_rub)}</div>
+              <div className="bridge-driver-meta">
+                Цена {fmtEffectRub(group.price_effect_rub)} · Объём {fmtEffectRub(group.volume_effect_rub)} · Микс {fmtEffectRub(group.mix_effect_rub)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -4394,6 +4484,17 @@ function App() {
         ),
       };
     }
+    const revenueBridge = data?.insights?.revenue_bridge;
+    if (revenueBridge && Math.abs(Number(revenueBridge.delta_rub) || 0) > 0.01) {
+      extras.revenue_rub = {
+        tone: Number(revenueBridge.delta_rub) >= 0 ? "info" : "risk",
+        content: (
+          <>
+            Цена {fmtEffectRub(revenueBridge.price_effect_rub)} · Объём {fmtEffectRub(revenueBridge.volume_effect_rub)} · Микс {fmtEffectRub(revenueBridge.mix_effect_rub)}
+          </>
+        ),
+      };
+    }
     const overdueArDriver = data?.insights?.overdue_ar_driver;
     const overdueTop = overdueArDriver?.top_contributors || [];
     const overdueTopDelta = overdueTop.reduce((sum, row) => sum + Number(row?.delta_rub || 0), 0);
@@ -4456,6 +4557,16 @@ function App() {
     const items = [];
     const isYoY = data?.period?.compare_mode === "yoy";
     const changeSuffix = isYoY ? " год к году" : "";
+    const revenueBridge = data?.insights?.revenue_bridge;
+    if (revenueBridge && Math.abs(Number(cardMap.revenue_rub?.delta_pct) || 0) >= 3) {
+      const driver = revenueBridge.top_delta_driver;
+      items.push(
+        <>
+          <strong>Выручка</strong> {fmtMetricDelta(cardMap.revenue_rub, data?.period)}{changeSuffix}. Цена {fmtEffectRub(revenueBridge.price_effect_rub)} · объём {fmtEffectRub(revenueBridge.volume_effect_rub)} · микс {fmtEffectRub(revenueBridge.mix_effect_rub)}
+          {driver ? <>. Главный сдвиг: <strong>{driver.parent_group_name || "крупнейшая ТГ"}</strong> {fmtEffectRub(driver.delta_rub)}</> : ""}
+        </>
+      );
+    }
     const overdueArDriver = data?.insights?.overdue_ar_driver;
     const overdueTop = overdueArDriver?.top_contributors || [];
     const overdueTopDelta = overdueTop.reduce((sum, row) => sum + Number(row?.delta_rub || 0), 0);
@@ -4732,6 +4843,12 @@ function App() {
                 if (!c) return null;
                 return <Card key={bc.id} card={c} sub={bc.sub} tip={bc.tip} compareLabel={compareLabel} period={data.period} extra={overviewCardExtras[bc.id]}/>;
               })}
+              {block.id === "result" && (
+                <OverviewRevenueBridge
+                  summary={data?.insights?.revenue_bridge}
+                  compareLabel={compareLabel}
+                />
+              )}
               {block.id === "stock" && (
                 <OverviewDeadStockCard
                   summary={data?.insights?.dead_stock}
