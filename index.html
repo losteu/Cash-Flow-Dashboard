@@ -405,9 +405,13 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 .bridge-stat-value{font-family:var(--mn);font-size:14px;font-weight:700;color:var(--t1);line-height:1.2}
 .bridge-drivers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
 .bridge-driver{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;min-width:0}
+.bridge-driver.clickable{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.bridge-driver.clickable:hover{border-color:rgba(99,102,241,.35);box-shadow:0 8px 20px rgba(15,23,42,.06);transform:translateY(-1px)}
 .bridge-driver-label{font-size:11px;font-weight:800;color:var(--t1);line-height:1.35}
 .bridge-driver-value{font-family:var(--mn);font-size:12px;font-weight:700;color:var(--t1);margin-top:6px}
 .bridge-driver-meta{font-size:10px;font-weight:600;line-height:1.45;color:var(--t3);margin-top:6px}
+.bridge-driver-action{margin-top:8px;font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.35px}
+.bridge-footnote{margin-top:12px;font-size:11px;color:var(--t3);line-height:1.5}
 .stock-bars{display:flex;flex-direction:column;gap:10px}
 .stock-bar-row{display:flex;flex-direction:column;gap:5px}
 .stock-bar-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;font-size:12px}
@@ -1076,8 +1080,8 @@ const BLOCKS = [
       },
       {
         id:"wci_pct",
-        sub:"Средний ОК / выручка периода",
-        tip:"Working Capital Intensity — сколько рублей среднего оборотного капитала нужно на 1 рубль выручки. Чем ниже, тем легче расти без дополнительного финансирования; отрицательное значение означает, что цикл частично финансируют поставщики и авансы покупателей."
+        sub:"Средний ОК / выручка в годовом экв.",
+        tip:"Working Capital Intensity — сколько среднего оборотного капитала требует 1 рубль выручки в годовом эквиваленте. Чем ниже, тем легче расти без дополнительного финансирования; отрицательное значение означает, что цикл частично финансируют поставщики и авансы покупателей."
       },
     ]
   },
@@ -1104,12 +1108,18 @@ const fmtRowcValue = (value, workingCapital) => {
   }
   return fmtPct(value);
 };
-const rowcTitle = (workingCapital) => {
+const rowcTitle = (workingCapital, options={}) => {
   if (workingCapital == null || isNaN(workingCapital)) return undefined;
   const base = `Оборотный капитал = ${fmtRub(workingCapital)}`;
-  return Number(workingCapital) <= 0
-    ? `${base}. Бизнес финансируется внешними источниками, ROWC неприменим.`
-    : base;
+  if (Number(workingCapital) > 0) return base;
+  const extras = [];
+  if (options.grossMarginPct != null && !isNaN(options.grossMarginPct)) {
+    extras.push(`Gross Margin = ${fmtPct(options.grossMarginPct)}`);
+  }
+  if (options.cashAdjMarginRub != null && !isNaN(options.cashAdjMarginRub)) {
+    extras.push(`Cash-adjusted margin = ${fmtRub(options.cashAdjMarginRub)}`);
+  }
+  return `${base}. Бизнес финансируется внешними источниками, ROWC неприменим.${extras.length ? " Смотрите: " + extras.join(" · ") + "." : ""}`;
 };
 const fmtInt = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:0});
 const fmtQty = (n) => (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("ru-RU",{maximumFractionDigits:1});
@@ -1340,8 +1350,8 @@ const COL_TIPS = {
   overdueAp: "Просроченная КЗ — часть текущего долга поставщикам, где срок оплаты уже прошел.",
   dpo: "DPO — сколько дней в среднем мы оплачиваем поставщиков. Чем выше DPO, тем дольше поставщики финансируют наш оборот, но слишком высокий DPO может быть риском отношений.",
   ccc: "CCC = DIO + DSO − DPO. Показывает, сколько дней бизнесу нужно финансировать оборот своими деньгами.",
-  rowc: "ROWC = маржа / средний оборотный капитал × 365 / дни периода. Показывает годовую доходность на каждый рубль связанного в обороте капитала. Считается только при положительном среднем ОК.",
-  wci: "WCI = средний оборотный капитал / выручка периода × 100%. Показывает, сколько оборотного капитала требует рубль выручки. Ниже — лучше; отрицательное значение означает, что цикл финансируется не собственными деньгами.",
+  rowc: "ROWC = маржа / средний оборотный капитал × 365 / дни периода. Показывает годовую доходность на каждый рубль связанного в обороте капитала. Считается только при положительном среднем ОК; при отрицательном ОК смотрите Cash-adjusted margin и марж.%.",
+  wci: "WCI = средний оборотный капитал / выручка в годовом эквиваленте × 100%. Для коротких периодов выручка нормируется на 12 месяцев, чтобы показатель не завышался. Ниже — лучше; отрицательное значение означает, что цикл финансируется не собственными деньгами.",
   status: "Статус риска: учитывает Cash-adj, DSO и долю просрочки. «Только аванс» означает предоплату без продаж и ДЗ в выбранном периоде.",
   agingBucket: "Aging — текущая открытая ДЗ по FIFO, разложенная по срокам просрочки на дату окончания периода.",
   bucketValue: "Сумма текущего открытого остатка в выбранном бакете.",
@@ -2149,12 +2159,16 @@ function OverviewChangePanel({items}) {
   );
 }
 
-function OverviewRevenueBridge({summary, compareLabel="Предыдущий период"}) {
+function OverviewRevenueBridge({summary, compareLabel="Предыдущий период", drillEnabled=false, onSelectGroup=null}) {
   if (!summary) return null;
   const components = Array.isArray(summary.components) ? summary.components : [];
   if (!components.length) return null;
   const maxValue = Math.max(1, ...components.map((item) => Math.abs(Number(item?.value_rub || 0))));
   const topGroups = Array.isArray(summary.groups) ? summary.groups.slice(0, 3) : [];
+  const handleGroupSelect = (group) => {
+    if (!drillEnabled || !onSelectGroup) return;
+    onSelectGroup(group);
+  };
   return (
     <div className="bridge-panel">
       <div className="stock-panel-head">
@@ -2214,16 +2228,36 @@ function OverviewRevenueBridge({summary, compareLabel="Предыдущий пе
       {topGroups.length > 0 && (
         <div className="bridge-drivers">
           {topGroups.map((group) => (
-            <div className="bridge-driver" key={group.parent_group_id || group.parent_group_name}>
+            <div
+              className={"bridge-driver" + (drillEnabled && Number(group.parent_group_id || 0) > 0 ? " clickable" : "")}
+              key={group.parent_group_id || group.parent_group_name}
+              onClick={() => handleGroupSelect(group)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  handleGroupSelect(group);
+                }
+              }}
+              role={drillEnabled && Number(group.parent_group_id || 0) > 0 ? "button" : undefined}
+              tabIndex={drillEnabled && Number(group.parent_group_id || 0) > 0 ? 0 : undefined}
+              title={drillEnabled && Number(group.parent_group_id || 0) > 0 ? "Открыть клиентов по этой товарной группе" : undefined}
+            >
               <div className="bridge-driver-label">{group.parent_group_name || "Без группы"}</div>
               <div className="bridge-driver-value">{fmtEffectRub(group.delta_rub)}</div>
               <div className="bridge-driver-meta">
                 Цена {fmtEffectRub(group.price_effect_rub)} · Объём {fmtEffectRub(group.volume_effect_rub)} · Микс {fmtEffectRub(group.mix_effect_rub)}
               </div>
+              {drillEnabled && Number(group.parent_group_id || 0) > 0 && (
+                <div className="bridge-driver-action">Открыть клиентов по ТГ</div>
+              )}
             </div>
           ))}
         </div>
       )}
+      <div className="bridge-footnote">
+        Микс = структурный сдвиг внутри ТГ: новые/ушедшие SKU и смещение в более дорогие или дешёвые позиции.
+        {drillEnabled ? " Нажмите на ТГ, чтобы перейти к клиентам этой группы." : ""}
+      </div>
     </div>
   );
 }
@@ -2235,6 +2269,8 @@ function OverviewDeadStockCard({summary}) {
   const deadSku = summary.dead_180_sku;
   const share = summary.dead_180_share_pct;
   const slowRub = summary.slow_90_rub;
+  const deadDeltaRub = summary.dead_180_delta_rub;
+  const deadDeltaPct = summary.dead_180_delta_pct;
 
   return (
     <div className="card">
@@ -2254,6 +2290,7 @@ function OverviewDeadStockCard({summary}) {
       <div className={"card-insight " + ((share || 0) >= 15 ? "risk" : (share || 0) >= 7 ? "warn" : "info")}>
         <strong>{fmtInt(deadSku)}</strong> SKU · {fmtPct(share)} от запаса
         {slowRub == null ? "" : ` · Slow 90+: ${fmtRub(slowRub)}`}
+        {deadDeltaRub == null || Math.abs(Number(deadDeltaRub) || 0) <= 0.01 ? "" : ` · Δ: ${fmtEffectRub(deadDeltaRub)}${deadDeltaPct == null ? "" : ` (${fmtPct(deadDeltaPct)})`}`}
       </div>
       <div className="card-foot">
         <span className="card-foot-label">Складской аудит</span>
@@ -4633,20 +4670,26 @@ function App() {
       };
     }
     const rowcCard = cardMap.rowc_pct;
-    const wciCard = cardMap.wci_pct;
-    const revenueCard = cardMap.revenue_rub;
-    const workingCapital = revenueCard?.value == null || wciCard?.value == null
-      ? null
-      : Number(revenueCard.value) * Number(wciCard.value) / 100;
+    const workingCapital = data?.insights?.working_capital_rub;
+    const grossMarginPct = Number(cardMap.margin_rub?.value || 0) > 0 && Number(cardMap.revenue_rub?.value || 0) > 0
+      ? Number(cardMap.margin_rub.value) / Number(cardMap.revenue_rub.value) * 100
+      : null;
+    const cashAdjMarginRub = cardMap.cash_adj_margin_rub?.value;
     if ((rowcCard?.value == null || isNaN(rowcCard?.value)) && Number.isFinite(workingCapital) && workingCapital <= 0) {
-      const rowcExplain = rowcTitle(workingCapital);
+      const rowcExplain = rowcTitle(workingCapital, {grossMarginPct, cashAdjMarginRub});
       extras.rowc_pct = {
         tone: workingCapital < 0 ? "info" : "warn",
         valueLabel: "ОК≤0",
         hideUnit: true,
         valueTitle: rowcExplain,
         tooltipText: rowcExplain,
-        content: <>Оборотный капитал: <strong>{fmtRub(workingCapital)}</strong>. Бизнес финансируется внешними источниками; ROWC неприменим.</>,
+        content: (
+          <>
+            Оборотный капитал: <strong>{fmtRub(workingCapital)}</strong>. Бизнес финансируется внешними источниками; ROWC неприменим.
+            {cashAdjMarginRub == null ? "" : ` Смотрите Cash-adjusted margin: ${fmtRub(cashAdjMarginRub)}.`}
+            {grossMarginPct == null ? "" : ` Gross Margin: ${fmtPct(grossMarginPct)}.`}
+          </>
+        ),
       };
     }
     return extras;
@@ -4657,6 +4700,14 @@ function App() {
   const visibleClientData = clientLoadedKeyRef.current === requestKey ? clientData : null;
   const visibleInventoryData = inventoryLoadedKeyRef.current === requestKey ? inventoryData : null;
   const visibleArAgingData = arAgingLoadedKeyRef.current === requestKey ? arAgingData : null;
+  const handleRevenueGroupDrill = useCallback((group) => {
+    if (runtimeSnapshotMode) return;
+    const groupId = Number(group?.parent_group_id || 0);
+    if (!Number.isFinite(groupId) || groupId <= 0) return;
+    setFilters((prev) => ({...prev, product_group_ids:[groupId]}));
+    setFiltersCollapsed(false);
+    setActiveTab("clients");
+  }, [runtimeSnapshotMode]);
   const overviewChangeItems = useMemo(() => {
     const items = [];
     const isYoY = data?.period?.compare_mode === "yoy";
@@ -4707,6 +4758,17 @@ function App() {
         <>
           <strong>Неликвид 180+</strong>: {fmtRub(deadStock.dead_180_rub)}
           {deadStock.dead_180_sku == null ? "" : ` · ${fmtInt(deadStock.dead_180_sku)} SKU без расхода 180+ дней`}
+          {deadStock.dead_180_delta_rub == null || Math.abs(Number(deadStock.dead_180_delta_rub) || 0) <= 0.01
+            ? ""
+            : ` · Δ ${fmtEffectRub(deadStock.dead_180_delta_rub)}${deadStock.dead_180_delta_pct == null ? "" : ` (${fmtPct(deadStock.dead_180_delta_pct)})`}`}
+        </>
+      );
+    }
+    const overdueConcentration = visibleArAgingData?.totals?.top5_overdue_share_pct;
+    if (Number.isFinite(Number(overdueConcentration)) && Number(overdueConcentration) >= 50) {
+      items.push(
+        <>
+          <strong>Top-5 клиентов</strong> формируют <strong>{fmtPct(overdueConcentration)}</strong> просрочки ДЗ. Риск сконцентрирован, коллекшн лучше вести по приоритетному списку.
         </>
       );
     }
@@ -4741,7 +4803,7 @@ function App() {
       });
     }
     return items.slice(0, 5);
-  }, [data, cardMap]);
+  }, [data, cardMap, visibleArAgingData]);
 
   return (
     <div className="app-shell" ref={captureRef}>
@@ -4971,6 +5033,8 @@ function App() {
                 <OverviewRevenueBridge
                   summary={data?.insights?.revenue_bridge}
                   compareLabel={compareLabel}
+                  drillEnabled={!runtimeSnapshotMode}
+                  onSelectGroup={handleRevenueGroupDrill}
                 />
               )}
               {block.id === "stock" && (
