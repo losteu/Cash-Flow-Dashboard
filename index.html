@@ -482,8 +482,9 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
   .card-tooltip,.card-info.tt-left .card-tooltip,.card-info.tt-right .card-tooltip{left:auto;right:0;transform:none;width:min(280px,calc(100vw - 40px))}
   .card-info:hover .card-tooltip,.card-info.tt-left:hover .card-tooltip,.card-info.tt-right:hover .card-tooltip{transform:none}
 }
-/* --- GitHub Pages snapshot picker --- */
-.snapshot-bar{max-width:1640px;margin:14px auto 0;padding:12px 32px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--t1)}
+/* --- Snapshot picker --- */
+.snapshot-bar{max-width:1640px;margin:14px auto 0;padding:12px 32px;display:none;align-items:center;gap:12px;flex-wrap:wrap;color:var(--t1)}
+.snapshot-bar.visible{display:flex}
 .snapshot-box{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);box-shadow:var(--sh1);padding:12px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .snapshot-title{font-weight:800;font-size:12px;color:var(--t1);text-transform:uppercase;letter-spacing:.5px}
 .snapshot-sub{font-size:11px;color:var(--t3);font-weight:600;line-height:1.45;flex:1;min-width:360px}
@@ -498,8 +499,8 @@ body,#root{font-family:var(--sn);background:var(--bg);color:var(--t1);min-height
 <body>
 <div class="snapshot-bar">
   <div class="snapshot-box">
-    <div class="snapshot-title">GitHub Pages</div>
-    <div class="snapshot-sub">Откройте snapshot-папку, созданную через export_snapshot.bat. Интерфейс остается как в рабочем React-дашборде, но данные берутся из заранее выгруженных JSON-файлов.</div>
+    <div class="snapshot-title">Snapshot-режим</div>
+    <div class="snapshot-sub">Этот же интерфейс работает и с SQL, и с заранее выгруженным snapshot. На GitHub Pages или при открытии файла напрямую выберите snapshot-папку, созданную через export_snapshot.bat.</div>
     <label class="btn-secondary" for="snapshotFolderInput">Выбрать папку snapshot</label>
     <input id="snapshotFolderInput" class="snapshot-file" type="file" webkitdirectory multiple>
     <div id="snapshotStatus" class="snapshot-status">Папка не выбрана</div>
@@ -533,7 +534,15 @@ setTimeout(function() {
 </script>
 <script>
 (function(){
-  window.KPI_GITHUB_SNAPSHOT = true;
+  const host = String(window.location.hostname || "").toLowerCase();
+  const params = new URLSearchParams(window.location.search || "");
+  const snapshotClientMode = params.get("snapshot") === "1"
+    || window.location.protocol === "file:"
+    || /\.github\.io$/i.test(host);
+  const snapshotBar = document.querySelector(".snapshot-bar");
+
+  window.KPI_GITHUB_SNAPSHOT = snapshotClientMode;
+  if (snapshotBar) snapshotBar.classList.toggle("visible", snapshotClientMode);
 
   const STORE = {
     files: new Map(),
@@ -543,6 +552,21 @@ setTimeout(function() {
     folderName: "",
   };
   window.KPI_SNAPSHOT_STORE = STORE;
+
+  const emitSnapshotReady = () => {
+    window.dispatchEvent(new CustomEvent("kpi:snapshot-ready", {
+      detail: {
+        ready: STORE.ready,
+        folderName: STORE.folderName,
+        manifest: STORE.manifest,
+      },
+    }));
+  };
+
+  if (!snapshotClientMode) {
+    emitSnapshotReady();
+    return;
+  }
 
   const REQUIRED = [
     "manifest.json",
@@ -815,6 +839,7 @@ setTimeout(function() {
       return nativeFetch(input, init);
     }
 
+    if (!snapshotClientMode) return nativeFetch(input, init);
     if (!url.pathname.startsWith("/api/")) return nativeFetch(input, init);
     if (!STORE.ready) {
       return fail("Сначала нажмите 'Выбрать папку snapshot' и выберите папку с manifest.json.", 428);
@@ -849,6 +874,7 @@ setTimeout(function() {
     const missing = REQUIRED.filter((path) => !STORE.files.has(path));
     if (missing.length) {
       setStatus("Не хватает файлов snapshot: " + missing.slice(0, 3).join(", ") + (missing.length > 3 ? "..." : ""), "err");
+      emitSnapshotReady();
       return;
     }
 
@@ -862,10 +888,13 @@ setTimeout(function() {
       STORE.ready = false;
       setStatus("Ошибка чтения snapshot: " + (e?.message || String(e)), "err");
     }
+    emitSnapshotReady();
   };
 
   const input = document.getElementById("snapshotFolderInput");
   if (input) input.addEventListener("change", loadSnapshotFolder);
+  setStatus("Выберите snapshot-папку для работы без SQL");
+  emitSnapshotReady();
 })();
 </script>
 <script type="text/babel">
@@ -3977,6 +4006,7 @@ function App() {
   const [arAgingErr, setArAgingErr] = useState(null);
   const [pngExporting, setPngExporting] = useState(false);
   const [autoReloadEnabled, setAutoReloadEnabled] = useState(false);
+  const [snapshotReady, setSnapshotReady] = useState(Boolean(window.KPI_SNAPSHOT_STORE?.ready));
   const captureRef = useRef(null);
   const lastLoadedKeyRef = useRef(null);
   const branchLoadedKeyRef = useRef(null);
@@ -3985,6 +4015,7 @@ function App() {
   const clientLoadedKeyRef = useRef(null);
   const inventoryLoadedKeyRef = useRef(null);
   const arAgingLoadedKeyRef = useRef(null);
+  const snapshotClientMode = Boolean(window.KPI_GITHUB_SNAPSHOT);
   const requestSeqRef = useRef(0);
   const branchSeqRef = useRef(0);
   const managerSeqRef = useRef(0);
@@ -4032,7 +4063,8 @@ function App() {
     return PRESETS.find(p => p.id===preset)?.days || 30;
   }, [preset, customPeriodDays, customPeriodInvalid]);
   const effectiveEnd = preset === "cst" && !customPeriodInvalid ? customEnd : null;
-  const compareModeDisabled = Boolean(data?.snapshot_mode);
+  const compareModeDisabled = snapshotClientMode || Boolean(data?.snapshot_mode);
+  const snapshotLoadBlocked = snapshotClientMode && !snapshotReady;
   const compareLabel = data?.period?.compare_label || (compareMode === "yoy" ? "YoY" : "Предыдущий период");
   const periodSummary = useMemo(() => {
     const period = data?.period;
@@ -4068,7 +4100,15 @@ function App() {
   }, [effectiveDays, effectiveEnd]);
 
   useEffect(() => {
-    if (window.KPI_GITHUB_SNAPSHOT && !window.KPI_SNAPSHOT_STORE?.ready) return;
+    const syncSnapshotReady = (event) => {
+      setSnapshotReady(Boolean(event?.detail?.ready));
+    };
+    window.addEventListener("kpi:snapshot-ready", syncSnapshotReady);
+    return () => window.removeEventListener("kpi:snapshot-ready", syncSnapshotReady);
+  }, []);
+
+  useEffect(() => {
+    if (snapshotClientMode && !snapshotReady) return;
 
     let cancelled = false;
     const sameIds = (a=[], b=[]) => {
@@ -4122,7 +4162,7 @@ function App() {
       cancelled = true;
       setDefaultFiltersLoading(false);
     };
-  }, [dictQuery]);
+  }, [dictQuery, snapshotClientMode, snapshotReady]);
 
   useEffect(() => {
     if (data?.snapshot_mode && compareMode !== "prev") {
@@ -4321,8 +4361,12 @@ function App() {
 
   const downloadHtml = useCallback(() => {
     if (customPeriodInvalid) return;
+    if (snapshotClientMode) {
+      window.alert("HTML-экспорт в браузерном snapshot-режиме недоступен. Для него используйте локальный Flask-сервер или run_snapshot.bat.");
+      return;
+    }
     window.location.href = `${API}/export/dashboard.html?${requestKey}`;
-  }, [requestKey, customPeriodInvalid]);
+  }, [requestKey, customPeriodInvalid, snapshotClientMode]);
 
   const downloadPng = useCallback(async () => {
     if (customPeriodInvalid || loading || pngExporting || !captureRef.current) return;
@@ -4702,10 +4746,20 @@ function App() {
                      onChange={e=>setRate(Math.max(0, parseFloat(e.target.value)||0))}/>
             </div>
             <div className="header-actions">
-              <button className="btn-primary" onClick={load} disabled={loading || customPeriodInvalid || defaultFiltersLoading}>
-                {loading ? "Считаю…" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
+              <button
+                className="btn-primary"
+                onClick={load}
+                disabled={loading || customPeriodInvalid || defaultFiltersLoading || snapshotLoadBlocked}
+                title={snapshotLoadBlocked ? "Сначала выберите snapshot-папку" : undefined}
+              >
+                {loading ? "Считаю…" : snapshotLoadBlocked ? "Выбрать snapshot" : defaultFiltersLoading ? "Фильтры…" : "Рассчитать"}
               </button>
-              <button className="btn-secondary" onClick={downloadHtml} disabled={customPeriodInvalid}>
+              <button
+                className="btn-secondary"
+                onClick={downloadHtml}
+                disabled={customPeriodInvalid || snapshotClientMode}
+                title={snapshotClientMode ? "В браузерном snapshot-режиме HTML-экспорт недоступен" : undefined}
+              >
                 Скачать HTML
               </button>
               <button className="btn-secondary"
