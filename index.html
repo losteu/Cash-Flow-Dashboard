@@ -772,6 +772,247 @@ setTimeout(function() {
 
   const payloadFor = async (path) => markSnapshot(clone(await readJson(path)));
 
+  const num = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const round2 = (value) => Math.round(Number(value) * 100) / 100;
+  const deltaPct = (cur, prev) => {
+    if (cur == null || prev == null || Number(prev) === 0) return null;
+    return round2((Number(cur) - Number(prev)) / Math.abs(Number(prev)) * 100);
+  };
+  const ceiPct = (beginAr, revenue, endAr, overdueAr) => {
+    if ([beginAr, revenue, endAr, overdueAr].some((v) => v == null)) return null;
+    const endCurrentAr = Math.max(num(endAr) - num(overdueAr), 0);
+    const collectible = num(beginAr) + num(revenue) - endCurrentAr;
+    const collected = num(beginAr) + num(revenue) - num(endAr);
+    return collectible > 0 ? collected / collectible * 100 : null;
+  };
+
+  const idsParam = (params, key) => parseIds(params.get(key));
+  const hasNonDefaultSnapshotFactFilter = (params) => {
+    for (const key of ["sale_type_ids", "product_group_ids", "auction_flags"]) {
+      const raw = String(params.get(key) || "").trim();
+      if (!raw) continue;
+      if (!(DEFAULT_FILTER_KEYS.has(key) && matchesDefaultFilter(params, key))) return true;
+    }
+    return false;
+  };
+  const canUseClientMart = (params) => {
+    if (hasOnlyDefaultFilters(params)) return false;
+    if (hasNonDefaultSnapshotFactFilter(params)) return false;
+    return ["bu_ids", "mol_ids", "dept_ids", "parole_ids"].some((key) => String(params.get(key) || "").trim());
+  };
+  const clientMartPath = (params) => {
+    const defaults = STORE.manifest?.default_filters || {};
+    const hasDefaultScope =
+      matchesDefaultFilter(params, "sale_type_ids") ||
+      matchesDefaultFilter(params, "product_group_ids") ||
+      (Array.isArray(defaults.parole_ids) && defaults.parole_ids.length > 0 && String(params.get("parole_ids") || "").trim());
+    return hasDefaultScope ? "kpi/default/clients.json" : "kpi/clients.json";
+  };
+  const filterRowsBySnapshotParams = (rows, params) => {
+    const bu = new Set(idsParam(params, "bu_ids"));
+    const mol = new Set(idsParam(params, "mol_ids"));
+    const dept = new Set(idsParam(params, "dept_ids"));
+    const clients = new Set(idsParam(params, "parole_ids"));
+    return (rows || []).filter((row) => (
+      (!bu.size || bu.has(Number(row.branch_id || 0))) &&
+      (!mol.size || mol.has(Number(row.manager_id || 0))) &&
+      (!dept.size || dept.has(Number(row.department_id || 0))) &&
+      (!clients.size || clients.has(Number(row.client_id || 0)))
+    ));
+  };
+  const rankClientRows = (rows) => {
+    const scopeRevenue = rows.reduce((sum, row) => sum + num(row.revenue_rub), 0);
+    return rows.map((row, idx) => ({
+      ...row,
+      rank: idx + 1,
+      revenue_share_pct: scopeRevenue ? num(row.revenue_rub) / scopeRevenue * 100 : null,
+    }));
+  };
+  const calcClientTotals = (rows, period) => {
+    const days = Number(period?.days || STORE.manifest?.period?.days || 30);
+    const totals = {
+      clients: rows.length,
+      revenue_rub: rows.reduce((s, r) => s + num(r.revenue_rub), 0),
+      revenue_prev_rub: rows.reduce((s, r) => s + num(r.revenue_prev_rub), 0),
+      margin_rub: rows.reduce((s, r) => s + num(r.margin_rub), 0),
+      margin_prev_rub: rows.reduce((s, r) => s + num(r.margin_prev_rub), 0),
+      ar_begin_rub: rows.reduce((s, r) => s + num(r.ar_begin_rub), 0),
+      ar_prev_begin_rub: rows.reduce((s, r) => s + num(r.ar_prev_begin_rub), 0),
+      ar_rub: rows.reduce((s, r) => s + num(r.ar_rub), 0),
+      avg_ar_rub: rows.reduce((s, r) => s + num(r.avg_ar_rub), 0),
+      overdue_ar_rub: rows.reduce((s, r) => s + num(r.overdue_ar_rub), 0),
+      overdue_ar_prev_rub: rows.reduce((s, r) => s + num(r.overdue_ar_prev_rub), 0),
+      advances_rub: rows.reduce((s, r) => s + num(r.advances_rub), 0),
+      advances_begin_rub: rows.reduce((s, r) => s + num(r.advances_begin_rub), 0),
+      avg_advance_rub: rows.reduce((s, r) => s + num(r.avg_advance_rub), 0),
+      ar_fin_cost_rub: rows.reduce((s, r) => s + num(r.ar_fin_cost_rub), 0),
+      ar_fin_cost_prev_rub: rows.reduce((s, r) => s + num(r.ar_fin_cost_prev_rub), 0),
+      cash_adj_margin_rub: rows.reduce((s, r) => s + num(r.cash_adj_margin_rub), 0),
+      risk_clients: rows.filter((r) => r.status_code === "risk").length,
+      warn_clients: rows.filter((r) => r.status_code === "warn").length,
+    };
+    totals.revenue_delta_pct = deltaPct(totals.revenue_rub, totals.revenue_prev_rub);
+    totals.margin_delta_pct = deltaPct(totals.margin_rub, totals.margin_prev_rub);
+    totals.overdue_ar_delta_pct = deltaPct(totals.overdue_ar_rub, totals.overdue_ar_prev_rub);
+    totals.margin_pct = totals.revenue_rub ? totals.margin_rub / totals.revenue_rub * 100 : null;
+    totals.overdue_share_pct = totals.ar_rub ? totals.overdue_ar_rub / totals.ar_rub * 100 : null;
+    totals.cash_adj_margin_pct = totals.revenue_rub ? totals.cash_adj_margin_rub / totals.revenue_rub * 100 : null;
+    totals.margin_ar_ratio = totals.ar_rub ? totals.margin_rub / totals.ar_rub : null;
+    totals.cei_pct = ceiPct(totals.ar_begin_rub, totals.revenue_rub, totals.ar_rub, totals.overdue_ar_rub);
+    totals.cei_prev_pct = ceiPct(totals.ar_prev_begin_rub, totals.revenue_prev_rub, totals.ar_begin_rub, totals.overdue_ar_prev_rub);
+    totals.cei_delta_pct = deltaPct(totals.cei_pct, totals.cei_prev_pct);
+    totals.dso_days = totals.revenue_rub ? totals.ar_rub / totals.revenue_rub * days : null;
+    return totals;
+  };
+  const snapshotFilterWarning = "Snapshot v2: срез пересчитан в браузере по выгруженной клиентской витрине. Товарные группы, типы продаж и аукцион требуют новой SQL-выгрузки snapshot.";
+  const withSnapshotFilters = (payload, params, rows, totals) => {
+    const next = markSnapshot(payload);
+    next.rows = rows;
+    next.totals = totals;
+    next.filters = {
+      bu_ids: idsParam(params, "bu_ids"),
+      mol_ids: idsParam(params, "mol_ids"),
+      dept_ids: idsParam(params, "dept_ids"),
+      parole_ids: idsParam(params, "parole_ids"),
+      pred_ids: idsParam(params, "pred_ids"),
+      sale_type_ids: idsParam(params, "sale_type_ids"),
+      auction_flags: idsParam(params, "auction_flags"),
+      product_group_ids: idsParam(params, "product_group_ids"),
+      active: true,
+    };
+    if (!next.warnings.includes(snapshotFilterWarning)) next.warnings.unshift(snapshotFilterWarning);
+    return next;
+  };
+  const filteredClientMart = async (params) => {
+    const payload = clone(await readJson(clientMartPath(params)));
+    const filtered = rankClientRows(filterRowsBySnapshotParams(payload.rows || [], params));
+    return withSnapshotFilters(payload, params, filtered, calcClientTotals(filtered, payload.period));
+  };
+  const groupClientRows = (rows, dim) => {
+    const cfg = {
+      branches: {id: "branch_id", label: "branch", count: "branches"},
+      departments: {id: "department_id", label: "department", count: "departments"},
+      managers: {id: "manager_id", label: "manager", count: "managers"},
+    }[dim];
+    const map = new Map();
+    rows.forEach((row) => {
+      const id = Number(row[cfg.id] || 0);
+      const key = String(id);
+      if (!map.has(key)) {
+        map.set(key, {
+          [cfg.id]: id,
+          [cfg.label]: row[cfg.label] || (id ? `${cfg.label} ${id}` : "Без значения"),
+          department: row.department || "",
+          rows: [],
+        });
+      }
+      map.get(key).rows.push(row);
+    });
+    const grouped = Array.from(map.values()).map((bucket) => ({
+      ...bucket,
+      ...calcClientTotals(bucket.rows, STORE.manifest?.period),
+    }));
+    grouped.sort((a, b) => num(b.revenue_rub) - num(a.revenue_rub));
+    const totalRevenue = grouped.reduce((s, row) => s + num(row.revenue_rub), 0);
+    return grouped.map((row, idx) => ({
+      ...row,
+      rows: undefined,
+      rank: idx + 1,
+      revenue_share_pct: totalRevenue ? num(row.revenue_rub) / totalRevenue * 100 : null,
+    }));
+  };
+  const filteredGroupedPayload = async (endpoint, params) => {
+    const clientsPayload = await filteredClientMart(params);
+    const rows = groupClientRows(clientsPayload.rows || [], endpoint);
+    const payload = clone(await readJson(clientMartPath(params).includes("/default/") ? `kpi/default/${endpoint}.json` : `kpi/${endpoint}.json`));
+    const totals = calcClientTotals(clientsPayload.rows || [], payload.period);
+    totals[endpoint] = rows.length;
+    return withSnapshotFilters(payload, params, rows, totals);
+  };
+  const filteredTopPayload = async (params) => {
+    const clientsPayload = await filteredClientMart(params);
+    const base = clone(await readJson(clientMartPath(params).includes("/default/") ? "kpi/default/top.json" : "kpi/top.json"));
+    const totals = clientsPayload.totals || {};
+    const updates = {
+      revenue_rub: [totals.revenue_rub, totals.revenue_prev_rub],
+      margin_rub: [totals.margin_rub, totals.margin_prev_rub],
+      ar_rub: [totals.ar_rub, totals.ar_begin_rub],
+      ar_advance_rub: [totals.advances_rub, totals.advances_begin_rub],
+      overdue_ar_rub: [totals.overdue_ar_rub, totals.overdue_ar_prev_rub],
+      dso_days: [totals.dso_days, totals.revenue_prev_rub ? totals.ar_begin_rub / totals.revenue_prev_rub * Number(base.period?.days || 30) : null],
+      cei_pct: [totals.cei_pct, totals.cei_prev_pct],
+      cash_adj_margin_rub: [totals.cash_adj_margin_rub, null],
+    };
+    base.cards = (base.cards || []).map((card) => {
+      if (!updates[card.id]) return card;
+      const [value, prev] = updates[card.id];
+      return {...card, value, prev_value: prev, delta_pct: deltaPct(value, prev)};
+    });
+    base.filters = clientsPayload.filters;
+    base.warnings = [...(base.warnings || [])];
+    if (!base.warnings.includes(snapshotFilterWarning)) base.warnings.unshift(snapshotFilterWarning);
+    return markSnapshot(base);
+  };
+  const filteredArAgingPayload = async (params) => {
+    const clientsPayload = await filteredClientMart(params);
+    const base = clone(await readJson(clientMartPath(params).includes("/default/") ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json"));
+    const agingByClient = new Map((base.top_clients || []).map((row) => [Number(row.client_id || 0), row]));
+    const topClients = (clientsPayload.rows || [])
+      .filter((row) => num(row.overdue_ar_rub) > 0.01)
+      .map((row) => {
+        const aging = agingByClient.get(Number(row.client_id || 0)) || {};
+        return {
+          client_id: Number(row.client_id || 0),
+          client_name: row.client || aging.client_name || "Без клиента",
+          counterparty_id: Number(aging.counterparty_id || 0),
+          counterparty_name: aging.counterparty_name || "",
+          inn: aging.inn || "",
+          parole_deleted: Boolean(aging.parole_deleted),
+          counterparty_status: aging.counterparty_status || "",
+          counterparty_archived: Boolean(aging.counterparty_archived),
+          counterparty_group: aging.counterparty_group || "",
+          counterparty_category: aging.counterparty_category || "",
+          credit_status: aging.credit_status || "",
+          base_manager: aging.base_manager || "",
+          manager_head: aging.manager_head || "",
+          counterparties_count: Number(aging.counterparties_count || 0),
+          counterparties: aging.counterparties || [],
+          ar_rub: num(row.ar_rub),
+          overdue_rub: num(row.overdue_ar_rub),
+          d_1_30_rub: num(aging.d_1_30_rub),
+          d_31_60_rub: num(aging.d_31_60_rub),
+          d_61_90_rub: num(aging.d_61_90_rub),
+          d_90_plus_rub: num(aging.d_90_plus_rub),
+          open_docs_count: Number(aging.open_docs_count || 0),
+          max_overdue_days: Number(aging.max_overdue_days || 0),
+        };
+      })
+      .sort((a, b) => num(b.overdue_rub) - num(a.overdue_rub));
+    const totals = {
+      ...(base.totals || {}),
+      ar_rub: num(clientsPayload.totals?.ar_rub),
+      overdue_rub: num(clientsPayload.totals?.overdue_ar_rub),
+      clients_count: (clientsPayload.rows || []).filter((row) => num(row.ar_rub) > 0.01).length,
+      overdue_clients_count: topClients.length,
+      top5_overdue_share_pct: topClients.length && num(clientsPayload.totals?.overdue_ar_rub)
+        ? topClients.slice(0, 5).reduce((s, r) => s + num(r.overdue_rub), 0) / num(clientsPayload.totals?.overdue_ar_rub) * 100
+        : null,
+      top10_overdue_share_pct: topClients.length && num(clientsPayload.totals?.overdue_ar_rub)
+        ? topClients.slice(0, 10).reduce((s, r) => s + num(r.overdue_rub), 0) / num(clientsPayload.totals?.overdue_ar_rub) * 100
+        : null,
+    };
+    base.top_clients = topClients;
+    base.totals = totals;
+    base.filters = clientsPayload.filters;
+    base.warnings = [...(base.warnings || [])];
+    if (!base.warnings.includes(snapshotFilterWarning)) base.warnings.unshift(snapshotFilterWarning);
+    return markSnapshot(base);
+  };
+
   const unsupported = () => fail(
     "Этот срез не выгружен в snapshot. В GitHub Pages режиме можно смотреть общий snapshot и заранее экспортированные раскрытия. Для новых фильтров сделайте новую выгрузку или запустите SQL-режим.",
     422
@@ -797,18 +1038,21 @@ setTimeout(function() {
 
   const kpiPayload = async (endpoint, params) => {
     if (endpoint === "top") {
+      if (canUseClientMart(params)) return filteredTopPayload(params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/top.json" : "kpi/top.json");
     }
 
     if (endpoint === "branches") {
+      if (canUseClientMart(params)) return filteredGroupedPayload("branches", params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/branches.json" : "kpi/branches.json");
     }
 
     if (endpoint === "departments") {
+      if (canUseClientMart(params)) return filteredGroupedPayload("departments", params);
       const buId = singleValue(params, "bu_ids");
       if (String(params.get("bu_ids") || "").trim() && buId == null) return unsupported();
       const defaultOnly = hasOnlyDefaultFilters(params, ["bu_ids"]);
@@ -820,12 +1064,14 @@ setTimeout(function() {
     }
 
     if (endpoint === "managers") {
+      if (canUseClientMart(params)) return filteredGroupedPayload("managers", params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/managers.json" : "kpi/managers.json");
     }
 
     if (endpoint === "clients") {
+      if (canUseClientMart(params)) return filteredClientMart(params);
       const deptId = singleValue(params, "dept_ids");
       const managerId = singleValue(params, "mol_ids");
       if (String(params.get("dept_ids") || "").trim() && deptId == null) return unsupported();
@@ -843,12 +1089,18 @@ setTimeout(function() {
     }
 
     if (endpoint === "inventory") {
+      if (canUseClientMart(params)) {
+        const payload = await payloadFor(clientMartPath(params).includes("/default/") ? "kpi/default/inventory.json" : "kpi/inventory.json");
+        if (!payload.warnings.includes(snapshotFilterWarning)) payload.warnings.unshift(snapshotFilterWarning);
+        return payload;
+      }
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/inventory.json" : "kpi/inventory.json");
     }
 
     if (endpoint === "ar-aging") {
+      if (canUseClientMart(params)) return filteredArAgingPayload(params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json");
@@ -1114,7 +1366,7 @@ const BLOCKS = [
       {
         id:"wc_fin_cost_rub",
         sub:"(ДЗ + Запас + авансы пост. − КЗ − авансы пок.) × ставка",
-        tip:"Денежный эффект оборотного капитала за период. Плюс означает стоимость замороженных денег, минус — нас финансируют авансы покупателей и кредиторка поставщиков. Светофор здесь завязан на soft-target 0: 5/5 означает, что эффект не положительный и оборотный капитал не съедает деньги."
+        tip:"Денежный эффект оборотного капитала за период. Плюс означает стоимость замороженных денег, минус — нас финансируют авансы покупателей и кредиторка поставщиков. Светофор теперь завязан на внутреннюю цель: оборотка должна давать не меньше 3 млн руб. эффекта за 30 дней; 5/5 — при 5 млн+ с поправкой на длину выбранного периода."
       },
       {
         id:"rowc_pct",
@@ -1192,7 +1444,7 @@ const capitalEfficiencyTitle = (options={}) => {
     lines.push(`Оборотный капитал = ${fmtRub(options.workingCapital)}`);
   }
   if (options.score != null && !isNaN(options.score)) {
-    lines.push(`Capital Efficiency = ${fmtMultiple(options.score)}x`);
+    lines.push(`Маржа покрывает стоимость цикла в ${fmtMultiple(options.score)}x`);
   }
   if (options.cycleCostRub != null && !isNaN(options.cycleCostRub)) {
     lines.push(`Расчётная стоимость денежного цикла = ${fmtRub(options.cycleCostRub)}`);
@@ -1305,6 +1557,11 @@ const cispBuyerStatementUrl = (row, period) => {
   const periodText = cispPeriod(period);
   if (!agentId || !periodText) return "";
   return `https://cisp.ssnab.ru/fin/dbt#/dbtagent?PERIOD=${periodText}&AGENT_ID=${agentId}&SHOW_TOVS_WAITING=true&GROUP_EXPANDED=true&SHOWDATA=true&IS_RECALC=false`;
+};
+const cispCounterpartyCardUrl = (counterpartyId) => {
+  const id = Number(counterpartyId || 0);
+  if (!id) return "";
+  return `https://cisp.ssnab.ru/catalog/preds/pred/${id}`;
 };
 
 const effectTitle = (row, period, valueOverride) => {
@@ -1450,9 +1707,9 @@ const COL_TIPS = {
   stockShare: "Доля SKU/бакета/склада в общей сумме запасов.",
   qty: "Количество остатка в базовой единице.",
   warehouses: "Количество складов, где лежит остаток SKU.",
-  out90: "Расход 90д: количество, списанное или отгруженное за последние 90 дней.",
-  lastOut: "Дата последнего расхода по SKU.",
-  stockStatus: "Статус по движению остатка: оборот есть, Slow 90+ или неликвид 180+.",
+  out90: "Расход 90д: количество реального расхода по текущему непрерывному остатку SKU после последнего обнуления, без внутренних перемещений.",
+  lastOut: "Дата последнего реального расхода по текущему непрерывному остатку SKU после последнего обнуления, без внутренних перемещений.",
+  stockStatus: "Статус по текущему непрерывному остатку SKU: Slow 90+ и неликвид 180+ считаем только после последнего обнуления остатка.",
 };
 
 const compareSortValues = (a, b) => {
@@ -1539,7 +1796,9 @@ function CounterpartyList({row}) {
     <div className="counterparty-list">
       {items.map((x, i) => (
         <div className="counterparty-item" key={`${x.counterparty_id || 0}-${i}`}>
-          <span className="counterparty-name" title={x.counterparty || ""}>{x.counterparty || "Без контрагента"}</span>
+          <CispCounterpartyLink row={x} className="counterparty-name" title={x.counterparty || ""}>
+            {x.counterparty || "Без контрагента"}
+          </CispCounterpartyLink>
           <span className="counterparty-metrics">
             <span className="counterparty-metric">выр. {fmtRub(x.revenue_rub)}</span>
             <span className="counterparty-metric">маржа {fmtRub(x.margin_rub)}</span>
@@ -1670,6 +1929,25 @@ function CispMetricLink({row, period, children}) {
   );
 }
 
+function CispCounterpartyLink({row, children, className="", title}) {
+  const href = cispCounterpartyCardUrl(row?.counterparty_id);
+  if (!href) {
+    return <span className={className} title={title}>{children}</span>;
+  }
+  return (
+    <a
+      className={["cisp-link", className].filter(Boolean).join(" ")}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={title || "Открыть карточку контрагента в ERP"}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </a>
+  );
+}
+
 function NoticePanel({title, items, icon="!", defaultOpen=false}) {
   const safeItems = items || [];
   const [open, setOpen] = useState(defaultOpen);
@@ -1736,7 +2014,9 @@ function AdvanceOnlyTable({rows, period, title="Авансы без отгруз
                 <td className="rank">{idx + 1}</td>
                 <td className="dept-name">{row.client || "—"}</td>
                 <td className="counterparty-cell">
-                  <span className="counterparty-name" title={row.counterparty || ""}>{row.counterparty || "—"}</span>
+                  <CispCounterpartyLink row={row} className="counterparty-name" title={row.counterparty || ""}>
+                    {row.counterparty || "—"}
+                  </CispCounterpartyLink>
                 </td>
                 <td className="num"><ScoreCell row={row}/></td>
                 <td className="num"><CispMetricLink row={row} period={period}>{fmtRub(row.revenue_rub)}</CispMetricLink></td>
@@ -1928,6 +2208,7 @@ const fmtTargetVal = (target, unit) => {
 
 // Текст «Цель: ≤ 45 дн.» / «Цель: ≥ 45 дн.» / «Цель: 0 руб».
 const targetLine = (card) => {
+  if (card?.target_text) return card.target_text;
   if (card.target == null) return null;
   const val = fmtTargetVal(card.target, card.unit);
   if (card.target === 0) return "Цель: " + val;
@@ -1943,6 +2224,7 @@ function CardTooltip({card, tip, extraTip}) {
       <b>{card.label}.</b> {tip}
       {extraTip && <span className="tt-target"><b>●</b> {extraTip}</span>}
       {tline && <span className="tt-target"><b>●</b> {tline}</span>}
+      {card?.benchmark_text && <span className="tt-target"><b>○</b> {card.benchmark_text}</span>}
     </span>
   );
 }
@@ -3183,7 +3465,11 @@ function DepartmentView({data, loading, err, requestKey, emptyStateTitle, emptyS
                                     <tr key={c.counterparty_row_key || `${c.client_id || "client"}-${detailIdx}`}>
                                       <td className="rank sticky-col sticky-rank">{detailIdx + 1}</td>
                                       <td className="dept-name sticky-col sticky-client">{c.client}</td>
-                                      <td className="counterparty-cell sticky-col sticky-counterparty">{c.counterparty || "—"}</td>
+                                      <td className="counterparty-cell sticky-col sticky-counterparty">
+                                        <CispCounterpartyLink row={c} className="counterparty-name" title={c.counterparty || ""}>
+                                          {c.counterparty || "—"}
+                                        </CispCounterpartyLink>
+                                      </td>
                                       <td className="num sticky-col sticky-score sticky-divider"><ScoreCell row={c}/></td>
                                       <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
                                       <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
@@ -3486,7 +3772,9 @@ function ManagerView({data, loading, err, requestKey, emptyStateTitle, emptyStat
                                     <td className="rank">{idx + 1}</td>
                                     <td className="dept-name">{c.client}</td>
                                     <td className="counterparty-cell">
-                                      <span className="counterparty-name" title={c.counterparty || ""}>{c.counterparty || "—"}</span>
+                                      <CispCounterpartyLink row={c} className="counterparty-name" title={c.counterparty || ""}>
+                                        {c.counterparty || "—"}
+                                      </CispCounterpartyLink>
                                     </td>
                                     <td className="num"><CispMetricLink row={c} period={detail?.period || data.period}>{fmtRub(c.revenue_rub)}</CispMetricLink></td>
                                     <td className="num">{fmtPct(r.revenue_rub ? c.revenue_rub / r.revenue_rub * 100 : null)}</td>
@@ -3964,7 +4252,9 @@ function ClientView({data, loading, err, emptyStateTitle, emptyStateSub, emptySt
                   {r.department && <span className="muted">{r.department}</span>}
                 </td>
                 <td className="counterparty-cell">
-                  <span className="counterparty-name" title={r.counterparty || ""}>{r.counterparty || "—"}</span>
+                  <CispCounterpartyLink row={r} className="counterparty-name" title={r.counterparty || ""}>
+                    {r.counterparty || "—"}
+                  </CispCounterpartyLink>
                 </td>
                 <td>{r.manager || "—"}</td>
                 <td className="num"><CispMetricLink row={r} period={data.period}>{fmtRub(r.revenue_rub)}</CispMetricLink></td>
@@ -4034,6 +4324,7 @@ function ArAgingView({data, loading, err, emptyStateTitle, emptyStateSub, emptyS
     if ((days || 0) > 30) return "warn";
     return "ok";
   };
+  const textOrEmpty = (value) => String(value || "").trim() || "Нет данных";
 
   return (
     <>
@@ -4088,6 +4379,10 @@ function ArAgingView({data, loading, err, emptyStateTitle, emptyStateSub, emptyS
             <tr>
               <Th {...sortable(sortState, requestSort, "rank")}>#</Th>
               <Th {...sortable(sortState, requestSort, "client_name")}>Клиент</Th>
+              <Th tip="Контрагент, ИНН и признаки карточки КА из PREDS/PAROLES" {...sortable(sortState, requestSort, "counterparty_name")}>Контрагент</Th>
+              <Th tip="Статус контрагента и группа PREDS" {...sortable(sortState, requestSort, "counterparty_status")}>Статус / группа</Th>
+              <Th tip="Категория и кредитный статус контрагента" {...sortable(sortState, requestSort, "counterparty_category")}>Категория / кредит</Th>
+              <Th tip="Базовый МП пароля и руководитель отдела МП" {...sortable(sortState, requestSort, "base_manager")}>Базовый МП</Th>
               <Th className="num" tip={COL_TIPS.ar} {...sortable(sortState, requestSort, "ar_rub")}>ДЗ</Th>
               <Th className="num" tip={COL_TIPS.overdueAr} {...sortable(sortState, requestSort, "overdue_rub")}>Просрочка</Th>
               <Th className="num" tip={COL_TIPS.overdueShare} {...sortable(sortState, requestSort, "overdue_share_pct")}>Доля проср.</Th>
@@ -4101,14 +4396,43 @@ function ArAgingView({data, loading, err, emptyStateTitle, emptyStateSub, emptyS
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan="11" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов с просроченной ДЗ</td></tr>
+              <tr><td colSpan="15" style={{textAlign:"center",color:"var(--t3)",padding:"28px"}}>Нет клиентов с просроченной ДЗ</td></tr>
             )}
             {rows.map((r, i) => (
               <tr key={r.client_id || i}>
                 <td className="rank">{i + 1}</td>
                 <td className="dept-name">{r.client_name || "Без клиента"}</td>
-                <td className="num">{fmtRub(r.ar_rub)}</td>
-                <td className="num risk">{fmtRub(r.overdue_rub)}</td>
+                <td className="counterparty-cell">
+                  <CispCounterpartyLink row={r} className="counterparty-name" title={r.counterparty_name || ""}>
+                    {textOrEmpty(r.counterparty_name)}
+                  </CispCounterpartyLink>
+                  <span className="counterparty-metrics">
+                    {!!r.inn && <span className="counterparty-metric">ИНН {r.inn}</span>}
+                    {Number(r.counterparties_count || 0) > 1 && <span className="counterparty-metric">КА {fmtInt(r.counterparties_count)}</span>}
+                    {r.parole_deleted && <span className="counterparty-metric risk">пароль удален</span>}
+                    {r.counterparty_archived && <span className="counterparty-metric risk">КА архивный</span>}
+                  </span>
+                </td>
+                <td className="counterparty-cell">
+                  <span className="counterparty-name" title={r.counterparty_status || ""}>{textOrEmpty(r.counterparty_status)}</span>
+                  <span className="counterparty-metrics">
+                    <span className="counterparty-metric">группа {textOrEmpty(r.counterparty_group)}</span>
+                  </span>
+                </td>
+                <td className="counterparty-cell">
+                  <span className="counterparty-name" title={r.counterparty_category || ""}>{textOrEmpty(r.counterparty_category)}</span>
+                  <span className="counterparty-metrics">
+                    <span className="counterparty-metric">кредит {textOrEmpty(r.credit_status)}</span>
+                  </span>
+                </td>
+                <td className="counterparty-cell">
+                  <span className="counterparty-name" title={r.base_manager || ""}>{textOrEmpty(r.base_manager)}</span>
+                  <span className="counterparty-metrics">
+                    <span className="counterparty-metric">рук. {textOrEmpty(r.manager_head)}</span>
+                  </span>
+                </td>
+                <td className="num"><CispMetricLink row={r} period={data.period}>{fmtRub(r.ar_rub)}</CispMetricLink></td>
+                <td className="num risk"><CispMetricLink row={r} period={data.period}>{fmtRub(r.overdue_rub)}</CispMetricLink></td>
                 <td className="num">{fmtPct(r.overdue_share_pct)}</td>
                 <td className="num">{fmtRub(r.d_1_30_rub)}</td>
                 <td className="num">{fmtRub(r.d_31_60_rub)}</td>
@@ -4351,7 +4675,7 @@ function InventoryView({data, loading, err, emptyStateTitle, emptyStateSub, empt
       </div>
 
       <div className="stock-status-note">
-        ТОП SKU отсортирован по замороженным деньгам. Slow 90+ означает, что за последние 90 дней по текущему остатку не было расхода; неликвид 180+ — не было расхода 180 дней.
+        ТОП SKU отсортирован по замороженным деньгам. Slow 90+ означает, что за последние 90 дней по SKU не было реального расхода; неликвид 180+ — не было расхода 180 дней. Внутренние перемещения не считаем расходом.
       </div>
 
       <div className="stock-filter-bar">
@@ -4407,6 +4731,12 @@ function InventoryView({data, loading, err, emptyStateTitle, emptyStateSub, empt
                 <td>
                   {r.last_out_date ? fmtDate(r.last_out_date) : "нет расхода"}
                   <span className="muted">{r.days_since_last_out == null ? "—" : fmtDays(r.days_since_last_out) + " дн. назад"}</span>
+                  {r.stock_since_date && (!r.last_out_date || r.stock_since_date > r.last_out_date) && (
+                    <span className="muted">
+                      Текущий остаток с {fmtDate(r.stock_since_date)}
+                      {r.days_in_stock == null ? "" : ` · ${fmtDays(r.days_in_stock)} дн.`}
+                    </span>
+                  )}
                 </td>
                 <td>
                   <span className={"status-badge " + stockStatusClass(r.stock_status)}>{r.stock_status || "—"}</span>
@@ -4442,6 +4772,8 @@ function App() {
   const [clientLoading, setClientLoading] = useState(false);
   const [inventoryLoading, setInventoryLoading] = useState(false);
   const [arAgingLoading, setArAgingLoading] = useState(false);
+  const [overviewStructuralLoading, setOverviewStructuralLoading] = useState(false);
+  const [overviewSparkLoading, setOverviewSparkLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [branchErr, setBranchErr] = useState(null);
   const [managerErr, setManagerErr] = useState(null);
@@ -4462,13 +4794,19 @@ function App() {
   const arAgingLoadedKeyRef = useRef(null);
   const snapshotClientMode = Boolean(window.KPI_GITHUB_SNAPSHOT);
   const requestSeqRef = useRef(0);
+  const overviewStructuralSeqRef = useRef(0);
+  const overviewSparkSeqRef = useRef(0);
   const branchSeqRef = useRef(0);
   const managerSeqRef = useRef(0);
   const deptSeqRef = useRef(0);
+  const deptSparkSeqRef = useRef(0);
   const clientSeqRef = useRef(0);
   const inventorySeqRef = useRef(0);
   const arAgingSeqRef = useRef(0);
   const defaultFiltersRef = useRef(makeEmptyFilters());
+  const overviewStructuralLoadedKeyRef = useRef(null);
+  const overviewSparkLoadedKeyRef = useRef(null);
+  const deptSparkLoadedKeyRef = useRef(null);
   const [defaultFiltersLoading, setDefaultFiltersLoading] = useState(false);
   const [filtersCollapsed, setFiltersCollapsed] = useState(true);
 
@@ -4554,6 +4892,40 @@ function App() {
     });
     return parts.join("&");
   }, [effectiveDays, effectiveEnd, rate, filters, compareMode]);
+
+  const mergeTextLists = useCallback((left, right) => {
+    const seen = new Set();
+    const out = [];
+    [...(left || []), ...(right || [])].forEach(item => {
+      const key = String(item || "");
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(item);
+    });
+    return out;
+  }, []);
+
+  const mergeOverviewPayload = useCallback((basePayload, extraPayload) => {
+    if (!basePayload) return basePayload;
+    const extraCardMap = {};
+    (extraPayload?.cards || []).forEach(card => {
+      if (card?.id) extraCardMap[card.id] = card;
+    });
+    const mergedCards = (basePayload.cards || []).map(card => (
+      extraCardMap[card.id] ? {...card, ...extraCardMap[card.id]} : card
+    ));
+    const knownIds = new Set((basePayload.cards || []).map(card => card.id));
+    Object.keys(extraCardMap).forEach(id => {
+      if (!knownIds.has(id)) mergedCards.push(extraCardMap[id]);
+    });
+    return {
+      ...basePayload,
+      cards: mergedCards,
+      insights: {...(basePayload.insights || {}), ...(extraPayload?.insights || {})},
+      warnings: mergeTextLists(basePayload.warnings, extraPayload?.warnings),
+      errors: mergeTextLists(basePayload.errors, extraPayload?.errors),
+    };
+  }, [mergeTextLists]);
 
   const dictQuery = useMemo(() => {
     const parts = [`period_days=${effectiveDays}`];
@@ -4698,9 +5070,11 @@ function App() {
       return;
     }
     const seq = ++deptSeqRef.current;
+    ++deptSparkSeqRef.current;
+    deptSparkLoadedKeyRef.current = null;
     setDeptLoading(true);
     setDeptErr(null);
-    const url = `${API}/kpi/departments?${requestKey}`;
+    const url = `${API}/kpi/departments?${requestKey}&include_score_sparklines=1`;
     console.log("[KPI departments] fetch:", url);
     try {
       const r = await fetch(url);
@@ -4718,6 +5092,41 @@ function App() {
       if (seq === deptSeqRef.current) setDeptLoading(false);
     }
   }, [requestKey, customPeriodInvalid, customPeriodError]);
+
+  const loadDepartmentSparklines = useCallback(async (key, parentSeq) => {
+    if (!key || snapshotClientMode) return;
+    if (deptSparkLoadedKeyRef.current === key) return;
+    const seq = ++deptSparkSeqRef.current;
+    const url = `${API}/kpi/departments/heavy?${key}&points=6`;
+    console.log("[KPI departments heavy] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI departments heavy] payload:", j);
+      if (parentSeq !== deptSeqRef.current || seq !== deptSparkSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      const sparkMap = new Map((Array.isArray(j.sparklines) ? j.sparklines : []).map(item => [
+        Number(item.department_id),
+        Array.isArray(item.health_score_sparkline) ? item.health_score_sparkline : [],
+      ]));
+      setDeptData(prev => {
+        if (!prev || !Array.isArray(prev.rows)) return prev;
+        return {
+          ...prev,
+          rows: prev.rows.map(row => ({
+            ...row,
+            health_score_sparkline: sparkMap.get(Number(row.department_id)) || row.health_score_sparkline || [],
+          })),
+          warnings: [...(prev.warnings || []), ...(j.warnings || [])],
+          errors: [...(prev.errors || []), ...(j.errors || [])],
+        };
+      });
+      deptSparkLoadedKeyRef.current = key;
+    } catch (e) {
+      if (parentSeq !== deptSeqRef.current || seq !== deptSparkSeqRef.current) return;
+      console.warn("[KPI departments heavy] fetch error:", e);
+    }
+  }, [snapshotClientMode]);
 
   const loadClients = useCallback(async () => {
     if (customPeriodInvalid) {
@@ -4800,15 +5209,69 @@ function App() {
     }
   }, [requestKey, customPeriodInvalid, customPeriodError]);
 
+  const loadOverviewStructural = useCallback(async (key, parentSeq) => {
+    if (!key || snapshotClientMode) return;
+    if (overviewStructuralLoadedKeyRef.current === key) return;
+    const seq = ++overviewStructuralSeqRef.current;
+    setOverviewStructuralLoading(true);
+    const url = `${API}/kpi/top/heavy?${key}&include_sparklines=0&include_structural=1`;
+    console.log("[KPI heavy structural] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI heavy structural] payload:", j);
+      if (parentSeq !== requestSeqRef.current || seq !== overviewStructuralSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setData(prev => mergeOverviewPayload(prev, j));
+      overviewStructuralLoadedKeyRef.current = key;
+    } catch (e) {
+      if (parentSeq !== requestSeqRef.current || seq !== overviewStructuralSeqRef.current) return;
+      console.warn("[KPI heavy structural] fetch error:", e);
+    } finally {
+      if (parentSeq === requestSeqRef.current && seq === overviewStructuralSeqRef.current) {
+        setOverviewStructuralLoading(false);
+      }
+    }
+  }, [snapshotClientMode, mergeOverviewPayload]);
+
+  const loadOverviewSparklines = useCallback(async (key, parentSeq) => {
+    if (!key || snapshotClientMode) return;
+    if (overviewSparkLoadedKeyRef.current === key) return;
+    const seq = ++overviewSparkSeqRef.current;
+    setOverviewSparkLoading(true);
+    const url = `${API}/kpi/top/heavy?${key}&include_sparklines=1&include_structural=0`;
+    console.log("[KPI heavy spark] fetch:", url);
+    try {
+      const r = await fetch(url);
+      const j = await r.json();
+      console.log("[KPI heavy spark] payload:", j);
+      if (parentSeq !== requestSeqRef.current || seq !== overviewSparkSeqRef.current) return;
+      if (!j.ok) throw new Error(j.error || "Неизвестная ошибка");
+      setData(prev => mergeOverviewPayload(prev, j));
+      overviewSparkLoadedKeyRef.current = key;
+    } catch (e) {
+      if (parentSeq !== requestSeqRef.current || seq !== overviewSparkSeqRef.current) return;
+      console.warn("[KPI heavy spark] fetch error:", e);
+    } finally {
+      if (parentSeq === requestSeqRef.current && seq === overviewSparkSeqRef.current) {
+        setOverviewSparkLoading(false);
+      }
+    }
+  }, [snapshotClientMode, mergeOverviewPayload]);
+
   const load = useCallback(async () => {
     if (customPeriodInvalid) {
       setErr(customPeriodError);
       return;
     }
     const seq = ++requestSeqRef.current;
+    ++overviewStructuralSeqRef.current;
+    ++overviewSparkSeqRef.current;
+    overviewStructuralLoadedKeyRef.current = null;
+    overviewSparkLoadedKeyRef.current = null;
     lastLoadedKeyRef.current = requestKey;
     setAutoReloadEnabled(true);
-    setLoading(true); setErr(null);
+    setLoading(true); setErr(null); setOverviewStructuralLoading(false); setOverviewSparkLoading(false);
     const url = `${API}/kpi/top?${requestKey}&include_sparklines=1&include_structural=1`;
     console.log("[KPI] fetch:", url);
     try {
@@ -5064,6 +5527,7 @@ function App() {
     if ((rowcCard?.value == null || isNaN(rowcCard?.value)) && Number.isFinite(workingCapital) && workingCapital <= 0) {
       const rowcExplain = rowcTitle(workingCapital, {grossMarginPct, cashAdjMarginRub});
       const capitalEfficiencyScore = Number(capitalEfficiency.score);
+      const capitalEfficiencyScorecard = Number(capitalEfficiency.scorecard_score);
       if (Number.isFinite(capitalEfficiencyScore)) {
         const efficiencyTitle = capitalEfficiencyTitle({
           workingCapital,
@@ -5074,12 +5538,21 @@ function App() {
           rate: capitalEfficiency.rate ?? data?.period?.rate,
         });
         extras.rowc_pct = {
-          cardOverrides: {label:"Capital Efficiency", unit:"x", target:null, score:null},
-          tip:"Альтернативная метрика для периодов, где классический ROWC неприменим. Показывает, во сколько раз маржа покрывает стоимость денежного цикла при текущей ставке; для нормировки берём модуль CCC.",
-          tone: capitalEfficiencyScore >= 1 ? "info" : "warn",
+          cardOverrides: {
+            label:"Capital Efficiency",
+            unit:"x",
+            target:null,
+            score:Number.isFinite(capitalEfficiencyScorecard) ? capitalEfficiencyScorecard : null,
+            target_text: capitalEfficiency.target_text,
+            benchmark_text: capitalEfficiency.benchmark_text,
+          },
+          tip:"Альтернативная метрика для периодов, где классический ROWC неприменим. Показывает, во сколько раз маржа покрывает расчётную стоимость денежного цикла при текущей ставке; для нормировки берём модуль CCC.",
+          tone: Number.isFinite(capitalEfficiencyScorecard)
+            ? (capitalEfficiencyScorecard >= 4 ? "info" : (capitalEfficiencyScorecard >= 3 ? "warn" : "risk"))
+            : (capitalEfficiencyScore >= 1 ? "info" : "warn"),
           valueLabel: fmtMultiple(capitalEfficiency.score),
           unitLabel: "x",
-          sub:"Во сколько раз маржа покрывает стоимость цикла",
+          sub:"Во сколько раз маржа покрывает расчётную стоимость цикла",
           valueTitle: efficiencyTitle,
           tooltipText: efficiencyTitle,
           content: (
@@ -5423,7 +5896,7 @@ function App() {
         {activeTab === "overview" && loading && (
           <div className="loading">
             <div className="spinner"></div>
-            <div className="loading-text">Считаю KPI за {effectiveDays} дн. Это может занять до 30 секунд…</div>
+            <div className="loading-text">Считаю KPI за {effectiveDays} дн., включая HHI, неликвиды и мини-тренды…</div>
           </div>
         )}
 
@@ -5445,6 +5918,16 @@ function App() {
             compareLabel={compareLabel}
             snapshotMode={runtimeSnapshotMode}
           />
+        )}
+
+        {activeTab === "overview" && !loading && data && (overviewStructuralLoading || overviewSparkLoading) && !runtimeSnapshotMode && (
+          <div className="overview-method-note">
+            {overviewStructuralLoading && overviewSparkLoading
+              ? "Догружаю структурные риски и мини-тренды. Базовые KPI уже готовы."
+              : overviewStructuralLoading
+                ? "Догружаю HHI, slow-mover и неликвиды. Базовые KPI уже готовы."
+                : "Догружаю мини-тренды карточек. Базовые KPI уже готовы."}
+          </div>
         )}
 
         {activeTab === "overview" && !loading && data && BLOCKS.map(block => (
