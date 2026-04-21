@@ -799,11 +799,6 @@ setTimeout(function() {
     }
     return false;
   };
-  const canUseClientMart = (params) => {
-    if (hasOnlyDefaultFilters(params)) return false;
-    if (hasNonDefaultSnapshotFactFilter(params)) return false;
-    return ["bu_ids", "mol_ids", "dept_ids", "parole_ids"].some((key) => String(params.get(key) || "").trim());
-  };
   const clientMartPath = (params) => {
     const defaults = STORE.manifest?.default_filters || {};
     const hasDefaultScope =
@@ -811,6 +806,32 @@ setTimeout(function() {
       matchesDefaultFilter(params, "product_group_ids") ||
       (Array.isArray(defaults.parole_ids) && defaults.parole_ids.length > 0 && String(params.get("parole_ids") || "").trim());
     return hasDefaultScope ? "kpi/default/clients.json" : "kpi/clients.json";
+  };
+  const clientMartRequiredFields = (params) => ([
+    ["bu_ids", "branch_id"],
+    ["mol_ids", "manager_id"],
+    ["dept_ids", "department_id"],
+    ["parole_ids", "client_id"],
+  ]).filter(([key]) => String(params.get(key) || "").trim()).map(([, field]) => field);
+  const clientMartHasRequiredFields = async (params) => {
+    const required = clientMartRequiredFields(params);
+    if (!required.length) return true;
+    try {
+      const payload = await readJson(clientMartPath(params));
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      if (!rows.length) return true;
+      const sample = rows.slice(0, 200);
+      return required.every((field) => sample.some((row) => row && row[field] !== undefined && row[field] !== null));
+    } catch (e) {
+      return false;
+    }
+  };
+  const canUseClientMart = async (params) => {
+    if (hasOnlyDefaultFilters(params)) return false;
+    if (hasNonDefaultSnapshotFactFilter(params)) return false;
+    if (String(params.get("pred_ids") || "").trim()) return false;
+    const hasClientScope = ["bu_ids", "mol_ids", "dept_ids", "parole_ids"].some((key) => String(params.get(key) || "").trim());
+    return hasClientScope && await clientMartHasRequiredFields(params);
   };
   const filterRowsBySnapshotParams = (rows, params) => {
     const bu = new Set(idsParam(params, "bu_ids"));
@@ -1038,21 +1059,21 @@ setTimeout(function() {
 
   const kpiPayload = async (endpoint, params) => {
     if (endpoint === "top") {
-      if (canUseClientMart(params)) return filteredTopPayload(params);
+      if (await canUseClientMart(params)) return filteredTopPayload(params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/top.json" : "kpi/top.json");
     }
 
     if (endpoint === "branches") {
-      if (canUseClientMart(params)) return filteredGroupedPayload("branches", params);
+      if (await canUseClientMart(params)) return filteredGroupedPayload("branches", params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/branches.json" : "kpi/branches.json");
     }
 
     if (endpoint === "departments") {
-      if (canUseClientMart(params)) return filteredGroupedPayload("departments", params);
+      if (await canUseClientMart(params)) return filteredGroupedPayload("departments", params);
       const buId = singleValue(params, "bu_ids");
       if (String(params.get("bu_ids") || "").trim() && buId == null) return unsupported();
       const defaultOnly = hasOnlyDefaultFilters(params, ["bu_ids"]);
@@ -1064,14 +1085,14 @@ setTimeout(function() {
     }
 
     if (endpoint === "managers") {
-      if (canUseClientMart(params)) return filteredGroupedPayload("managers", params);
+      if (await canUseClientMart(params)) return filteredGroupedPayload("managers", params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/managers.json" : "kpi/managers.json");
     }
 
     if (endpoint === "clients") {
-      if (canUseClientMart(params)) return filteredClientMart(params);
+      if (await canUseClientMart(params)) return filteredClientMart(params);
       const deptId = singleValue(params, "dept_ids");
       const managerId = singleValue(params, "mol_ids");
       if (String(params.get("dept_ids") || "").trim() && deptId == null) return unsupported();
@@ -1089,7 +1110,7 @@ setTimeout(function() {
     }
 
     if (endpoint === "inventory") {
-      if (canUseClientMart(params)) {
+      if (await canUseClientMart(params)) {
         const payload = await payloadFor(clientMartPath(params).includes("/default/") ? "kpi/default/inventory.json" : "kpi/inventory.json");
         if (!payload.warnings.includes(snapshotFilterWarning)) payload.warnings.unshift(snapshotFilterWarning);
         return payload;
@@ -1100,7 +1121,7 @@ setTimeout(function() {
     }
 
     if (endpoint === "ar-aging") {
-      if (canUseClientMart(params)) return filteredArAgingPayload(params);
+      if (await canUseClientMart(params)) return filteredArAgingPayload(params);
       const defaultOnly = hasOnlyDefaultFilters(params);
       if (hasUnsupportedFilters(params) || (hasFilters(params) && !defaultOnly)) return unsupported();
       return payloadFor(defaultOnly ? "kpi/default/ar-aging.json" : "kpi/ar-aging.json");
